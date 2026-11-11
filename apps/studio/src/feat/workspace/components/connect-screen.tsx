@@ -13,7 +13,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert, Loader2, Plug, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
-import { listInstalledWallets } from "@peridotbase/sdk";
+import { listInstalledWallets, subscribeToWallets } from "@peridotbase/sdk";
 import { DemoBanner } from "@/shared/components/demo-banner";
 import { homePath } from "@/shared/lib/sections";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
@@ -87,13 +87,14 @@ export const ConnectScreen = () => {
 	useEffect(() => setDraftUrl(rpcUrl), [rpcUrl]);
 	useEffect(() => setDraftProgramId(programId), [programId]);
 
-	// Wallets register asynchronously after the page announces itself, so re-list once.
+	// Wallets announce themselves after the page announces readiness, so the list subscribes to
+	// arrivals instead of trusting a single first read.
 	useEffect(() => {
-		setInstalledWallets(listInstalledWallets());
+		const refresh = () => setInstalledWallets(listInstalledWallets());
 
-		const timer = setTimeout(() => setInstalledWallets(listInstalledWallets()), 500);
+		refresh();
 
-		return () => clearTimeout(timer);
+		return subscribeToWallets(refresh);
 	}, []);
 
 	const handleApplyUrl = () => {
@@ -167,7 +168,7 @@ export const ConnectScreen = () => {
 				</section>
 
 				<section className="rounded-lg border border-border p-5">
-					<h2 className="mb-3 text-sm font-medium">Wallet</h2>
+					<h2 className="mb-3 text-sm font-medium">Wallet (optional)</h2>
 					{wallet ? (
 						<div className="flex flex-wrap items-center justify-between gap-3">
 							<div className="space-y-1">
@@ -182,10 +183,10 @@ export const ConnectScreen = () => {
 						<div className="space-y-3">
 							<p className="text-sm text-muted-foreground">
 								{demo
-									? "Demo mode opens without a wallet. Connect one only if you want to see the Wallet Standard picker."
+									? "Demo mode opens without a wallet. Connect one only if you want to see the wallet picker."
 									: installedWallets.length > 0
-										? "A Wallet Standard wallet is installed. Connect it to sign instructions."
-										: "No Wallet Standard wallet detected. Install one (Phantom, Solflare, Backpack) and reload."}
+										? `${installedWallets.map((installed) => installed.name).join(", ")} detected. Connecting is optional until the program can sign instructions.`
+										: "No wallet detected. You can keep using the Studio; install Phantom, Solflare, or Backpack to connect one later."}
 							</p>
 							<div className="flex flex-wrap items-center gap-2">
 								<Button type="button" onClick={() => void connect()} disabled={isConnecting}>
@@ -243,13 +244,9 @@ export const ConnectScreen = () => {
 							? "Demo mode: open the workspace to browse sample data."
 							: wallet
 								? "Wallet connected. Open the workspace to see program status."
-								: "Connect a wallet to continue."}
+								: "You can open the workspace without a wallet; it stays optional until signing ships."}
 					</p>
-					<Button
-						type="button"
-						disabled={!demo && !wallet}
-						onClick={() => navigate({ to: homePath(capabilities) })}
-					>
+					<Button type="button" onClick={() => navigate({ to: homePath(capabilities) })}>
 						{demo ? "Explore the demo" : "Open workspace"}
 					</Button>
 				</div>

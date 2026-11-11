@@ -13,7 +13,9 @@ No. The Studio is a static web app. It talks to Solana RPC endpoints and your wa
 
 ### Which wallets work?
 
-Any wallet that registers through Wallet Standard. Phantom, Solflare, and Backpack all announce themselves the standard way, and the Studio lists whatever it finds.
+Phantom, Solflare, and Backpack. The Studio lists wallets from Wallet Standard, and also
+detects their injected providers, so a wallet that misses its standard announcement still shows
+up. No wallet is needed until the program starts signing.
 
 ### Why does an action say "pending integration"?
 

@@ -1,17 +1,18 @@
 ---
 title: Getting started
-description: "Connect a Wallet Standard wallet, point the Studio at an RPC endpoint, and open your first Peridotbase workspace."
+description: "Point the Studio at an RPC endpoint, open a workspace, and connect a wallet when you need to sign."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-The Studio is a static web app. It needs a browser with a Wallet Standard wallet extension, and an RPC endpoint for the cluster you want to use.
+The Studio is a static web app. It needs a browser and an RPC endpoint for the cluster you
+want to use. A wallet is optional until the program can sign instructions.
 
 ## Prerequisites
 
 - A modern browser (Chrome, Brave, Firefox, or Safari).
-- A Wallet Standard wallet extension such as Phantom, Solflare, or Backpack.
 - An RPC URL. The public devnet endpoint works for a first look; a dedicated provider is better for real work.
+- Optional: a wallet such as Phantom, Solflare, or Backpack, for when the program starts signing.
 
 ## Run the Studio locally
 
@@ -22,10 +23,14 @@ pnpm dev:studio
 
 The app starts at `http://localhost:3001`.
 
-## Connect
+## Connect a wallet (optional)
 
-1. Open the Studio and choose **Connect wallet**.
-2. Pick an installed wallet. The Studio lists wallets that registered through Wallet Standard.
+The Studio opens without a wallet. Connect one when you want the workspace menu to show it, and
+for signing once the program ships:
+
+1. Open **Connection settings** from the workspace menu, or visit `/connect`.
+2. Choose **Connect wallet**. The Studio lists wallets from Wallet Standard, and also detects an
+   injected Phantom, Solflare, or Backpack provider.
 3. Approve the connection in the extension. Peridotbase receives only your public address.
 
 <Aside type="caution">

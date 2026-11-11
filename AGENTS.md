@@ -99,6 +99,9 @@ precedence over the skill when they conflict; state the conflict instead of rest
   capability today; the rest are `false` in `PROGRAM_NOT_WIRED`.
 - Use `useStudioCapabilities()` (Studio) or `isIntegrationUnavailable()` / `isSdkFailure()`
   (errors) instead of matching message strings.
+- The Studio opens without a wallet. Connecting is optional until signing ships; `/connect` stays
+  reachable from the workspace menu. Wallet discovery is Wallet Standard first, with the injected
+  Phantom/Solflare/Backpack provider as a fallback, so a missed announcement does not hide it.
 - Never add a fake REST client, mock server, or placeholder database. Unimplemented operations
   throw `IntegrationUnavailableError("PROGRAM_NOT_WIRED")`; the UI explains that state.
 - When an operation has no on-chain instruction, do not stub a success. Gate the control.

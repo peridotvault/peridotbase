@@ -60,7 +60,8 @@ pnpm dev:studio   # http://localhost:3001
 pnpm dev:web      # http://localhost:3000
 ```
 
-The Studio needs a Wallet Standard wallet extension and an RPC endpoint. See
+An RPC endpoint is all the Studio needs to open. A Wallet Standard wallet (Phantom, Solflare,
+Backpack) is optional until the program can sign instructions. See
 [apps/web/src/content/docs/getting-started.mdx](apps/web/src/content/docs/getting-started.mdx).
 
 To open the Studio without a wallet or a deployed program, use the demo:

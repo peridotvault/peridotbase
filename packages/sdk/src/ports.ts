@@ -15,8 +15,9 @@ export type ConnectedWallet = {
 
 /**
  * The wallet surface the Studio needs. Implemented today by the Wallet Standard adapter, which
- * discovers installed wallets through `window.navigator` registration. Message and transaction
- * signing run against the connected wallet when the program IDL starts defining instructions.
+ * discovers wallets through `wallet-standard:register-wallet` and falls back to the provider the
+ * extension injects. Message and transaction signing run against the connected wallet when the
+ * program IDL starts defining instructions.
  */
 export type WalletPort = {
 	wallet: ConnectedWallet | null;

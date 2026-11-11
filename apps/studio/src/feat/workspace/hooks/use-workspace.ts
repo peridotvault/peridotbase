@@ -19,8 +19,9 @@ export const useProtocolHealth = () => {
 };
 
 /**
- * The wallet session and its actions. `connect` opens the wallet extension's own picker through
- * Wallet Standard; it never fabricates an account when no extension is installed.
+ * The wallet session and its actions. `connect` opens the installed wallet (Wallet Standard
+ * first, then its injected provider); it never fabricates an account when no wallet is present.
+ * Connecting is optional until the program can sign instructions.
  */
 export const useWalletSession = () => {
 	const {
@@ -38,13 +39,15 @@ export const useWalletSession = () => {
 		mutationFn: async () => {
 			const port = getWalletPort();
 
-			if (!port) throw new Error("This browser has no Wallet Standard wallet to connect.");
+			if (!port) throw new Error("This browser has no wallet to connect.");
 
 			return port.connect();
 		},
 		onSuccess: (connected) => {
 			if (!connected) {
-				toast.info("No wallet was selected");
+				toast.info(
+					"The wallet did not return an account. Approve the connection in the extension, then try again.",
+				);
 				return;
 			}
 

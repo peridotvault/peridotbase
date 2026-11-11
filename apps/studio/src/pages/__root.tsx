@@ -3,16 +3,14 @@ import { TooltipProvider } from "@peridotbase/ui/tooltip";
 import { aiDevtoolsPlugin } from "@tanstack/react-ai-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { createRootRoute, Navigate, Outlet, useRouterState } from "@tanstack/react-router";
+import { createRootRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { NuqsAdapter } from "nuqs/adapters/react";
 import { useLayoutEffect } from "react";
-import { useWorkspaceStore } from "@/feat/workspace";
 import { SettingsOverlay } from "@/feat/settings";
 import { TableBuilderOverlay } from "@/feat/schema";
 import { CommandPalette } from "@/shared/components/components/command-palette";
 import { useTheme } from "@/shared/hooks/use-theme";
-import { isDemoMode } from "@/shared/peridotbase/demo/demo-mode";
 
 const connectDevtoolsServerBus =
 	import.meta.env.DEV && import.meta.env.VITE_TANSTACK_SERVER_BUS === "true";
@@ -20,7 +18,6 @@ const connectDevtoolsServerBus =
 export const Route = createRootRoute({
 	component: function RootRouteComponent() {
 		const { resolvedTheme } = useTheme();
-		const wallet = useWorkspaceStore((state) => state.wallet);
 
 		// A layout effect, so the first frame already has the stored theme.
 		useLayoutEffect(() => {
@@ -35,9 +32,9 @@ export const Route = createRootRoute({
 			select: (state) => state.matches.some((match) => match.routeId === "/connect"),
 		});
 
-		// Demo mode never asks for a wallet: the walkthrough must open on the sample workspace.
-		const demo = isDemoMode();
-		const isInApp = (Boolean(wallet) || demo) && !isConnectPage;
+		// The Studio opens without a wallet. Until the program can sign, connecting one is
+		// optional; the connect page stays reachable from the workspace menu.
+		const isInApp = !isConnectPage;
 
 		return (
 			<TooltipProvider>
@@ -45,7 +42,7 @@ export const Route = createRootRoute({
 					fullPageNavigationOnShallowFalseUpdates
 					defaultOptions={{ shallow: true, clearOnDefault: true }}
 				>
-					{isConnectPage || wallet || demo ? <Outlet /> : <Navigate to="/connect" />}
+					<Outlet />
 					{/* Inside the adapter: it reads the open table's schema from the URL. */}
 					{isInApp && <CommandPalette />}
 				</NuqsAdapter>
