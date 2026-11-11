@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "@peridotbase/ui/styles.css";
 @import "@fontsource-variable/jetbrains-mono";
-@source "../../ui/src/**/*.{ts,tsx}";
+@source "../../../packages/ui/src/**/*.{ts,tsx}";
 @source "../node_modules/streamdown/dist/*.js";
 
 /* Chromium and Safari: rounded, inset thumb on a transparent track */
