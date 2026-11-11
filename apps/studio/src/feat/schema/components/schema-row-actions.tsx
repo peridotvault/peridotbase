@@ -22,9 +22,8 @@ import { EllipsisVertical, Pencil, Trash2, Type } from "lucide-react";
 import { useState } from "react";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
+import { openDropColumn, useSchemaEditStore } from "@/shared/stores/schema-edit.store";
 import { useRenameColumn } from "../hooks/use-rename-column";
-import { useSchemaEditStore } from "../stores/schema-edit.store";
-import { DropColumnDialog } from "./drop-column-dialog";
 
 export const SchemaRowActions = ({
 	col,
@@ -44,7 +43,6 @@ export const SchemaRowActions = ({
 	});
 
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-	const [isDropDialogOpen, setIsDropDialogOpen] = useState(false);
 	const [newColumnName, setNewColumnName] = useState(col.columnName);
 
 	const handleEditColumn = () => {
@@ -88,7 +86,16 @@ export const SchemaRowActions = ({
 							Rename Column
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem variant="destructive" onClick={() => setIsDropDialogOpen(true)}>
+						<DropdownMenuItem
+							variant="destructive"
+							onClick={() =>
+								openDropColumn({
+									tableName,
+									schemaName,
+									columnName: col.columnName,
+								})
+							}
+						>
 							<Trash2 className="size-4" />
 							Drop Column
 						</DropdownMenuItem>
@@ -104,14 +111,6 @@ export const SchemaRowActions = ({
 				onOpenChange={handleRenameDialogChange}
 				onRename={handleRenameColumn}
 				isRenaming={isRenamingColumn}
-			/>
-
-			<DropColumnDialog
-				tableName={tableName}
-				schemaName={schemaName}
-				columnName={col.columnName}
-				open={isDropDialogOpen}
-				onOpenChange={setIsDropDialogOpen}
 			/>
 		</>
 	);

@@ -14,7 +14,7 @@ import {
 	Zap,
 } from "lucide-react";
 import { useQueryState } from "nuqs";
-import { askAssistant } from "@/feat/ai-assistant";
+import { askAssistant } from "@/shared/stores/assistant-request.store";
 import { RUNNER_STATE_KEYS } from "../constants";
 
 export const RunnerHeader = ({

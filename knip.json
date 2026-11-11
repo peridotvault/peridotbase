@@ -1,6 +1,7 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
 	"ignoreExportsUsedInFile": true,
+	"ignore": ["apps/studio/src/pages/route.tsx"],
 	"ignoreIssues": {
 		"packages/ui/src/**": ["exports", "types"],
 		"packages/sdk/src/index.ts": ["exports", "types"]

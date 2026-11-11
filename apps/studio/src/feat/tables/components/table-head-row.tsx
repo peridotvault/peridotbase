@@ -27,11 +27,11 @@ import {
 	X,
 } from "lucide-react";
 import { useQueryState } from "nuqs";
-import { useCallback, useState } from "react";
-import { DropColumnDialog } from "@/feat/schema";
+import { useCallback } from "react";
 import type { TableRecord } from "@/feat/tables/table.type";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
+import { openDropColumn } from "@/shared/stores/schema-edit.store";
 import { CONSTANTS } from "@/shared/utils/constants";
 import { TableColumnResizer } from "./table-col-resizer";
 
@@ -54,7 +54,6 @@ export const TableHeadRow = ({
 }: TableHeadRowProps) => {
 	const { ddl } = useStudioCapabilities();
 
-	const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
 	const schemaName = useTableSchemaName();
 
 	const [, setSort] = useQueryState(CONSTANTS.TABLE_STATE_KEYS.SORT);
@@ -204,7 +203,13 @@ export const TableHeadRow = ({
 												<DropdownMenuItem
 													variant="destructive"
 													disabled={!ddl}
-													onClick={() => setColumnToDelete(header.column.id)}
+													onClick={() =>
+														openDropColumn({
+															tableName,
+															schemaName,
+															columnName: header.column.id,
+														})
+													}
 												>
 													<Trash2 />
 													Delete column
@@ -230,16 +235,6 @@ export const TableHeadRow = ({
 					<th style={{ display: "flex", width: virtualPaddingRight }} />
 				) : null}
 			</tr>
-
-			<DropColumnDialog
-				tableName={tableName}
-				schemaName={schemaName}
-				columnName={columnToDelete ?? ""}
-				open={columnToDelete !== null}
-				onOpenChange={(open) => {
-					if (!open) setColumnToDelete(null);
-				}}
-			/>
 		</>
 	);
 };

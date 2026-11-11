@@ -8,7 +8,7 @@ import type { Table } from "@tanstack/react-table";
 import { Braces, CopyPlus } from "lucide-react";
 import type { ReactNode } from "react";
 import { toast } from "sonner";
-import { openAddRecord } from "@/feat/records";
+import { openAddRecord } from "@/shared/stores/add-record.store";
 import type { TableRecord } from "@/feat/tables/table.type";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";

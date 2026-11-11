@@ -14,7 +14,6 @@ import { Link, useLocation, useParams } from "@tanstack/react-router";
 import { Bug, Check, Ellipsis, Monitor, Moon, PanelLeft, Settings, Sun } from "lucide-react";
 import type { ReactNode } from "react";
 import { LuGithub } from "react-icons/lu";
-import { Chat } from "@/feat/ai-assistant";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useTheme } from "@/shared/hooks/use-theme";
@@ -160,7 +159,7 @@ const MoreMenu = () => {
 const Divider = () => <div className="h-px w-full shrink-0 bg-border" />;
 
 // Navigation on top, utilities pinned to the bottom; there is no top header.
-export const NavRail = () => {
+export const NavRail = ({ assistant }: { assistant?: ReactNode }) => {
 	const { openOverlay } = useOverlayStore();
 	const { pathname } = useLocation();
 	const hasSidebar = Boolean(sectionOf(pathname)?.sidebar);
@@ -180,7 +179,7 @@ export const NavRail = () => {
 			<RailSections />
 			<div className="mt-auto flex flex-col">
 				<Divider />
-				<Chat />
+				{assistant}
 				<RailTip label="Settings">
 					<button
 						type="button"

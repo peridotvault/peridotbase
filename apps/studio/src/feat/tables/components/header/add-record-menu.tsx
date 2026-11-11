@@ -6,7 +6,7 @@ import {
 	DropdownMenuTrigger,
 } from "@peridotbase/ui/dropdown-menu";
 import { Plus } from "lucide-react";
-import { openAddRecord } from "@/feat/records";
+import { openAddRecord } from "@/shared/stores/add-record.store";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 
 export const AddRecordMenu = () => {

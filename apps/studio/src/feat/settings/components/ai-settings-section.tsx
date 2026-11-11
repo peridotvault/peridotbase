@@ -12,9 +12,7 @@ import { Switch } from "@peridotbase/ui/switch";
 import { useByok } from "@tanstack/ai-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { AI_PROVIDER_OPTIONS, type AiProvider } from "../ai-providers";
-import { aiByok } from "../byok";
-import { useAiSettingsStore } from "../stores/ai-settings.store";
+import { AI_PROVIDER_OPTIONS, type AiProvider, aiByok, useAiSettingsStore } from "@/shared/ai";
 
 export const AiSettingsSection = () => {
 	const [apiKey, setApiKey] = useState("");

@@ -5,7 +5,7 @@ import JsonView from "@uiw/react-json-view";
 import { vscodeTheme } from "@uiw/react-json-view/vscode";
 import { useQueryState } from "nuqs";
 import { useMemo } from "react";
-import { askAssistant } from "@/feat/ai-assistant";
+import { askAssistant } from "@/shared/stores/assistant-request.store";
 import { RUNNER_STATE_KEYS } from "../constants";
 import { TableView } from "./table-view";
 

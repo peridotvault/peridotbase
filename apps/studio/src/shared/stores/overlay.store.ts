@@ -7,6 +7,7 @@ type OverlayId =
 	| "schema.add-column"
 	| "schema.edit-column"
 	| "schema.edit-table"
+	| "schema.drop-column"
 	| "schema.edit-table-discard-changes"
 	| "indexes.create-index"
 	| "indexes.drop-index"

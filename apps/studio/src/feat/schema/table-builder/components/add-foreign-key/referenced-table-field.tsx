@@ -1,0 +1,97 @@
+import { Button } from "@peridotbase/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@peridotbase/ui/command";
+import { Label } from "@peridotbase/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@peridotbase/ui/popover";
+import { cn } from "@peridotbase/ui/utils";
+import { CheckIcon, ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import type { AddTableFormData } from "../../types";
+import { useTablesList } from "@/shared/hooks/use-tables-list";
+
+export const ReferencedTableField = ({ index }: { index: number }) => {
+	const [open, setOpen] = useState<boolean>(false);
+	const { tablesList, isLoadingTablesList } = useTablesList();
+	const { control } = useFormContext<AddTableFormData>();
+
+	return (
+		<Controller
+			control={control}
+			name={`fields.${index}.foreignKey`}
+			render={({ field }) => (
+				<div className="flex flex-col gap-2">
+					<Label htmlFor="referencedTable">Select a table to reference to</Label>
+					<Popover modal={true} onOpenChange={setOpen} open={open}>
+						<PopoverTrigger asChild>
+							<Button
+								aria-expanded={open}
+								aria-controls="referencedTable-listbox"
+								className="w-full justify-between border-input bg-background px-3 font-normal outline-none outline-offset-0 hover:bg-background focus-visible:outline-[3px]"
+								id="referencedTable"
+								role="combobox"
+								variant="outline"
+								disabled={isLoadingTablesList}
+							>
+								<span
+									className={cn(
+										"truncate",
+										!field.value?.referencedTable && "text-muted-foreground",
+									)}
+								>
+									{field.value?.referencedTable || "---"}
+								</span>
+								<ChevronDownIcon
+									aria-hidden="true"
+									className="shrink-0 text-muted-foreground/80"
+									size={16}
+								/>
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent
+							id="referencedTable-listbox"
+							align="start"
+							className="w-full min-w-(--radix-popper-anchor-width) border-input p-0"
+						>
+							<Command>
+								<CommandInput placeholder="Search table..." />
+								<CommandList>
+									<CommandEmpty>No table found.</CommandEmpty>
+									<CommandGroup>
+										{tablesList?.map((table) => (
+											<CommandItem
+												key={table.tableName}
+												onSelect={() => {
+													// A new table's columns differ, so the picked column resets.
+													field.onChange({
+														onUpdate: field.value?.onUpdate ?? "NO ACTION",
+														onDelete: field.value?.onDelete ?? "NO ACTION",
+														referencedTable: table.tableName,
+														referencedColumn: "",
+													});
+													setOpen(false);
+												}}
+												value={table.tableName}
+											>
+												{table.tableName}
+												{field.value?.referencedTable === table.tableName && (
+													<CheckIcon className="ml-auto" size={16} />
+												)}
+											</CommandItem>
+										))}
+									</CommandGroup>
+								</CommandList>
+							</Command>
+						</PopoverContent>
+					</Popover>
+				</div>
+			)}
+		/>
+	);
+};

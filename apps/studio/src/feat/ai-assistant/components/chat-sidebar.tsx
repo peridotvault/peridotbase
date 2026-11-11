@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { SheetSidebar } from "@/shared/components/sheet-sidebar";
-import { aiByok, getAiProviderLabel, useAiSettingsStore } from "@/feat/settings";
+import { aiByok, getAiProviderLabel, useAiSettingsStore } from "@/shared/ai";
 import { getSchemaGraph } from "@/shared/peridotbase";
 import { tableKeys } from "@/shared/query/keys";
 import { useDatabaseStore } from "@/shared/stores/database.store";
@@ -12,7 +12,7 @@ import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { useAiAvailability } from "../hooks/use-ai-availability";
 import { streamAssistantReply } from "../lib/direct-chat";
 import { CHAT_SUGGESTIONS } from "../lib/suggestions";
-import { useAssistantRequestStore } from "../stores/assistant-request.store";
+import { useAssistantRequestStore } from "@/shared/stores/assistant-request.store";
 import { Conversation, ConversationContent, ConversationScrollButton } from "./conversation";
 import { LoadingText } from "./loading-text";
 import {

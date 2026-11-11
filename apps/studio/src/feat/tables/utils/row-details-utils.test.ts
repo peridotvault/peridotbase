@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { column } from "../../../../tests/column";
+import { column } from "@/shared/testing/column";
 import { isGeneratedColumn, toFormValues } from "./row-details-utils";
 
 const cols = [

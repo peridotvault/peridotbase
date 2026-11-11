@@ -9,7 +9,7 @@ import { NuqsAdapter } from "nuqs/adapters/react";
 import { useLayoutEffect } from "react";
 import { useWorkspaceStore } from "@/feat/workspace";
 import { SettingsOverlay } from "@/feat/settings";
-import { TableBuilderOverlay } from "@/feat/table-builder";
+import { TableBuilderOverlay } from "@/feat/schema";
 import { CommandPalette } from "@/shared/components/components/command-palette";
 import { useTheme } from "@/shared/hooks/use-theme";
 

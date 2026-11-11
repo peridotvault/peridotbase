@@ -1,5 +1,5 @@
 import { useByok } from "@tanstack/ai-react";
-import { aiByok, useAiByokReady, useAiSettingsStore } from "@/feat/settings";
+import { aiByok, useAiByokReady, useAiSettingsStore } from "@/shared/ai";
 
 /**
  * Whether the assistant can send. There is no hosted key: a turn goes straight from this tab to

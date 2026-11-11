@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { column } from "../../../../../tests/column";
+import { column } from "@/shared/testing/column";
 import {
 	getColumnPrefs,
 	useColumnPreferencesStore,

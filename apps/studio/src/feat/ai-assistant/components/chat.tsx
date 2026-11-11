@@ -3,7 +3,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@peridotbase/ui/tooltip
 import { cn } from "@peridotbase/ui/utils";
 import { Sparkles } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
-import { getAiProviderLabel } from "@/feat/settings";
+import { getAiProviderLabel } from "@/shared/ai";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { useAiAvailability } from "../hooks/use-ai-availability";
 

@@ -10,7 +10,7 @@ import { SheetSidebar } from "@/shared/components/sheet-sidebar";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { useAlterColumn } from "../hooks/use-alter-column";
-import { useSchemaEditStore } from "../stores/schema-edit.store";
+import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
 import { columnFieldSchema } from "./column-fields/column-field-values";
 import { ColumnTypeField } from "./column-fields/column-type-field";
 import { DefaultValueField } from "./column-fields/default-value-field";

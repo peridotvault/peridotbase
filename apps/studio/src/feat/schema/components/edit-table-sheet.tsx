@@ -22,7 +22,7 @@ import { SheetSidebar } from "@/shared/components/sheet-sidebar";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { type ColumnChange, planColumnChanges, useEditTable } from "../hooks/use-edit-table";
-import { useSchemaEditStore } from "../stores/schema-edit.store";
+import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
 import { ColumnTypeField } from "./column-fields/column-type-field";
 
 const editTableFormSchema = z.object({

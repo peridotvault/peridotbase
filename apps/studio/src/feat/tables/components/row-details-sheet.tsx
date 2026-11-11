@@ -17,7 +17,7 @@ import { useFormContext } from "react-hook-form";
 import { useHotkeys } from "react-hotkeys-hook";
 import { CopyButton } from "@/shared/components/copy-button";
 import { SheetSidebar } from "@/shared/components/sheet-sidebar";
-import { AddRecordField, RecordFormProvider } from "@/feat/records";
+import { AddRecordField, RecordFormProvider } from "../records";
 import type { TableRecord } from "@/feat/tables/table.type";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";

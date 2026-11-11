@@ -1,2 +1,2 @@
-export { WorkspaceMenu } from "./components/workspace-menu";
+export { SidebarFooter } from "./components/sidebar-footer";
 export { useWorkspaceStore } from "./stores/workspace.store";

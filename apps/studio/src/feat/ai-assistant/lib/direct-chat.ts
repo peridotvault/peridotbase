@@ -3,7 +3,7 @@ import { createAnthropicChat } from "@tanstack/ai-anthropic";
 import { createGeminiChat } from "@tanstack/ai-gemini";
 import { createOpenaiChat } from "@tanstack/ai-openai";
 import type { UIMessage } from "@tanstack/ai-react";
-import type { AiProvider } from "@/feat/settings";
+import type { AiProvider } from "@/shared/ai";
 import type { SchemaGraphTable } from "@/shared/peridotbase";
 
 const BASE_PROMPT = `You are the database assistant inside Peridotbase Studio, a wallet-connected client for Peridotbase, a Solana-native relational database.

@@ -53,7 +53,7 @@ Run the relevant commands before declaring work done, and report exactly what ra
 
 ```
 src/
-  pages/    route files; hierarchical registration in pages/**/route.tsx
+  pages/    page components + route.tsx; every group directory has route.tsx
   feat/     feature modules (components, hooks, screens, stores, index.ts barrel)
   shared/   cross-feature code: api/sdk transport, hooks, lib, stores, ui helpers
 ```
@@ -67,6 +67,25 @@ Rules:
 4. Keep new code in the layer that matches its scope. Do not create flat `hooks/` or
    `components/` folders outside `shared`.
 5. The ESLint `boundaries/dependencies` rule enforces this at lint time.
+
+### Routing and the TanStack conflict
+
+TanStack's file router owns the runtime tree, so its filenames apply inside `pages/`:
+
+- `pages/__root.tsx` is the TanStack root route and cannot be renamed.
+- Each group (`_pathlessLayout/{indexes,runner,schema,table}`) has a `route.tsx` layout that
+  renders `<Outlet />`; `index.tsx` and `$param` pages are its children.
+- `pages/route.tsx` is the Arctis root aggregator. TanStack ignores files that export no `Route`,
+  and knip ignores this file, so it stays registration-only: it re-exports `__root`, the pathless
+  layout, and direct pages for hierarchy documentation. Do not move shell composition into it.
+- Shell composition (nav rail, sidebar, footer, shell-level dialogs) lives in
+  `pages/_pathlessLayout/route.tsx`; cross-cutting overlays live in `pages/__root.tsx`.
+
+Run the Arctis validator before declaring frontend work done:
+
+```bash
+node ~/.agents/skills/frontend/scripts/validate-architecture.mjs apps/studio
+```
 
 The Arctis skills (`frontend`, `backend`, `monorepo`) are installed globally. Load the matching
 skill before writing or reviewing the relevant code. The repository's own conventions take

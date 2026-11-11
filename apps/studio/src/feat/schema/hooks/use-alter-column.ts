@@ -9,7 +9,7 @@ import {
 import { invalidateTable } from "@/shared/query/invalidate-table";
 import { useDatabaseStore } from "@/shared/stores/database.store";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
-import { useSchemaEditStore } from "../stores/schema-edit.store";
+import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
 
 const normalizeAlterColumnPayload = (data: AlterColumnSchemaType): AlterColumnSchemaType => ({
 	...data,

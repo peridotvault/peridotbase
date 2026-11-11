@@ -1,4 +1,4 @@
-import { AddRecordForm, BulkInsertSheet } from "@/feat/records";
+import { AddRecordForm, BulkInsertSheet } from "../records";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { TableTab } from "../components/table-tab";
 

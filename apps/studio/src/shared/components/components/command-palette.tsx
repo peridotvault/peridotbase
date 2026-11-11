@@ -34,10 +34,10 @@ import {
 	Table2,
 	Upload,
 } from "lucide-react";
-import { askAssistant } from "@/feat/ai-assistant";
-import { openAddRecord } from "@/feat/records";
-import { useCopyTableSchema } from "@/feat/table-builder";
-import { useExportFile } from "@/feat/tables";
+import { askAssistant } from "@/shared/stores/assistant-request.store";
+import { openAddRecord } from "@/shared/stores/add-record.store";
+import { useCopyTableSchema } from "@/shared/hooks/use-copy-table-schema";
+import { useExportFile } from "@/shared/hooks/use-export-file";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useTablesList } from "@/shared/hooks/use-tables-list";
 import { useTheme } from "@/shared/hooks/use-theme";
