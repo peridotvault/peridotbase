@@ -62,10 +62,7 @@ export const TableToolbar = () => (
 						<TableCell>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										size="icon-sm"
-									>
+									<Button variant="ghost" size="icon-sm">
 										<MoreHorizontal />
 									</Button>
 								</DropdownMenuTrigger>
@@ -82,18 +79,12 @@ export const TableToolbar = () => (
 		<Pagination className="mt-3 justify-end">
 			<PaginationContent>
 				<PaginationItem>
-					<Button
-						variant="outline"
-						size="sm"
-					>
+					<Button variant="outline" size="sm">
 						Previous
 					</Button>
 				</PaginationItem>
 				<PaginationItem>
-					<Button
-						variant="outline"
-						size="sm"
-					>
+					<Button variant="outline" size="sm">
 						Next
 					</Button>
 				</PaginationItem>

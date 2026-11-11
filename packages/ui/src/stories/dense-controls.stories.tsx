@@ -33,11 +33,7 @@ export const Controls = () => (
 				<Label htmlFor="dense-search">Search tables</Label>
 				<div className="relative">
 					<Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-2 size-3 text-muted-foreground" />
-					<Input
-						id="dense-search"
-						className="pl-7"
-						placeholder="Filter schema objects"
-					/>
+					<Input id="dense-search" className="pl-7" placeholder="Filter schema objects" />
 				</div>
 			</div>
 			<Select defaultValue="public">
@@ -58,10 +54,7 @@ export const Controls = () => (
 		<div className="flex items-center gap-2">
 			<Toggle size="sm">PK</Toggle>
 			<Toggle size="sm">FK</Toggle>
-			<Button
-				variant="outline"
-				size="sm"
-			>
+			<Button variant="outline" size="sm">
 				Refresh
 			</Button>
 			<Kbd>⌘K</Kbd>

@@ -1,0 +1,22 @@
+{
+	"useTabs": true,
+	"printWidth": 95,
+	"trailingComma": "all",
+	"semi": true,
+	"singleQuote": false,
+	"plugins": ["prettier-plugin-astro"],
+	"overrides": [
+		{
+			"files": "*.astro",
+			"options": {
+				"parser": "astro"
+			}
+		},
+		{
+			"files": "*.mdx",
+			"options": {
+				"tabWidth": 2
+			}
+		}
+	]
+}

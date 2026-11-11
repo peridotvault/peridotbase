@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Questions & Discussions
-    url: https://github.com/husamql3/db-studio/discussions
-    about: Please ask general questions or start discussions here instead of opening an issue.
+    url: https://github.com/peridotbase/peridotbase/discussions
+    about: Ask general questions or start a discussion instead of opening an issue.
   - name: Report a security vulnerability
-    url: https://github.com/husamql3/db-studio/security/advisories/new
-    about: Please report security issues privately. Do not open a public issue.
+    url: https://github.com/peridotbase/peridotbase/security/advisories/new
+    about: Report security issues privately. Do not open a public issue.

@@ -1,0 +1,63 @@
+---
+title: Getting started
+description: "Connect a Wallet Standard wallet, point the Studio at an RPC endpoint, and open your first Peridotbase workspace."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The Studio is a static web app. It needs a browser with a Wallet Standard wallet extension, and an RPC endpoint for the cluster you want to use.
+
+## Prerequisites
+
+- A modern browser (Chrome, Brave, Firefox, or Safari).
+- A Wallet Standard wallet extension such as Phantom, Solflare, or Backpack.
+- An RPC URL. The public devnet endpoint works for a first look; a dedicated provider is better for real work.
+
+## Run the Studio locally
+
+```bash
+pnpm install
+pnpm dev:studio
+```
+
+The app starts at `http://localhost:3001`.
+
+## Connect
+
+1. Open the Studio and choose **Connect wallet**.
+2. Pick an installed wallet. The Studio lists wallets that registered through Wallet Standard.
+3. Approve the connection in the extension. Peridotbase receives only your public address.
+
+<Aside type="caution">
+	Never enter a seed phrase or private key into the Studio. There is no field for one, and no
+	legitimate Peridotbase screen will ask.
+</Aside>
+
+## Choose a cluster and RPC endpoint
+
+The workspace settings let you pick a cluster and an RPC URL:
+
+| Cluster        | Typical use                    |
+| -------------- | ------------------------------ |
+| `mainnet-beta` | Production data                |
+| `devnet`       | Development and testing        |
+| `testnet`      | Validator and protocol testing |
+| `localnet`     | A validator on your machine    |
+| `custom`       | Any compatible RPC provider    |
+
+The Studio checks the endpoint with a `getSlot` and `getVersion` call. A reachable endpoint shows its slot height in the workspace header; an unreachable one explains what failed instead of silently timing out.
+
+## Open a database
+
+Once the SDK can read Peridotbase accounts, the workspace lists the databases your wallet can access. Select one to browse its tables, inspect the schema, run queries, and manage indexes.
+
+<Aside type="note">
+	Until `peridotbase-core` publishes the deployed program ID and IDL, the workspace shows the
+	connection as healthy but reports account reads as **pending integration**. The interface is
+	complete; only the program instructions are missing.
+</Aside>
+
+## Next steps
+
+- [Studio tour](/studio/) — what each section does.
+- [TypeScript SDK](/sdk/) — use the same client from your own app.

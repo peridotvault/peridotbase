@@ -1,0 +1,16 @@
+Peridotbase
+Copyright 2026 the Peridotbase contributors
+
+This product includes software derived from db-studio
+(https://github.com/husamql3/db-studio), Copyright the db-studio authors,
+licensed under the Apache License, Version 2.0.
+
+The original authors are credited in the AUTHORS file. The full license text
+is in LICENSE. Git history from the fork is preserved so individual
+contributions remain attributable.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.

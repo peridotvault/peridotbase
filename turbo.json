@@ -1,138 +1,49 @@
 {
-  "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
-  "tasks": {
-    "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "dist/**",
-        ".vercel/**"
-      ],
-      "env": [
-        "NODE_ENV"
-      ],
-      "passThroughEnv": [
-        "SENTRY_AUTH_TOKEN"
-      ]
-    },
-    "db-studio#build": {
-      "dependsOn": [
-        "@db-studio/web#build",
-        "^build"
-      ],
-      "outputs": [
-        "dist/**"
-      ],
-      "env": [
-        "NODE_ENV"
-      ],
-      "passThroughEnv": [
-        "SENTRY_AUTH_TOKEN"
-      ]
-    },
-    "@db-studio/desktop#build": {
-      "dependsOn": [
-        "db-studio#build"
-      ],
-      "outputs": [
-        "dist-electron/**"
-      ]
-    },
-    "@db-studio/shared#build": {
-      "outputs": [],
-      "cache": true
-    },
-    "@db-studio/ui#build": {
-      "outputs": [],
-      "cache": true
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "db-studio#dev": {
-      "dependsOn": [
-        "@db-studio/web#build"
-      ],
-      "cache": false,
-      "persistent": true
-    },
-    "@db-studio/desktop#electron": {
-      "dependsOn": [
-        "db-studio#build"
-      ],
-      "cache": false,
-      "persistent": true
-    },
-    "typecheck": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [],
-      "passThroughEnv": [
-        "GITHUB_ACTIONS"
-      ],
-      "cache": true
-    },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [],
-      "cache": true
-    },
-    "db-studio#test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ],
-      "cache": true
-    },
-    "deploy": {
-      "dependsOn": [
-        "build"
-      ],
-      "cache": false,
-      "outputs": []
-    },
-    "deploy:preview": {
-      "dependsOn": [
-        "build"
-      ],
-      "cache": false,
-      "outputs": []
-    },
-    "package": {
-      "dependsOn": [
-        "build"
-      ],
-      "cache": false,
-      "outputs": []
-    },
-    "clean": {
-      "cache": false
-    },
-    "start": {
-      "dependsOn": [
-        "build"
-      ],
-      "cache": false,
-      "outputs": []
-    }
-  },
-  "globalDependencies": [
-    "tsconfig.json",
-    "package.json",
-    "turbo.json",
-    ".env",
-    ".env.local"
-  ],
-  "globalEnv": [
-    "NODE_ENV",
-    "CI"
-  ]
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["dist/**"],
+			"env": ["NODE_ENV"],
+			"passThroughEnv": ["PUBLIC_SOLANA_RPC_URL", "PUBLIC_SOLANA_CLUSTER", "PUBLIC_SITE_URL"]
+		},
+		"@peridotbase/sdk#build": {
+			"dependsOn": ["^build"],
+			"outputs": []
+		},
+		"@peridotbase/config#build": {
+			"dependsOn": ["^build"],
+			"outputs": []
+		},
+		"@peridotbase/ui#build": {
+			"dependsOn": ["^build"],
+			"outputs": []
+		},
+		"dev": {
+			"dependsOn": ["^build"],
+			"cache": false,
+			"persistent": true
+		},
+		"lint": {
+			"dependsOn": ["^build"],
+			"outputs": [],
+			"cache": true
+		},
+		"typecheck": {
+			"dependsOn": ["^build"],
+			"outputs": [],
+			"cache": true
+		},
+		"test": {
+			"dependsOn": ["^build"],
+			"outputs": [],
+			"cache": true
+		},
+		"clean": {
+			"cache": false
+		}
+	},
+	"globalDependencies": ["tsconfig.json", "package.json", "turbo.json", ".env", ".env.local"],
+	"globalEnv": ["NODE_ENV", "CI"]
 }

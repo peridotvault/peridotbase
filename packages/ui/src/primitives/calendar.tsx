@@ -133,41 +133,19 @@ function Calendar({
 }
 
 function CalendarRoot({ className, rootRef, ...props }: RootProps) {
-	return (
-		<div
-			data-slot="calendar"
-			ref={rootRef}
-			className={cn(className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="calendar" ref={rootRef} className={cn(className)} {...props} />;
 }
 
 function CalendarChevron({ className, orientation, ...props }: ChevronProps) {
 	if (orientation === "left") {
-		return (
-			<ChevronLeft
-				className={cn("size-4", className)}
-				{...props}
-			/>
-		);
+		return <ChevronLeft className={cn("size-4", className)} {...props} />;
 	}
 
 	if (orientation === "right") {
-		return (
-			<ChevronRight
-				className={cn("size-4", className)}
-				{...props}
-			/>
-		);
+		return <ChevronRight className={cn("size-4", className)} {...props} />;
 	}
 
-	return (
-		<ChevronDown
-			className={cn("size-4", className)}
-			{...props}
-		/>
-	);
+	return <ChevronDown className={cn("size-4", className)} {...props} />;
 }
 
 function CalendarWeekNumber({ children, ...props }: WeekNumberProps) {

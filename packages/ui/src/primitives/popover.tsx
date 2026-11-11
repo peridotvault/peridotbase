@@ -16,12 +16,7 @@ function Popover({ modal, ...props }: React.ComponentProps<typeof PopoverPrimiti
 }
 
 function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-	return (
-		<PopoverPrimitive.Trigger
-			data-slot="popover-trigger"
-			{...props}
-		/>
-	);
+	return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 }
 
 function PopoverContent({
@@ -47,12 +42,7 @@ function PopoverContent({
 }
 
 function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
-	return (
-		<PopoverPrimitive.Anchor
-			data-slot="popover-anchor"
-			{...props}
-		/>
-	);
+	return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
 }
 
 function _PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {

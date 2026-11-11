@@ -1,0 +1,109 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { roadmapItems } from "../content-data/roadmap";
+import { ROADMAP_STATUS } from "../content-data/roadmap-helpers";
+---
+
+<StarlightPage
+	frontmatter={{
+		title: "Roadmap",
+		description: "What is done, what is in progress, and what comes next for Peridotbase.",
+	}}
+>
+	<p class="lead">
+		Peridotbase ships in the open. A capability turns on for users only when the program and
+		the Studio both implement it.
+	</p>
+
+	{roadmapItems.map((group) => {
+		const status = ROADMAP_STATUS[group.status];
+		return (
+			<section class="group">
+				<header>
+					<h2>{group.title}</h2>
+					<span class={`badge ${status.tone}`}>{status.label}</span>
+				</header>
+				<ul>
+					{group.items.map((item) => (
+						<li class={ROADMAP_STATUS[item.status].tone}>
+							<span class="mark" aria-hidden="true" />
+							<span>{item.title}</span>
+						</li>
+					))}
+				</ul>
+			</section>
+		);
+	})}
+</StarlightPage>
+
+<style>
+	.lead {
+		color: var(--sl-color-gray-3);
+		font-size: var(--sl-text-lg);
+	}
+
+	.group {
+		margin-top: 2.25rem;
+		padding-top: 1.4rem;
+		border-top: 1px solid var(--sl-color-hairline);
+	}
+
+	.group header {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.group h2 {
+		margin: 0;
+		font-size: var(--sl-text-h3);
+	}
+
+	.badge {
+		padding: 0.15rem 0.55rem;
+		border: 1px solid currentColor;
+		border-radius: 999px;
+		font-size: var(--sl-text-xs);
+		opacity: 0.85;
+	}
+
+	.badge.done,
+	li.done .mark {
+		color: var(--sl-color-accent-high);
+		background: var(--sl-color-accent-low);
+	}
+
+	.badge.active,
+	li.active .mark {
+		color: var(--sl-color-accent-high);
+		background: color-mix(in srgb, var(--sl-color-accent-low) 60%, transparent);
+	}
+
+	.badge.next,
+	li.next .mark {
+		color: var(--sl-color-gray-3);
+	}
+
+	.group ul {
+		margin: 1rem 0 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 0.55rem;
+	}
+
+	.group li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.7rem;
+	}
+
+	.mark {
+		flex: none;
+		width: 0.6rem;
+		height: 0.6rem;
+		margin-top: 0.45rem;
+		border-radius: 50%;
+		border: 1px solid currentColor;
+	}
+</style>

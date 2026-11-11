@@ -1,0 +1,26 @@
+import { useQuery } from "@tanstack/react-query";
+import { useQueryState } from "nuqs";
+import { useMemo } from "react";
+import { buildSchemaGraph } from "@/feat/visualizer/lib/schema-graph";
+import { getSchemaGraph } from "@/shared/peridotbase";
+import { tableKeys } from "@/shared/query/keys";
+import { useDatabaseStore } from "@/shared/stores/database.store";
+import { CONSTANTS } from "@/shared/utils/constants";
+
+export const useSchemaGraph = () => {
+	const { selectedDatabase } = useDatabaseStore();
+
+	const [schema] = useQueryState(CONSTANTS.ACTIVE_SCHEMA, {
+		defaultValue: CONSTANTS.ALL_SCHEMAS,
+	});
+
+	const { data, isLoading, error } = useQuery({
+		queryKey: tableKeys.graph(selectedDatabase),
+		queryFn: () => getSchemaGraph(selectedDatabase),
+		enabled: Boolean(selectedDatabase),
+	});
+
+	const graph = useMemo(() => buildSchemaGraph(data ?? [], schema), [data, schema]);
+
+	return { ...graph, isLoading, error };
+};

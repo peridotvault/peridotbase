@@ -1,0 +1,127 @@
+---
+import LandingLayout from "../layouts/LandingLayout.astro";
+
+const snippet = `<span class="tok-key">import</span> {
+  createPeridotbaseClient,
+  createRpcPort,
+  createWalletStandardPort,
+} <span class="tok-key">from</span> <span class="tok-str">"@peridotbase/sdk"</span>;
+
+<span class="tok-key">const</span> client = createPeridotbaseClient({
+  rpc: createRpcPort({ url: <span class="tok-str">"https://api.devnet.solana.com"</span>, cluster: <span class="tok-str">"devnet"</span> }),
+  wallet: createWalletStandardPort(),
+  programId: <span class="tok-str">null</span>, <span class="tok-com">// published by peridotbase-core</span>
+});
+
+<span class="tok-key">const</span> tables = <span class="tok-key">await</span> client.listTables(database);`;
+---
+
+<LandingLayout>
+	<section class="hero">
+		<span class="eyebrow">Solana-native relational database</span>
+		<h1>
+			Your database lives <em>on-chain</em>.
+		</h1>
+		<p>
+			Peridotbase stores tables, rows, and indexes as Solana program accounts. The Studio
+			browses them through your wallet — no server, no custody, no off-chain copy.
+		</p>
+		<div class="actions">
+			<a class="button button-primary" href="/getting-started/">
+				Get started
+			</a>
+			<a class="button button-ghost" href="/introduction/">
+				Read the docs
+			</a>
+		</div>
+
+		<div class="code-card">
+			<header>
+				<span class="dot"></span>
+				<span class="dot"></span>
+				<span class="dot"></span>
+				<span style="margin-left:auto">peridotbase.ts</span>
+			</header>
+			<pre><code set:html={snippet}></code></pre>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="section-head">
+			<h2>Built for data you can verify</h2>
+			<p>
+				Every read is an RPC call against program state. Every write is a wallet-signed
+				instruction. There is no middle layer to trust.
+			</p>
+		</div>
+		<div class="grid">
+			<div class="card">
+				<h3>On-chain by default</h3>
+				<p>
+					Tables and rows are program accounts. What the Studio shows is what the chain holds.
+				</p>
+			</div>
+			<div class="card">
+				<h3>Wallet-native access</h3>
+				<p>Any Wallet Standard wallet works. Keys never leave the extension.</p>
+			</div>
+			<div class="card">
+				<h3>One relational model</h3>
+				<p>
+					PostgreSQL-style types, SQL-shaped queries, primary and foreign keys, and indexes.
+				</p>
+			</div>
+			<div class="card">
+				<h3>Honest interface</h3>
+				<p>A control only enables when the program implements the instruction behind it.</p>
+			</div>
+			<div class="card">
+				<h3>Browser-side exports</h3>
+				<p>CSV and JSON are generated from SDK reads, so nothing leaves your machine.</p>
+			</div>
+			<div class="card">
+				<h3>Open source</h3>
+				<p>Apache-2.0 Studio, SDK, and configuration, with fork attribution preserved.</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="section-head">
+			<h2>From wallet to table in three steps</h2>
+		</div>
+		<div class="steps">
+			<div class="step">
+				<h3>Connect</h3>
+				<p>
+					Pick an installed wallet. Peridotbase receives a public address and nothing else.
+				</p>
+			</div>
+			<div class="step">
+				<h3>Point at an RPC</h3>
+				<p>
+					Choose a cluster or paste a custom endpoint. The Studio checks it with a slot and
+					version call.
+				</p>
+			</div>
+			<div class="step">
+				<h3>Browse</h3>
+				<p>Open a database, then move between tables, schema, queries, and indexes.</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="status">
+		<div>
+			<h2>Program integration is in progress</h2>
+			<p>
+				The Studio, wallet, and RPC layers are ready. Reads, writes, DDL, queries, and indexes
+				turn on as <code>peridotbase-core</code> publishes each instruction — no Studio rewrite
+				required.
+			</p>
+		</div>
+		<a class="button button-ghost" href="/roadmap/">
+			See the roadmap
+		</a>
+	</section>
+</LandingLayout>

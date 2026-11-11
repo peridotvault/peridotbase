@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve db-studio! Please fill this out completely.
+        Thanks for helping improve Peridotbase! Please fill this out completely.
 
   - type: checkboxes
     id: preflight
@@ -15,14 +15,14 @@ body:
       options:
         - label: I searched existing issues and discussions to avoid creating a duplicate.
           required: true
-        - label: I can reproduce this on the latest version of db-studio.
+        - label: I can reproduce this on the latest version of Peridotbase.
           required: false
 
   - type: input
     id: version
     attributes:
-      label: db-studio Version
-      description: What version of db-studio are you using? (Check Help → About)
+      label: Peridotbase Version
+      description: What version of Peridotbase are you using? (Check Help → About)
       placeholder: e.g. 0.1.0 or commit hash
     validations:
       required: true

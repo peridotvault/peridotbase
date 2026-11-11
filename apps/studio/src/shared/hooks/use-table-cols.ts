@@ -1,0 +1,34 @@
+import { useQuery } from "@tanstack/react-query";
+import { getTableColumns } from "@/shared/peridotbase";
+import { tableKeys } from "@/shared/query/keys";
+import { useDatabaseStore } from "@/shared/stores/database.store";
+
+export const useTableCols = ({
+	tableName,
+	schemaName,
+}: {
+	tableName: string;
+	schemaName: string | undefined;
+}) => {
+	const { selectedDatabase } = useDatabaseStore();
+
+	const {
+		data: tableCols,
+		isLoading: isLoadingTableCols,
+		isRefetching: isRefetchingTableCols,
+		error: errorTableCols,
+		refetch: refetchTableCols,
+	} = useQuery({
+		queryKey: tableKeys.columns(tableName, selectedDatabase, schemaName),
+		queryFn: () => getTableColumns(tableName, selectedDatabase, schemaName),
+		enabled: !!tableName && !!selectedDatabase,
+	});
+
+	return {
+		tableCols,
+		isLoadingTableCols,
+		isRefetchingTableCols,
+		errorTableCols,
+		refetchTableCols,
+	};
+};

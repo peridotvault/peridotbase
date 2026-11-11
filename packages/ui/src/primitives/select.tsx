@@ -6,12 +6,7 @@ import type * as React from "react";
 import { cn } from "../utils";
 
 function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-	return (
-		<SelectPrimitive.Root
-			data-slot="select"
-			{...props}
-		/>
-	);
+	return <SelectPrimitive.Root data-slot="select" {...props} />;
 }
 
 function _SelectGroup({
@@ -28,12 +23,7 @@ function _SelectGroup({
 }
 
 function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-	return (
-		<SelectPrimitive.Value
-			data-slot="select-value"
-			{...props}
-		/>
-	);
+	return <SelectPrimitive.Value data-slot="select-value" {...props} />;
 }
 
 function SelectTrigger({

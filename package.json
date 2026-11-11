@@ -1,76 +1,36 @@
 {
-  "name": "@db-studio/monorepo",
-  "workspaces": [
-    "packages/*",
-    "www"
-  ],
-  "scripts": {
-    "dev": "turbo run dev",
-    "dev:web": "turbo run dev --filter=@db-studio/web",
-    "dev:server": "turbo run dev --filter=db-studio",
-    "dev:proxy": "turbo run dev --filter=@db-studio/proxy",
-    "dev:www": "turbo run dev --filter=@db-studio/www",
-    "dev:desktop": "turbo run electron --filter=@db-studio/desktop",
-    "start": "turbo run start",
-    "init-db:pgsql": "bash ./scripts/init-db-pgsql.sh",
-    "init-db:mysql": "bash ./scripts/init-db-mysql.sh",
-    "init-db:mssql": "bash ./scripts/init-db-mssql.sh",
-    "init-db:mongo": "bash ./scripts/init-db-mongo.sh",
-    "init-db:sqlite": "bash ./scripts/init-db-sqlite.sh",
-    "init-db:libsql": "bash ./scripts/init-db-libsql.sh",
-    "init-db:d1": "bash ./scripts/init-db-d1.sh",
-    "init-db:redis": "bash ./scripts/init-db-redis.sh",
-    "init-db:mariadb": "bash ./scripts/init-db-mariadb.sh",
-    "init-db:cockroach": "bash ./scripts/init-db-cockroach.sh",
-    "init-db:tidb": "bash ./scripts/init-db-tidb.sh",
-    "init-db:duckdb": "bash ./scripts/init-db-duckdb.sh",
-    "init-db:oracle": "bash ./scripts/init-db-oracle.sh",
-    "init-db:clickhouse": "bash ./scripts/init-db-clickhouse.sh",
-    "build": "turbo run build",
-    "build:web": "turbo run build --filter=@db-studio/web",
-    "scan:web": "bunx react-scan@latest https://web.db-studio.localhost",
-    "build:server": "turbo run build --filter=db-studio",
-    "build:proxy": "turbo run build --filter=@db-studio/proxy",
-    "build:www": "turbo run build --filter=@db-studio/www",
-    "build:desktop": "turbo run build --filter=@db-studio/desktop",
-    "package:desktop": "turbo run package --filter=@db-studio/desktop",
-    "deploy:www": "turbo run deploy --filter=@db-studio/www",
-    "deploy:www:preview": "turbo run deploy:preview --filter=@db-studio/www",
-    "deploy:proxy": "turbo run deploy --filter=@db-studio/proxy",
-    "format": "oxfmt && oxlint --fix",
-    "lint": "oxlint",
-    "check:meta": "bun run --cwd www check-meta",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
-    "test:server": "turbo run test --filter=db-studio",
-    "prepare": "husky",
-    "clean": "rm -rf node_modules packages/*/node_modules packages/*/dist www/node_modules www/dist bun.lockb .turbo",
-    "knip": "knip"
-  },
-  "dependencies": {
-    "turbo": "^2.11.10"
-  },
-  "devDependencies": {
-    "@oxlint/plugins": "1.90.0",
-    "husky": "^9.1.7",
-    "knip": "^6.44.1",
-    "oxfmt": "0.75.0",
-    "oxlint": "1.90.0",
-    "portless": "^0.15.12"
-  },
-  "peerDependencies": {
-    "typescript": "^7.0.2"
-  },
-  "overrides": {
-    "esbuild": "0.28.2",
-    "@tanstack/ai-client": "0.32.1"
-  },
-  "trustedDependencies": [
-    "electron"
-  ],
-  "engines": {
-    "node": ">=20.x",
-    "bun": ">=1.4.4"
-  },
-  "packageManager": "bun@1.4.4"
+	"name": "@peridotbase/monorepo",
+	"private": true,
+	"type": "module",
+	"description": "Peridotbase — a Solana-native, fully on-chain relational database. Monorepo for the Studio dashboard, the marketing site, and the TypeScript SDK.",
+	"license": "Apache-2.0",
+	"packageManager": "pnpm@12.18.0",
+	"engines": {
+		"node": ">=22.23.4",
+		"pnpm": ">=12.18.0"
+	},
+	"scripts": {
+		"dev": "turbo run dev",
+		"dev:studio": "turbo run dev --filter=@peridotbase/studio",
+		"dev:web": "turbo run dev --filter=@peridotbase/web",
+		"build": "turbo run build",
+		"build:studio": "turbo run build --filter=@peridotbase/studio",
+		"build:web": "turbo run build --filter=@peridotbase/web",
+		"lint": "turbo run lint",
+		"typecheck": "turbo run typecheck",
+		"test": "turbo run test",
+		"format": "prettier --write \"**/*.{ts,tsx,astro,css,json,md,mdx,yaml,yml}\"",
+		"format:check": "prettier --check \"**/*.{ts,tsx,astro,css,json,md,mdx,yaml,yml}\"",
+		"knip": "knip",
+		"clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules .turbo",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"husky": "^9.1.7",
+		"knip": "^6.45.0",
+		"prettier": "^3.9.10",
+		"prettier-plugin-astro": "^1.1.2",
+		"turbo": "^2.11.10",
+		"typescript": "^7.0.2"
+	}
 }

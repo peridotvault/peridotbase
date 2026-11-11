@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+	<defs>
+		<linearGradient id="peridot" x1="4" y1="2" x2="28" y2="30" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#b6f36b" />
+			<stop offset="0.55" stop-color="#6fce3d" />
+			<stop offset="1" stop-color="#2f8f2a" />
+		</linearGradient>
+	</defs>
+	<path d="M16 2 29 11.5 24 29H8L3 11.5 16 2Z" fill="url(#peridot)" />
+	<path d="M16 2 29 11.5 24 29H8L3 11.5 16 2Z" stroke="#14501a" stroke-opacity="0.55" stroke-width="1.2" />
+	<path d="M3 11.5h26M16 2 11 11.5 16 29l5-17.5L16 2Z" stroke="#14501a" stroke-opacity="0.35" stroke-width="1" />
+</svg>

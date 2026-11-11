@@ -47,9 +47,6 @@ const rows: QueryRow[] = [
 
 export const VirtualizedGrid = () => (
 	<div className="h-64 w-[720px] rounded-xl border bg-background text-foreground">
-		<DataGrid
-			columns={columns}
-			data={rows}
-		/>
+		<DataGrid columns={columns} data={rows} />
 	</div>
 );

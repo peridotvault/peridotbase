@@ -1,0 +1,27 @@
+{
+	"name": "@peridotbase/web",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"description": "Peridotbase marketing site and documentation, built with Astro and Starlight.",
+	"license": "Apache-2.0",
+	"scripts": {
+		"dev": "astro dev --port 3000",
+		"build": "astro build",
+		"preview": "astro preview --port 3000",
+		"lint": "eslint .",
+		"typecheck": "astro check",
+		"clean": "rm -rf dist .astro .turbo"
+	},
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.4",
+		"@astrojs/starlight": "^0.42.10",
+		"astro": "^7.4.10"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.12",
+		"@peridotbase/config": "workspace:*",
+		"eslint": "^10.14.0",
+		"typescript": "6.0.3"
+	}
+}

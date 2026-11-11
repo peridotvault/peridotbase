@@ -1,0 +1,50 @@
+---
+title: On-chain model
+description: "How Peridotbase maps relational tables, rows, indexes, and grants onto Solana accounts."
+---
+
+Peridotbase is a single relational model over Solana accounts. This page describes the mapping the Studio and SDK assume; the program in `peridotbase-core` is the authoritative implementation.
+
+## Databases are account namespaces
+
+A database is a named collection of tables owned by (or referenced from) the program. The workspace lists databases the connected wallet can see; selecting one scopes every read and write.
+
+## Tables and columns
+
+A table carries a name, a schema name, and a row count. A column carries:
+
+| Field                           | Meaning                                                                                               |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `columnName`                    | The column label.                                                                                     |
+| `dataType`                      | The cell variant the Studio renders: `text`, `boolean`, `number`, `enum`, `json`, `date`, or `array`. |
+| `dataTypeLabel`                 | The wire-level protocol type, e.g. `int`, `varchar`, `timestamp`, `jsonb`, `uuid`.                    |
+| `isNullable` / `columnDefault`  | Whether the column accepts `NULL` and what it defaults to.                                            |
+| `isPrimaryKey` / `isForeignKey` | Key membership, with `referencedTable`, `referencedColumn`, and `referencedSchema` for foreign keys.  |
+| `enumValues`                    | The fixed label set for `enum` columns.                                                               |
+
+Types follow the PostgreSQL family: the Studio renders them under the fixed `pgsql` dialect, and the export helpers shape CSV and JSON from the same type set.
+
+## Rows
+
+Rows are addressed by primary-key predicate and paginated by cursor. Deletes are single-row calls; there is no cascading delete in the client — the program refuses a delete that would orphan dependent rows, and the Studio surfaces the related records.
+
+## Indexes
+
+An index has a name, a column list, a uniqueness flag, an access method, and a kind of `primary`, `unique-constraint`, or `index`. The indexes screen reads `listIndexes` and creates or drops through the matching instructions.
+
+## Capabilities
+
+The SDK exposes a `Capabilities` record consulted by every gated control:
+
+| Flag        | Controls                    |
+| ----------- | --------------------------- |
+| `wallet`    | Connection and RPC health   |
+| `discovery` | Database and table listing  |
+| `reads`     | Row reads                   |
+| `writes`    | Inserts, updates, deletes   |
+| `ddl`       | Table and column management |
+| `queries`   | Query execution             |
+| `indexes`   | Index management            |
+| `live`      | Table polling               |
+
+Today only `wallet` is `true`. The other flags flip on as `peridotbase-core` publishes each instruction — no Studio rewrite required.

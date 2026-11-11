@@ -14,10 +14,7 @@ export function Spinner({
 	const bars = Array(12).fill(0);
 
 	return (
-		<div
-			className={cn(size, className)}
-			{...props}
-		>
+		<div className={cn(size, className)} {...props}>
 			<div className={cn("relative top-1/2 left-1/2 h-[inherit] w-[inherit]")}>
 				{bars.map((_, i) => (
 					<div

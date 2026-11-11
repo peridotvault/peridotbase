@@ -22,5 +22,5 @@ For CLI or API changes, paste the terminal output or response before and after.
 ## Checklist
 
 - [ ] I added before/after screenshots, recordings, or output above.
-- [ ] I ran `bun run format`, `bun run typecheck`, and `bun run test`.
-- [ ] I added a changelog entry if this changes the desktop app or CLI/server.
+- [ ] I ran `pnpm format:check`, `pnpm lint`, `pnpm typecheck`, and `pnpm test`.
+- [ ] I added a changelog entry if this changes what a Studio user can see or do.

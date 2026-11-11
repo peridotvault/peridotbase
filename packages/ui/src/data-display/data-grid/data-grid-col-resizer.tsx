@@ -46,7 +46,7 @@ function DataGridColumnResizerImpl<TRow>({
 
 export const DataGridColumnResizer = memo(
 	DataGridColumnResizerImpl,
-	(prev: DataGridColumnResizerProps<any>, next: DataGridColumnResizerProps<any>) => {
+	(prev: DataGridColumnResizerProps<unknown>, next: DataGridColumnResizerProps<unknown>) => {
 		const prevColumn = prev.header.column;
 		const nextColumn = next.header.column;
 

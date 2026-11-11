@@ -1,0 +1,87 @@
+---
+title: TypeScript SDK
+description: "Use @peridotbase/sdk to read tables, write records, and manage a Peridotbase database from your own client."
+---
+
+`@peridotbase/sdk` is the same client the Studio uses. It has no framework dependency: it takes an RPC port, a wallet port, and an optional program ID, and returns a `PeridotbaseClient`.
+
+## Install
+
+```bash
+pnpm add @peridotbase/sdk
+```
+
+## Create a client
+
+```ts
+import {
+	createPeridotbaseClient,
+	createRpcPort,
+	createWalletStandardPort,
+} from "@peridotbase/sdk";
+
+const client = createPeridotbaseClient({
+	rpc: createRpcPort({ url: "https://api.devnet.solana.com", cluster: "devnet" }),
+	wallet: createWalletStandardPort(),
+	programId: null, // filled in when peridotbase-core publishes its ID
+});
+```
+
+The client is a thin port over the program. Nothing is cached off-chain and nothing is stored in a database you do not control.
+
+## Health check
+
+```ts
+const health = await client.getHealth();
+// { reachable: true, cluster: "devnet", slot: "…", version: "…" }
+```
+
+`getHealth` calls the RPC endpoint directly. It is the one operation that works before the program ID exists.
+
+## Reads
+
+```ts
+const databases = await client.listDatabases();
+const tables = await client.listTables(database);
+const columns = await client.listColumns({ database, table: "users" });
+const page = await client.readRows({ database, table: "users" }, { limit: 50 });
+```
+
+Every read takes a `TableRef` (`{ database, table, schema? }`) and returns typed rows. Pagination is cursor-based from the SDK's side so a page request stays stable while rows change.
+
+## Writes
+
+```ts
+await client.insertRecords(ref, { name: "Ada", role: "admin" });
+await client.updateRecords(ref, [{ key: { id: 1 }, values: { role: "owner" } }]);
+await client.deleteRecords(ref, [{ id: 1 }]);
+```
+
+Writes return a `MutationResult` with the signature the wallet approved. Errors arrive as `SdkFailure` with the failed operation named.
+
+## Schema
+
+```ts
+await client.createTable({ tableName: "projects", fields: [...] });
+await client.addColumn(ref, { columnName: "archived", columnType: "boolean" });
+await client.alterColumn(ref, "archived", { isNullable: false });
+await client.renameTable(ref, { newTableName: "projects_v2" });
+```
+
+## Error handling
+
+Every unimplemented operation throws `IntegrationUnavailableError` with a `code` of `PROGRAM_NOT_WIRED`. Use the exported guards instead of matching strings:
+
+```ts
+import { isIntegrationUnavailable, isSdkFailure } from "@peridotbase/sdk";
+
+try {
+	await client.readRows(ref);
+} catch (error) {
+	if (isIntegrationUnavailable(error)) {
+		// The program has no instruction for this yet.
+	} else if (isSdkFailure(error)) {
+		// RPC or wallet failure; error.operation says which call failed.
+	}
+}
+```

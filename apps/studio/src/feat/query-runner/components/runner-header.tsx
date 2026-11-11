@@ -1,0 +1,195 @@
+import type { ExecuteQueryResult } from "@peridotbase/sdk";
+import { Button } from "@peridotbase/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@peridotbase/ui/toggle-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@peridotbase/ui/tooltip";
+import {
+	AlignLeft,
+	Braces,
+	Command,
+	CornerDownLeft,
+	Heart,
+	Save,
+	Sparkles,
+	Table,
+	Zap,
+} from "lucide-react";
+import { useQueryState } from "nuqs";
+import { askAssistant } from "@/feat/ai-assistant";
+import { RUNNER_STATE_KEYS } from "../constants";
+
+export const RunnerHeader = ({
+	isExecutingQuery,
+	handleButtonClick,
+	handleFormatQuery,
+	handleSaveQuery,
+	handleFavorite,
+	isFavorite,
+	queryId,
+	hasUnsavedChanges,
+	queryResult,
+	currentQuery,
+}: {
+	isExecutingQuery: boolean;
+	handleButtonClick: () => void;
+	handleFormatQuery: () => void;
+	handleSaveQuery: () => void;
+	handleFavorite: () => void;
+	isFavorite: boolean;
+	queryId: string;
+	hasUnsavedChanges: boolean;
+	queryResult: ExecuteQueryResult | null;
+	currentQuery: string;
+}) => {
+	const [showAs, setShowAs] = useQueryState(RUNNER_STATE_KEYS.SHOW_AS);
+
+	return (
+		<header className="max-h-8 overflow-hidden border-b border-border w-full flex items-center justify-between bg-background text-foreground sticky top-0 left-0 right-0 z-0">
+			<div className="flex items-center">
+				<Button
+					type="button"
+					variant="default"
+					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none bg-green-700 text-white hover:bg-green-800 gap-1 disabled:opacity-50"
+					onClick={handleButtonClick}
+					disabled={isExecutingQuery}
+					aria-label="Run the query"
+				>
+					Run
+					<Command className="size-3" />
+					<CornerDownLeft className="size-3" />
+				</Button>
+
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							type="button"
+							variant="ghost"
+							className="h-8! border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
+							aria-label="Generate a query with AI"
+							onClick={() =>
+								askAssistant(
+									"Generate a query for this database. Ask me for the goal if it is unclear.",
+								)
+							}
+						>
+							<Sparkles className="size-3" />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>Generate with AI</TooltipContent>
+				</Tooltip>
+
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							type="button"
+							variant="ghost"
+							className="h-8! border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
+							aria-label="Optimize the query with AI"
+							disabled={!currentQuery.trim() || isExecutingQuery}
+							onClick={() =>
+								askAssistant(
+									`Suggest a faster, clearer version of this query. Explain the tradeoffs and return the complete query in a fenced code block.\n\n${currentQuery}`,
+								)
+							}
+						>
+							<Zap className="size-3" />
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent>Optimize with AI</TooltipContent>
+				</Tooltip>
+
+				<Button
+					type="button"
+					variant="ghost"
+					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					aria-label="Format the query"
+					onClick={handleFormatQuery}
+				>
+					Format <AlignLeft className="size-3" />
+				</Button>
+
+				<Button
+					type="button"
+					variant="ghost"
+					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					aria-label="Save the query"
+					onClick={handleSaveQuery}
+				>
+					Save <Save className="size-3" />
+				</Button>
+
+				<Button
+					type="button"
+					variant="ghost"
+					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					aria-label="Favorite the query"
+					onClick={handleFavorite}
+				>
+					{isFavorite ? (
+						<Heart className="size-3 fill-current" />
+					) : (
+						<Heart className="size-3" />
+					)}
+				</Button>
+
+				{queryId && hasUnsavedChanges && (
+					<span className="text-xs px-2 text-muted-foreground">Unsaved changes</span>
+				)}
+			</div>
+
+			<div className="flex items-center">
+				{queryResult && (
+					<div className="flex items-center gap-1 px-2">
+						<span className="text-xs text-muted-foreground">
+							{queryResult.duration.toFixed(2)}ms
+						</span>
+						<span className="text-xs text-muted-foreground">•</span>
+						<span className="text-xs text-muted-foreground">{queryResult.rowCount} rows</span>
+					</div>
+				)}
+
+				<ToggleGroup
+					type="single"
+					variant="ghost"
+					onValueChange={(value) => {
+						if (value === showAs) return;
+						setShowAs(value);
+					}}
+					value={showAs ?? undefined}
+					className="h-8! rounded-none! border-l! border-border!"
+				>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<ToggleGroupItem
+								value="table"
+								aria-label="Toggle table"
+								className="rounded-none! h-8! aspect-square!"
+								data-selected={showAs === "table"}
+							>
+								<Table />
+							</ToggleGroupItem>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>View as a table</p>
+						</TooltipContent>
+					</Tooltip>
+
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<ToggleGroupItem
+								value="json"
+								aria-label="Toggle JSON"
+								className="rounded-none! h-8! aspect-square!"
+								data-selected={showAs === "json"}
+							>
+								<Braces />
+							</ToggleGroupItem>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>View as a JSON</p>
+						</TooltipContent>
+					</Tooltip>
+				</ToggleGroup>
+			</div>
+		</header>
+	);
+};

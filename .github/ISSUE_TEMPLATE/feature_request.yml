@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting an idea for db-studio! Please share enough context that we can understand the problem and evaluate the request.
+        Thanks for suggesting an idea for Peridotbase! Please share enough context that we can understand the problem and evaluate the request.
 
   - type: checkboxes
     id: preflight

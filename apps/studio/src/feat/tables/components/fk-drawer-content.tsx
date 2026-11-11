@@ -1,0 +1,83 @@
+import type { FilterType } from "@peridotbase/sdk";
+import { Button } from "@peridotbase/ui/button";
+import { DataGrid } from "@peridotbase/ui/data-grid";
+import { DrawerHeader, DrawerTitle } from "@peridotbase/ui/drawer";
+import { Spinner } from "@peridotbase/ui/spinner";
+import { useNavigate } from "@tanstack/react-router";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ExternalLink } from "lucide-react";
+import { useMemo } from "react";
+import { CopyButton } from "@/shared/components/copy-button";
+import type { TableRecord } from "@/feat/tables/table.type";
+import { useTableCols } from "@/shared/hooks/use-table-cols";
+import { useTableData } from "@/shared/hooks/use-table-data";
+import { CONSTANTS } from "@/shared/utils/constants";
+import { formatCellValue } from "@/shared/utils/format-cell-value";
+import { toColumnDef } from "../utils/column-def";
+
+export const FkDrawerContent = ({
+	referencedTable,
+	referencedSchema: schemaName,
+	referencedColumn,
+	fkValue,
+}: {
+	referencedTable: string;
+	referencedSchema: string | undefined;
+	referencedColumn: string;
+	fkValue: string;
+}) => {
+	const { tableCols } = useTableCols({ tableName: referencedTable, schemaName });
+
+	const filter: FilterType = { columnName: referencedColumn, operator: "=", value: fkValue };
+
+	const { tableData, isLoadingTableData } = useTableData({
+		tableName: referencedTable,
+		schemaName,
+		cursor: null,
+		direction: null,
+		limit: null,
+		sort: null,
+		order: null,
+		filters: [filter],
+	});
+
+	const columns = useMemo<ColumnDef<TableRecord>[]>(
+		() => tableCols?.map((col) => toColumnDef(col)) ?? [],
+		[tableCols],
+	);
+
+	const navigate = useNavigate();
+
+	const handleNavigate = () => {
+		navigate({
+			to: "/table/$table",
+			params: { table: referencedTable },
+			search: { filters: [filter], [CONSTANTS.TABLE_SCHEMA]: schemaName },
+		});
+	};
+
+	return (
+		<>
+			<DrawerHeader className="flex flex-row items-center justify-between py-3">
+				<DrawerTitle>{referencedTable}</DrawerTitle>
+				<Button variant="outline" size="sm" onClick={handleNavigate}>
+					<ExternalLink size={14} />
+					Open table
+				</Button>
+			</DrawerHeader>
+			<div className="flex flex-1 overflow-hidden border-t">
+				{isLoadingTableData ? (
+					<div className="flex items-center justify-center w-full text-sm text-muted-foreground">
+						<Spinner />
+					</div>
+				) : (
+					<DataGrid
+						columns={columns}
+						data={tableData?.rows ?? []}
+						renderCellAccessory={(value) => <CopyButton value={formatCellValue(value)} />}
+					/>
+				)}
+			</div>
+		</>
+	);
+};

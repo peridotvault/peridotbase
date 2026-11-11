@@ -1,0 +1,170 @@
+import type { ColumnInfoSchemaType } from "@peridotbase/sdk";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import type { TableRecord } from "@/feat/tables/table.type";
+import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
+import { useDatabaseStore } from "@/shared/stores/database.store";
+import { useOverlayStore } from "@/shared/stores/overlay.store";
+import { useLiveModeStore } from "../stores/live-mode.store";
+import { useRowDetailsStore } from "../stores/row-details.store";
+import { useUpdateCellStore } from "../stores/update-cell.store";
+import { diffTableRows } from "../utils/table-diff";
+
+const LIVE_POLL_INTERVAL_MS = 1000;
+
+interface UseLiveTableProps {
+	tableName: string;
+	tableCols?: ColumnInfoSchemaType[];
+	tableDataRows: TableRecord[];
+	refetchTableData: () => Promise<{ isError: boolean }>;
+	isEditingCell?: boolean;
+}
+
+export const useLiveTable = ({
+	tableName,
+	tableCols,
+	tableDataRows,
+	refetchTableData,
+	isEditingCell = false,
+}: UseLiveTableProps) => {
+	const canLiveMode = useStudioCapabilities().live;
+
+	const { isLive, pauseLive, setStatus, triggerPulse, setHighlights, reset } =
+		useLiveModeStore();
+
+	const { selectedDatabase } = useDatabaseStore();
+	const { updates } = useUpdateCellStore();
+	const { openOverlays } = useOverlayStore();
+	const { isDirty: isRowDetailsDirty } = useRowDetailsStore();
+
+	const hasCellUpdates = updates.size > 0;
+	const hasOpenRecordOverlay = openOverlays.some((id) => id.startsWith("records."));
+	const hasDirtyRowDetails = isRowDetailsDirty && openOverlays.includes("tables.row-details");
+
+	const isEditing =
+		isEditingCell || hasCellUpdates || hasOpenRecordOverlay || hasDirtyRowDetails;
+
+	const pkCols = useMemo(
+		() => tableCols?.filter((c) => c.isPrimaryKey).map((c) => c.columnName) ?? [],
+		[tableCols],
+	);
+
+	const prevRowsRef = useRef<TableRecord[] | null>(null);
+	const refetchRef = useRef(refetchTableData);
+	refetchRef.current = refetchTableData;
+	const pollInFlightRef = useRef(false);
+	const tableNameRef = useRef(tableName);
+	tableNameRef.current = tableName;
+	const selectedDatabaseRef = useRef(selectedDatabase);
+	selectedDatabaseRef.current = selectedDatabase;
+
+	useEffect(() => {
+		if (isLive && isEditing) {
+			pauseLive();
+		}
+	}, [isLive, isEditing, pauseLive]);
+
+	useEffect(() => {
+		if (isLive && prevRowsRef.current !== null) {
+			const diff = diffTableRows(prevRowsRef.current, tableDataRows, pkCols);
+
+			if (diff.hasVisibleChanges) {
+				triggerPulse();
+				setHighlights(diff.insertedRowIds, diff.changedCellKeys);
+			}
+		}
+
+		prevRowsRef.current = tableDataRows;
+	}, [tableDataRows, isLive, pkCols, triggerPulse, setHighlights]);
+
+	const executePoll = useCallback(async () => {
+		if (typeof document !== "undefined" && document.hidden) {
+			return;
+		}
+
+		if (isEditing) {
+			pauseLive();
+
+			return;
+		}
+
+		if (pollInFlightRef.current) return;
+
+		const currentGeneration = useLiveModeStore.getState().generation;
+		const currentTable = tableNameRef.current;
+		const currentDatabase = selectedDatabaseRef.current;
+		pollInFlightRef.current = true;
+
+		try {
+			const res = await refetchRef.current();
+			const liveState = useLiveModeStore.getState();
+
+			if (
+				liveState.generation !== currentGeneration ||
+				!liveState.isLive ||
+				tableNameRef.current !== currentTable ||
+				selectedDatabaseRef.current !== currentDatabase
+			) {
+				return;
+			}
+
+			if (res.isError) {
+				setStatus("disconnected");
+			} else {
+				setStatus("healthy");
+			}
+		} catch {
+			const liveState = useLiveModeStore.getState();
+
+			if (
+				liveState.generation !== currentGeneration ||
+				!liveState.isLive ||
+				tableNameRef.current !== currentTable ||
+				selectedDatabaseRef.current !== currentDatabase
+			) {
+				return;
+			}
+
+			setStatus("disconnected");
+		} finally {
+			pollInFlightRef.current = false;
+		}
+	}, [isEditing, pauseLive, setStatus]);
+
+	useEffect(() => {
+		if (!isLive || !canLiveMode) {
+			return;
+		}
+
+		executePoll();
+
+		const intervalId = setInterval(() => {
+			executePoll();
+		}, LIVE_POLL_INTERVAL_MS);
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [isLive, canLiveMode, executePoll]);
+
+	useEffect(() => {
+		if (!isLive || !canLiveMode) return;
+
+		const handleVisibilityChange = () => {
+			if (!document.hidden && isLive) {
+				executePoll();
+			}
+		};
+
+		document.addEventListener("visibilitychange", handleVisibilityChange);
+
+		return () => {
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
+		};
+	}, [isLive, canLiveMode, executePoll]);
+
+	useEffect(() => {
+		return () => {
+			reset();
+		};
+	}, [tableName, selectedDatabase, reset]);
+};

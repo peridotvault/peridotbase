@@ -1,0 +1,32 @@
+---
+title: FAQ
+description: "Answers to common questions about Peridotbase, the Studio, and the SDK."
+---
+
+### Where does my data live?
+
+On Solana. Rows are program accounts; the Studio reads them over RPC and never keeps a canonical copy off-chain.
+
+### Does Peridotbase run a backend?
+
+No. The Studio is a static web app. It talks to Solana RPC endpoints and your wallet, and to nothing else.
+
+### Which wallets work?
+
+Any wallet that registers through Wallet Standard. Phantom, Solflare, and Backpack all announce themselves the standard way, and the Studio lists whatever it finds.
+
+### Why does an action say "pending integration"?
+
+That means the screen is ready but the program instruction it calls does not exist yet. The capability flag for that area (for example `indexes`) turns on when `peridotbase-core` publishes the instruction.
+
+### Where do AI keys go?
+
+The AI assistant is bring-your-own-key. You paste a Gemini, OpenAI, or Anthropic key, it stays in memory for the session, and requests go directly from your browser to that provider. Keys are never written to disk or routed through a Peridotbase server.
+
+### Is Peridotbase open source?
+
+Yes — Apache-2.0. This monorepo holds the Studio, website, SDK, and shared configuration. Git history and attribution from the db-studio fork are preserved.
+
+### How is Peridotbase different from db-studio?
+
+db-studio is a desktop and CLI database GUI that talks to self-hosted engines over local drivers. Peridotbase reuses its interface ideas but is Solana-native: the database itself is a program, wallets replace connection strings, and there is no backend at all.

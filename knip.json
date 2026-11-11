@@ -1,39 +1,8 @@
 {
 	"$schema": "https://unpkg.com/knip@6/schema.json",
-	"ignore": ["t3-*/**"],
-	"ignoreBinaries": ["lipo", "strip"],
+	"ignoreExportsUsedInFile": true,
 	"ignoreIssues": {
-		"www/src/components/ui/**": ["exports", "types"]
-	},
-	"workspaces": {
-		".": {
-			"ignore": ["tools/oxlint/anti-slop/**"]
-		},
-		"packages/web": {
-			"project": ["src/**/*.{ts,tsx}"],
-			"ignoreDependencies": ["@tanstack/ai-devtools-core"]
-		},
-		"packages/server": {
-			"project": ["src/**/*.ts"]
-		},
-		"packages/desktop": {
-			"entry": ["scripts/*.mjs"],
-			"project": ["src/**/*.ts"],
-			"ignoreDependencies": ["electron-builder"]
-		},
-		"packages/proxy": {
-			"project": ["src/**/*.ts"]
-		},
-		"packages/ui": {
-			"project": ["src/**/*.{ts,tsx}"],
-			"ignoreDependencies": ["shadcn", "tailwindcss", "tw-animate-css"]
-		},
-		"packages/shared": {
-			"project": ["src/**/*.ts"]
-		},
-		"www": {
-			"project": ["src/**/*.{ts,tsx}"],
-			"ignoreDependencies": ["@fontsource-variable/jetbrains-mono", "tailwindcss", "tw-animate-css"]
-		}
+		"packages/ui/src/**": ["exports", "types"],
+		"packages/sdk/src/index.ts": ["exports", "types"]
 	}
 }

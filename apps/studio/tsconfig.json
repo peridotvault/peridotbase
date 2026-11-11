@@ -1,0 +1,11 @@
+{
+	"extends": "@peridotbase/config/tsconfig/react",
+	"compilerOptions": {
+		"noUncheckedSideEffectImports": false,
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"types": ["vite/client", "node"]
+	},
+	"include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
+}

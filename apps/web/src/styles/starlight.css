@@ -1,0 +1,35 @@
+/* Peridotbase brand tokens layered over Starlight's defaults. */
+:root {
+	--sl-color-accent-low: #173b16;
+	--sl-color-accent: #6fce3d;
+	--sl-color-accent-high: #c6f59a;
+	--sl-color-white: #f7fbf3;
+	--sl-color-gray-1: #e5eddf;
+	--sl-color-gray-2: #c2ceba;
+	--sl-color-gray-3: #92a18a;
+	--sl-color-gray-4: #5c6b55;
+	--sl-color-gray-5: #2f3a2a;
+	--sl-color-gray-6: #1b2418;
+	--sl-color-black: #10150e;
+	--sl-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root[data-theme="light"] {
+	--sl-color-accent-low: #d9f5c4;
+	--sl-color-accent: #3d8f24;
+	--sl-color-accent-high: #1d4a11;
+	--sl-color-white: #10150e;
+	--sl-color-gray-1: #1b2418;
+	--sl-color-gray-2: #2f3a2a;
+	--sl-color-gray-3: #5c6b55;
+	--sl-color-gray-4: #92a18a;
+	--sl-color-gray-5: #c2ceba;
+	--sl-color-gray-6: #e5eddf;
+	--sl-color-gray-7: #f2f7ee;
+	--sl-color-black: #f7fbf3;
+}
+
+.site-title {
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}

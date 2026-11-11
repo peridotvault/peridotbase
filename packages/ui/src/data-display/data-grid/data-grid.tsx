@@ -21,10 +21,5 @@ export const DataGrid = <TRow,>({
 		columnResizeMode: "onChange",
 	});
 
-	return (
-		<DataGridContainer
-			table={table}
-			renderCellAccessory={renderCellAccessory}
-		/>
-	);
+	return <DataGridContainer table={table} renderCellAccessory={renderCellAccessory} />;
 };

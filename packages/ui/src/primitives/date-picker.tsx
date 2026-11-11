@@ -24,10 +24,7 @@ function CalendarDropdown({ onChange, options, value }: DropdownProps) {
 			</SelectTrigger>
 			<SelectContent>
 				{options?.map((option) => (
-					<SelectItem
-						key={option.value}
-						value={String(option.value)}
-					>
+					<SelectItem key={option.value} value={String(option.value)}>
 						{option.label}
 					</SelectItem>
 				))}
@@ -162,11 +159,7 @@ export function DatePicker({
 				: placeholder;
 
 	return (
-		<Popover
-			modal={modal}
-			open={open}
-			onOpenChange={setOpen}
-		>
+		<Popover modal={modal} open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button
 					variant="outline"

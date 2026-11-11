@@ -1,0 +1,58 @@
+---
+import "../styles/landing.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "Peridotbase — your database, on-chain",
+	description = "A Solana-native, fully on-chain relational database. Browse tables, edit records, and run queries straight from your wallet.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/logo.svg" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<header class="site-header">
+			<a class="brand" href="/">
+				<img src="/logo.svg" alt="" width="28" height="28" />
+				<span>Peridotbase</span>
+			</a>
+			<nav class="site-nav" aria-label="Primary">
+				<a href="/introduction/">Docs</a>
+				<a href="/sdk/">SDK</a>
+				<a href="/roadmap/">Roadmap</a>
+				<a href="/changelog/">Changelog</a>
+				<a class="nav-github" href="https://github.com/peridotbase">
+					GitHub
+				</a>
+			</nav>
+		</header>
+		<main>
+			<slot />
+		</main>
+		<footer class="site-footer">
+			<div>
+				<strong>Peridotbase</strong>
+				<p>Apache-2.0. Built on Solana.</p>
+			</div>
+			<nav aria-label="Footer">
+				<a href="/introduction/">Documentation</a>
+				<a href="/roadmap/">Roadmap</a>
+				<a href="/changelog/">Changelog</a>
+				<a href="https://github.com/peridotbase">GitHub</a>
+			</nav>
+		</footer>
+	</body>
+</html>

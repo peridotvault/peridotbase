@@ -1,0 +1,14 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Pinned provider adapters were published within pnpm's default freshness window.
+allowBuilds:
+  "@google/genai": true
+  esbuild: true
+  protobufjs: true
+minimumReleaseAge: 0
+minimumReleaseAgeExclude:
+  - "@tanstack/ai-openai"
+  - "@tanstack/ai-anthropic"
+  - "@tanstack/ai-gemini"

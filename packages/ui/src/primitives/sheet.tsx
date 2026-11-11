@@ -6,39 +6,19 @@ import { cn } from "../utils";
 import { Button } from "./button";
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-	return (
-		<SheetPrimitive.Root
-			data-slot="sheet"
-			{...props}
-		/>
-	);
+	return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
 function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-	return (
-		<SheetPrimitive.Trigger
-			data-slot="sheet-trigger"
-			{...props}
-		/>
-	);
+	return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
 function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
-	return (
-		<SheetPrimitive.Close
-			data-slot="sheet-close"
-			{...props}
-		/>
-	);
+	return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
 function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-	return (
-		<SheetPrimitive.Portal
-			data-slot="sheet-portal"
-			{...props}
-		/>
-	);
+	return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
 function SheetOverlay({
@@ -83,15 +63,8 @@ function SheetContent({
 			>
 				<DialogContext.Provider value={true}>{children}</DialogContext.Provider>
 				{showCloseButton && (
-					<SheetPrimitive.Close
-						data-slot="sheet-close"
-						asChild
-					>
-						<Button
-							variant="ghost"
-							className="absolute top-4 right-4"
-							size="icon-sm"
-						>
+					<SheetPrimitive.Close data-slot="sheet-close" asChild>
+						<Button variant="ghost" className="absolute top-4 right-4" size="icon-sm">
 							<X />
 							<span className="sr-only">Close</span>
 						</Button>

@@ -1,0 +1,44 @@
+---
+title: Studio tour
+description: "A section-by-section guide to the Peridotbase Studio: tables, schema, runner, indexes, and the schema visualizer."
+---
+
+The Studio is organised as a set of workspace sections. Each section is listed once in `src/shared/lib/sections.ts` and gated by the capabilities the SDK reports, so a control never appears enabled when the program cannot serve it yet.
+
+## Tables
+
+The default view for an open database. Tables are rendered as a spreadsheet-style grid:
+
+- Sort and filter by any column.
+- Edit a cell in place; pending edits stay marked until you save or discard them.
+- Copy a row as JSON or as an SQL `INSERT`.
+- Export the visible table as CSV or JSON — generated in the browser from the rows the SDK returned.
+- Pause and resume Live mode, which polls the table and highlights changed rows.
+
+## Schema
+
+The schema section shows every column with its protocol type, nullability, default, primary-key and foreign-key relationships, and enum values.
+
+From here you can create a table, add or alter a column, rename it, or drop it. Each change is a single SDK call; the interface reports the program's answer rather than an optimistic result.
+
+## Runner
+
+A SQL-shaped query editor with Monaco, a keyboard run command, and a results grid. Queries are submitted through the SDK against the selected database. A failed query keeps its error attached to the result pane so you can fix and rerun it.
+
+The runner uses the fixed `pgsql` dialect: Peridotbase exposes one relational model, so there is no engine picker to configure.
+
+## Indexes
+
+Indexes are shown per table with their columns, uniqueness, method, and kind. Create and drop actions are available when the SDK reports the `indexes` capability; otherwise the section stays visible and explains what is pending.
+
+## Visualizer
+
+An entity-relationship diagram built from the SDK's table and relationship reads. Tables are laid out automatically, and foreign keys are drawn between the columns that declare them.
+
+## AI assistant
+
+A sidebar that can explain the current database schema and help draft queries. It is bring-your-own-key: you choose Gemini, OpenAI, or Anthropic and paste a key that stays in memory for the session. No key is written to disk, and no request passes through a Peridotbase relay.
+
+## Workspace menu
+
+The sidebar footer opens the workspace menu, where you can switch clusters, edit the RPC endpoint, reconnect the wallet, or disconnect. The workspace section stays visible even when no database is selected, so the connection settings are always one click away.

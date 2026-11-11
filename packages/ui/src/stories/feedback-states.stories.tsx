@@ -38,10 +38,7 @@ export const ErrorState = () => (
 			title="Connection failed"
 			message="The database server refused the request. Check credentials and retry."
 		/>
-		<Button
-			variant="outline"
-			size="sm"
-		>
+		<Button variant="outline" size="sm">
 			<AlertCircle />
 			Retry
 		</Button>

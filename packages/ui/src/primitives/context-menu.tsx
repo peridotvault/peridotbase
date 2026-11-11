@@ -4,12 +4,7 @@ import type * as React from "react";
 import { cn } from "../utils";
 
 function ContextMenu({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Root>) {
-	return (
-		<ContextMenuPrimitive.Root
-			data-slot="context-menu"
-			{...props}
-		/>
-	);
+	return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />;
 }
 
 function ContextMenuTrigger({
@@ -28,43 +23,23 @@ function ContextMenuTrigger({
 function _ContextMenuGroup({
 	...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Group>) {
-	return (
-		<ContextMenuPrimitive.Group
-			data-slot="context-menu-group"
-			{...props}
-		/>
-	);
+	return <ContextMenuPrimitive.Group data-slot="context-menu-group" {...props} />;
 }
 
 function _ContextMenuPortal({
 	...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
-	return (
-		<ContextMenuPrimitive.Portal
-			data-slot="context-menu-portal"
-			{...props}
-		/>
-	);
+	return <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />;
 }
 
 function _ContextMenuSub({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Sub>) {
-	return (
-		<ContextMenuPrimitive.Sub
-			data-slot="context-menu-sub"
-			{...props}
-		/>
-	);
+	return <ContextMenuPrimitive.Sub data-slot="context-menu-sub" {...props} />;
 }
 
 function _ContextMenuRadioGroup({
 	...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.RadioGroup>) {
-	return (
-		<ContextMenuPrimitive.RadioGroup
-			data-slot="context-menu-radio-group"
-			{...props}
-		/>
-	);
+	return <ContextMenuPrimitive.RadioGroup data-slot="context-menu-radio-group" {...props} />;
 }
 
 function ContextMenuContent({
