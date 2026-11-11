@@ -36,16 +36,20 @@ are in place. On-chain reads, writes, DDL, queries, indexes, and live refresh ar
 capability flags and turn on as `peridotbase-core` publishes each instruction. Until then, a
 gated control reports **pending integration** rather than failing silently.
 
-To walk through every Studio section before the program ships, run the labeled demo:
+To walk through every Studio section before the program ships, use the labeled demo. It is the
+default development mode:
 
 ```bash
-pnpm dev:studio:demo   # http://localhost:3001
+pnpm dev:studio   # http://localhost:3001, labeled sample data
 ```
 
 Demo mode serves sample tables, rows, schema, indexes, and query results from the browser. Every
 screen carries a **Demo preview** banner; the demo never signs a transaction, never contacts an
 RPC endpoint, and never changes the real client's capability flags. It is enabled only by
-`VITE_STUDIO_DEMO=true` (see `apps/studio/.env.demo`).
+`VITE_STUDIO_DEMO=true` (see `apps/studio/.env.demo`), and a production build never loads it.
+
+To open the real client's connection screen instead, run `pnpm dev:studio:real`. That mode shows
+the workspace status until the program ships; it keeps the same capability gates.
 
 ## Requirements
 
@@ -56,27 +60,23 @@ RPC endpoint, and never changes the real client's capability flags. It is enable
 
 ```bash
 pnpm install
-pnpm dev:studio   # http://localhost:3001
-pnpm dev:web      # http://localhost:3000
+pnpm dev:studio          # http://localhost:3001, labeled demo data
+pnpm dev:studio:real     # http://localhost:3001, real connection screen
+pnpm dev:web             # http://localhost:3000
 ```
 
-An RPC endpoint is all the Studio needs to open. A Wallet Standard wallet (Phantom, Solflare,
-Backpack) is optional until the program can sign instructions. See
+The default Studio mode opens the full interface on sample data, with a **Demo preview** banner.
+A wallet is optional in every mode; the real mode is the one to use once the program ships. See
 [apps/web/src/content/docs/getting-started.mdx](apps/web/src/content/docs/getting-started.mdx).
-
-To open the Studio without a wallet or a deployed program, use the demo:
-
-```bash
-pnpm dev:studio:demo   # sample data, labeled Demo
-```
 
 ## Commands
 
 ```bash
-pnpm dev              # every app through Turbo
-pnpm dev:studio       # Studio only
-pnpm dev:studio:demo  # Studio with labeled sample data
-pnpm dev:web          # website only
+pnpm dev                 # every app through Turbo (Studio uses demo data)
+pnpm dev:studio          # Studio with labeled sample data
+pnpm dev:studio:real     # Studio against the real connection screen
+pnpm dev:studio:demo     # alias for the demo Studio
+pnpm dev:web             # website only
 pnpm build        # build every package and app
 pnpm lint         # ESLint across the workspace
 pnpm typecheck    # tsc --noEmit and astro check

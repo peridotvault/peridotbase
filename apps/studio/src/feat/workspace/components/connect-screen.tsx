@@ -203,40 +203,35 @@ export const ConnectScreen = () => {
 					)}
 				</section>
 
-				<section className="rounded-lg border border-border p-5">
-					<h2 className="mb-1 text-sm font-medium">Peridotbase program</h2>
-					<p className="mb-3 text-xs text-muted-foreground">
-						{demo
-							? "Demo mode does not connect to the program; every screen reads the bundled sample database."
-							: "The program address is published by peridotbase-core. Until then the Studio can verify connectivity but cannot read accounts."}
-					</p>
-					<div className="flex flex-col gap-2 sm:flex-row">
-						<Input
-							aria-label="Program ID"
-							value={draftProgramId}
-							onChange={(event) => setDraftProgramId(event.target.value)}
-							placeholder="Program ID (optional)"
-							className="font-mono text-xs"
-						/>
-						<Button type="button" variant="outline" onClick={handleApplyProgram}>
-							Save
-						</Button>
-					</div>
-					<div className="mt-2">
-						<Label className="sr-only">Program readiness</Label>
-						<HealthRow
-							label="Account reads"
-							state={demo || capabilities.discovery ? "ok" : "pending"}
-							detail={
-								demo
-									? "Sample data (demo)"
-									: capabilities.discovery
-										? "Available"
-										: "Waiting for the program IDL"
-							}
-						/>
-					</div>
-				</section>
+				{!demo && (
+					<section className="rounded-lg border border-border p-5">
+						<h2 className="mb-1 text-sm font-medium">Peridotbase program</h2>
+						<p className="mb-3 text-xs text-muted-foreground">
+							The program address is published by peridotbase-core. Until then the Studio can
+							verify connectivity but cannot read accounts.
+						</p>
+						<div className="flex flex-col gap-2 sm:flex-row">
+							<Input
+								aria-label="Program ID"
+								value={draftProgramId}
+								onChange={(event) => setDraftProgramId(event.target.value)}
+								placeholder="Program ID (optional)"
+								className="font-mono text-xs"
+							/>
+							<Button type="button" variant="outline" onClick={handleApplyProgram}>
+								Save
+							</Button>
+						</div>
+						<div className="mt-2">
+							<Label className="sr-only">Program readiness</Label>
+							<HealthRow
+								label="Account reads"
+								state={capabilities.discovery ? "ok" : "pending"}
+								detail={capabilities.discovery ? "Available" : "Waiting for the program IDL"}
+							/>
+						</div>
+					</section>
+				)}
 
 				<div className="flex items-center justify-between gap-3">
 					<p className="text-xs text-muted-foreground">

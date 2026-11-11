@@ -21,12 +21,23 @@ pnpm install
 pnpm dev:studio
 ```
 
-The app starts at `http://localhost:3001`.
+The app starts at `http://localhost:3001`. It opens in demo mode with labeled sample data, so
+you can browse tables, schema, indexes, the visualizer and the query runner without a wallet or
+a deployed program.
+
+To open the real connection screen instead, run:
+
+```bash
+pnpm dev:studio:real
+```
+
+That mode keeps the workspace status page until `peridotbase-core` publishes the program
+instructions.
 
 ## Connect a wallet (optional)
 
 The Studio opens without a wallet. Connect one when you want the workspace menu to show it, and
-for signing once the program ships:
+for signing once the program ships (run `pnpm dev:studio:real` for the connection screen):
 
 1. Open **Connection settings** from the workspace menu, or visit `/connect`.
 2. Choose **Connect wallet**. The Studio lists wallets from Wallet Standard, and also detects an

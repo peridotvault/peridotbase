@@ -28,6 +28,59 @@ export type DemoDatabase = {
 	relationships: Relationship[];
 };
 
+/** The Studio's normalized type for every PostgreSQL-style type the demo accepts. */
+const VARIANT_BY_TYPE: Record<string, DataTypes> = {
+	smallint: "number",
+	int: "number",
+	integer: "number",
+	bigint: "number",
+	serial: "number",
+	bigserial: "number",
+	numeric: "number",
+	decimal: "number",
+	real: "number",
+	float: "number",
+	double: "number",
+	"double precision": "number",
+	boolean: "boolean",
+	bool: "boolean",
+	text: "text",
+	varchar: "text",
+	character: "text",
+	"character varying": "text",
+	char: "text",
+	uuid: "text",
+	bytea: "text",
+	json: "json",
+	jsonb: "json",
+	date: "date",
+	time: "date",
+	"time with time zone": "date",
+	"time without time zone": "date",
+	timestamp: "date",
+	timestamptz: "date",
+	"timestamp with time zone": "date",
+	"timestamp without time zone": "date",
+	array: "array",
+	enum: "enum",
+};
+
+/** Maps a SQL type name to the label the schema screens show. */
+export const standardizedType = (type: string): StandardizedDataType => {
+	const normalized = type.trim().toLowerCase();
+
+	if (normalized === "serial") return "int";
+	if (normalized === "bigserial") return "bigint";
+
+	return (
+		Object.keys(VARIANT_BY_TYPE).includes(normalized) ? normalized : "text"
+	) as StandardizedDataType;
+};
+
+/** The coarse kind the data grid uses to choose a cell renderer. */
+export const variant = (type: StandardizedDataType): DataTypes =>
+	VARIANT_BY_TYPE[type] ?? "text";
+
 const column = (
 	columnName: string,
 	dataTypeLabel: StandardizedDataType,

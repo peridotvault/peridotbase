@@ -13,7 +13,6 @@ import type {
 	ColumnRef,
 	CreateIndexPayload,
 	CreateTablePayload,
-	DataTypes,
 	DatabaseInfo,
 	DeleteRowsResult,
 	ExecuteQueryRequest,
@@ -31,11 +30,17 @@ import type {
 	RowPage,
 	RowRecord,
 	RowUpdate,
-	StandardizedDataType,
 	TableInfo,
 	TableRef,
 } from "@peridotbase/sdk";
-import { createDemoDatabase, type DemoDatabase, type DemoTable } from "./demo-data";
+import {
+	createDemoDatabase,
+	standardizedType,
+	variant,
+	type DemoDatabase,
+	type DemoTable,
+} from "./demo-data";
+import { executeDemoSql } from "./demo-sql";
 
 const DEMO_CAPABILITIES: Capabilities = {
 	wallet: true,
@@ -47,44 +52,6 @@ const DEMO_CAPABILITIES: Capabilities = {
 	indexes: true,
 	live: true,
 };
-
-const VARIANT_BY_TYPE: Record<string, DataTypes> = {
-	smallint: "number",
-	int: "number",
-	bigint: "number",
-	serial: "number",
-	bigserial: "number",
-	numeric: "number",
-	float: "number",
-	double: "number",
-	boolean: "boolean",
-	text: "text",
-	varchar: "text",
-	char: "text",
-	uuid: "text",
-	bytea: "text",
-	json: "json",
-	jsonb: "json",
-	date: "date",
-	time: "date",
-	timestamp: "date",
-	timestamptz: "date",
-	array: "array",
-	enum: "enum",
-};
-
-const standardizedType = (type: string): StandardizedDataType => {
-	const normalized = type.trim().toLowerCase();
-
-	if (normalized === "serial") return "int";
-	if (normalized === "bigserial") return "bigint";
-
-	return (
-		Object.keys(VARIANT_BY_TYPE).includes(normalized) ? normalized : "text"
-	) as StandardizedDataType;
-};
-
-const variant = (type: StandardizedDataType): DataTypes => VARIANT_BY_TYPE[type] ?? "text";
 
 const clone = <T>(value: T): T => structuredClone(value);
 
@@ -563,40 +530,8 @@ export class DemoPeridotbaseClient implements PeridotbaseClient {
 
 	async executeQuery(database: string, request: ExecuteQueryRequest): Promise<QueryResult> {
 		this.assertDatabase(database);
-		const startedAt = performance.now();
-		const statement = request.statement.trim();
-		const match = /^select\b[\s\S]*?\bfrom\s+("?[\w]+"?)/i.exec(statement);
 
-		if (!match) {
-			return {
-				columns: [],
-				rows: [],
-				rowCount: 0,
-				duration: performance.now() - startedAt,
-				message:
-					"Demo mode: only SELECT statements read sample data. Nothing was sent to Solana.",
-			};
-		}
-
-		const tableName = match[1].replaceAll('"', "");
-		const table = this.database.tables.find(
-			(candidate) => candidate.info.tableName.toLowerCase() === tableName.toLowerCase(),
-		);
-
-		if (!table) {
-			throw new Error(`Demo mode: table "${tableName}" does not exist`);
-		}
-
-		const limitMatch = /\blimit\s+(\d+)/i.exec(statement);
-		const limit = limitMatch ? Number.parseInt(limitMatch[1], 10) : table.rows.length;
-		const rows = clone(table.rows.slice(0, limit));
-
-		return {
-			columns: table.columns.map((column) => column.columnName),
-			rows,
-			rowCount: rows.length,
-			duration: performance.now() - startedAt,
-		};
+		return executeDemoSql(this.database, request.statement);
 	}
 
 	private assertDatabase(database: string) {

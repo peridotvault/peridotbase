@@ -22,9 +22,10 @@ here. There is no backend: no API server, no database drivers, no hosted AI rela
 
 ```bash
 pnpm install
-pnpm dev            # all apps
-pnpm dev:studio     # Studio on :3001
-pnpm dev:web        # website on :3000
+pnpm dev                 # all apps; Studio starts in demo mode on :3001
+pnpm dev:studio          # Studio on :3001, labeled sample data
+pnpm dev:studio:real     # Studio on :3001 against the real connection screen
+pnpm dev:web             # website on :3000
 pnpm build
 pnpm lint
 pnpm typecheck      # tsc --noEmit + astro check
@@ -111,7 +112,8 @@ precedence over the skill when they conflict; state the conflict instead of rest
 The one allowed exception is the env-gated Studio demo, for looking around before the program
 ships:
 
-- `pnpm dev:studio:demo` loads `apps/studio/.env.demo` (`VITE_STUDIO_DEMO=true`).
+- `pnpm dev:studio` (and its `dev:studio:demo` alias) loads `apps/studio/.env.demo`
+  (`VITE_STUDIO_DEMO=true`). `pnpm dev:studio:real` loads no demo env.
 - `shared/peridotbase/client.ts` then builds `DemoPeridotbaseClient` from
   `shared/peridotbase/demo/`; every other path keeps `ProgramNotWiredClient` and
   `PROGRAM_NOT_WIRED` unchanged.

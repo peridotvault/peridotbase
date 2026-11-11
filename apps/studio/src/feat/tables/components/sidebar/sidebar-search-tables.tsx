@@ -1,6 +1,7 @@
 import { Button } from "@peridotbase/ui/button";
 import { Input } from "@peridotbase/ui/input";
 import { Kbd } from "@peridotbase/ui/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@peridotbase/ui/tooltip";
 import { Plus, Search } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useRef } from "react";
@@ -50,14 +51,19 @@ export const SidebarSearchTables = () => {
 					<Kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-xs">/</Kbd>
 				</div>
 				{ddl && (
-					<Button
-						size="icon-lg"
-						className="shrink-0 rounded-sm"
-						onClick={() => openOverlay("table-builder.create-table")}
-						aria-label="Add table"
-					>
-						<Plus className="size-4" />
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								size="icon-lg"
+								className="shrink-0 rounded-sm"
+								onClick={() => openOverlay("table-builder.create-table")}
+								aria-label="Create table"
+							>
+								<Plus className="size-4" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">Create table</TooltipContent>
+					</Tooltip>
 				)}
 			</div>
 		</div>

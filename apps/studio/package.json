@@ -6,7 +6,8 @@
 	"description": "Peridotbase Studio — the wallet-connected dashboard for browsing tables, editing records, and running queries against an on-chain Peridotbase database.",
 	"license": "Apache-2.0",
 	"scripts": {
-		"dev": "vite --port=3001",
+		"dev": "vite --mode demo --port=3001",
+		"dev:real": "vite --port=3001",
 		"dev:demo": "vite --mode demo --port=3001",
 		"build": "vite build",
 		"preview": "vite preview --port=3000",
