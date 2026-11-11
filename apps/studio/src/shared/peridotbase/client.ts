@@ -6,6 +6,8 @@ import {
 	type PeridotbaseClient,
 	type WalletPort,
 } from "@peridotbase/sdk";
+import { DemoPeridotbaseClient } from "./demo/demo-client";
+import { isDemoMode } from "./demo/demo-mode";
 
 export type StudioConnectionConfig = {
 	rpcUrl: string;
@@ -21,16 +23,27 @@ let currentConfig: StudioConnectionConfig = {
 };
 
 let walletPort: WalletPort | null = null;
+let demoClient: DemoPeridotbaseClient | null = null;
 let client: PeridotbaseClient = buildClient(currentConfig);
 
 function buildClient(config: StudioConnectionConfig): PeridotbaseClient {
 	walletPort ??= createWalletStandardPort();
 
-	return createPeridotbaseClient({
+	const options = {
 		rpc: createRpcPort({ url: config.rpcUrl, cluster: config.cluster }),
 		wallet: walletPort,
 		programId: config.programId,
-	});
+	};
+
+	// Demo mode keeps one client so in-memory edits survive a settings change; real mode builds a
+	// client per connection, because every read and write belongs to that endpoint.
+	if (isDemoMode()) {
+		demoClient ??= new DemoPeridotbaseClient(options);
+
+		return demoClient;
+	}
+
+	return createPeridotbaseClient(options);
 }
 
 /**

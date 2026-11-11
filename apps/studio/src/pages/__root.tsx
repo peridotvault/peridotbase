@@ -12,6 +12,7 @@ import { SettingsOverlay } from "@/feat/settings";
 import { TableBuilderOverlay } from "@/feat/schema";
 import { CommandPalette } from "@/shared/components/components/command-palette";
 import { useTheme } from "@/shared/hooks/use-theme";
+import { isDemoMode } from "@/shared/peridotbase/demo/demo-mode";
 
 const connectDevtoolsServerBus =
 	import.meta.env.DEV && import.meta.env.VITE_TANSTACK_SERVER_BUS === "true";
@@ -34,7 +35,9 @@ export const Route = createRootRoute({
 			select: (state) => state.matches.some((match) => match.routeId === "/connect"),
 		});
 
-		const isInApp = Boolean(wallet) && !isConnectPage;
+		// Demo mode never asks for a wallet: the walkthrough must open on the sample workspace.
+		const demo = isDemoMode();
+		const isInApp = (Boolean(wallet) || demo) && !isConnectPage;
 
 		return (
 			<TooltipProvider>
@@ -42,7 +45,7 @@ export const Route = createRootRoute({
 					fullPageNavigationOnShallowFalseUpdates
 					defaultOptions={{ shallow: true, clearOnDefault: true }}
 				>
-					{isConnectPage ? <Outlet /> : wallet ? <Outlet /> : <Navigate to="/connect" />}
+					{isConnectPage || wallet || demo ? <Outlet /> : <Navigate to="/connect" />}
 					{/* Inside the adapter: it reads the open table's schema from the URL. */}
 					{isInApp && <CommandPalette />}
 				</NuqsAdapter>

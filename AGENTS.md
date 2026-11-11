@@ -103,6 +103,19 @@ precedence over the skill when they conflict; state the conflict instead of rest
   throw `IntegrationUnavailableError("PROGRAM_NOT_WIRED")`; the UI explains that state.
 - When an operation has no on-chain instruction, do not stub a success. Gate the control.
 
+### Demo walkthrough exception
+
+The one allowed exception is the env-gated Studio demo, for looking around before the program
+ships:
+
+- `pnpm dev:studio:demo` loads `apps/studio/.env.demo` (`VITE_STUDIO_DEMO=true`).
+- `shared/peridotbase/client.ts` then builds `DemoPeridotbaseClient` from
+  `shared/peridotbase/demo/`; every other path keeps `ProgramNotWiredClient` and
+  `PROGRAM_NOT_WIRED` unchanged.
+- Demo data must stay labeled by `DemoBanner` and the workspace copy. The demo never signs, never
+  calls an RPC endpoint, and must not be enabled in production builds.
+- Do not use the demo client as a test double or as a fallback in real mode.
+
 ## Studio conventions
 
 - Data fetching: TanStack Query; keys live in `shared/query/keys.ts`.

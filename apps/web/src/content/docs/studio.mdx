@@ -3,7 +3,14 @@ title: Studio tour
 description: "A section-by-section guide to the Peridotbase Studio: tables, schema, runner, indexes, and the schema visualizer."
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 The Studio is organised as a set of workspace sections. Each section is listed once in `src/shared/lib/sections.ts` and gated by the capabilities the SDK reports, so a control never appears enabled when the program cannot serve it yet.
+
+<Aside type="note">
+	To visit every section before `peridotbase-core` publishes its program ID, run `pnpm
+	dev:studio:demo`. Demo mode serves labeled sample data and never contacts Solana.
+</Aside>
 
 ## Tables
 

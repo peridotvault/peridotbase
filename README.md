@@ -36,6 +36,17 @@ are in place. On-chain reads, writes, DDL, queries, indexes, and live refresh ar
 capability flags and turn on as `peridotbase-core` publishes each instruction. Until then, a
 gated control reports **pending integration** rather than failing silently.
 
+To walk through every Studio section before the program ships, run the labeled demo:
+
+```bash
+pnpm dev:studio:demo   # http://localhost:3001
+```
+
+Demo mode serves sample tables, rows, schema, indexes, and query results from the browser. Every
+screen carries a **Demo preview** banner; the demo never signs a transaction, never contacts an
+RPC endpoint, and never changes the real client's capability flags. It is enabled only by
+`VITE_STUDIO_DEMO=true` (see `apps/studio/.env.demo`).
+
 ## Requirements
 
 - Node.js **22.23.4+**
@@ -52,12 +63,19 @@ pnpm dev:web      # http://localhost:3000
 The Studio needs a Wallet Standard wallet extension and an RPC endpoint. See
 [apps/web/src/content/docs/getting-started.mdx](apps/web/src/content/docs/getting-started.mdx).
 
+To open the Studio without a wallet or a deployed program, use the demo:
+
+```bash
+pnpm dev:studio:demo   # sample data, labeled Demo
+```
+
 ## Commands
 
 ```bash
-pnpm dev          # every app through Turbo
-pnpm dev:studio   # Studio only
-pnpm dev:web      # website only
+pnpm dev              # every app through Turbo
+pnpm dev:studio       # Studio only
+pnpm dev:studio:demo  # Studio with labeled sample data
+pnpm dev:web          # website only
 pnpm build        # build every package and app
 pnpm lint         # ESLint across the workspace
 pnpm typecheck    # tsc --noEmit and astro check

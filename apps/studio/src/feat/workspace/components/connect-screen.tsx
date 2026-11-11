@@ -14,8 +14,10 @@ import { useNavigate } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert, Loader2, Plug, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { listInstalledWallets } from "@peridotbase/sdk";
+import { DemoBanner } from "@/shared/components/demo-banner";
 import { homePath } from "@/shared/lib/sections";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
+import { isDemoMode } from "@/shared/peridotbase/demo/demo-mode";
 import {
 	CLUSTER_OPTIONS,
 	clusterLabel,
@@ -60,6 +62,7 @@ const HealthRow = ({
  */
 export const ConnectScreen = () => {
 	const navigate = useNavigate();
+	const demo = isDemoMode();
 	const capabilities = useStudioCapabilities();
 	const {
 		wallet,
@@ -103,6 +106,7 @@ export const ConnectScreen = () => {
 
 	return (
 		<main className="flex min-h-dvh items-center justify-center bg-background px-6 py-12 text-foreground">
+			<DemoBanner className="fixed top-0 right-0 left-0 z-50 border-b border-amber-500/40" />
 			<div className="w-full max-w-2xl space-y-6">
 				<header className="space-y-2">
 					<div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
@@ -111,8 +115,9 @@ export const ConnectScreen = () => {
 					</div>
 					<h1 className="text-2xl font-semibold tracking-tight">Connect your workspace</h1>
 					<p className="text-sm text-muted-foreground">
-						The Studio talks to your Solana wallet and an RPC endpoint. There is no server in
-						between: every read and write is a program instruction.
+						{demo
+							? "Demo mode is showing labeled sample data. No wallet or RPC traffic is needed to look around."
+							: "The Studio talks to your Solana wallet and an RPC endpoint. There is no server in between: every read and write is a program instruction."}
 					</p>
 				</header>
 
@@ -176,9 +181,11 @@ export const ConnectScreen = () => {
 					) : (
 						<div className="space-y-3">
 							<p className="text-sm text-muted-foreground">
-								{installedWallets.length > 0
-									? "A Wallet Standard wallet is installed. Connect it to sign instructions."
-									: "No Wallet Standard wallet detected. Install one (Phantom, Solflare, Backpack) and reload."}
+								{demo
+									? "Demo mode opens without a wallet. Connect one only if you want to see the Wallet Standard picker."
+									: installedWallets.length > 0
+										? "A Wallet Standard wallet is installed. Connect it to sign instructions."
+										: "No Wallet Standard wallet detected. Install one (Phantom, Solflare, Backpack) and reload."}
 							</p>
 							<div className="flex flex-wrap items-center gap-2">
 								<Button type="button" onClick={() => void connect()} disabled={isConnecting}>
@@ -198,9 +205,9 @@ export const ConnectScreen = () => {
 				<section className="rounded-lg border border-border p-5">
 					<h2 className="mb-1 text-sm font-medium">Peridotbase program</h2>
 					<p className="mb-3 text-xs text-muted-foreground">
-						The program address is published by{" "}
-						<span className="font-mono">peridotbase-core</span>. Until then the Studio can
-						verify connectivity but cannot read accounts.
+						{demo
+							? "Demo mode does not connect to the program; every screen reads the bundled sample database."
+							: "The program address is published by peridotbase-core. Until then the Studio can verify connectivity but cannot read accounts."}
 					</p>
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<Input
@@ -218,24 +225,32 @@ export const ConnectScreen = () => {
 						<Label className="sr-only">Program readiness</Label>
 						<HealthRow
 							label="Account reads"
-							state={capabilities.discovery ? "ok" : "pending"}
-							detail={capabilities.discovery ? "Available" : "Waiting for the program IDL"}
+							state={demo || capabilities.discovery ? "ok" : "pending"}
+							detail={
+								demo
+									? "Sample data (demo)"
+									: capabilities.discovery
+										? "Available"
+										: "Waiting for the program IDL"
+							}
 						/>
 					</div>
 				</section>
 
 				<div className="flex items-center justify-between gap-3">
 					<p className="text-xs text-muted-foreground">
-						{wallet
-							? "Wallet connected. Open the workspace to see program status."
-							: "Connect a wallet to continue."}
+						{demo
+							? "Demo mode: open the workspace to browse sample data."
+							: wallet
+								? "Wallet connected. Open the workspace to see program status."
+								: "Connect a wallet to continue."}
 					</p>
 					<Button
 						type="button"
-						disabled={!wallet}
+						disabled={!demo && !wallet}
 						onClick={() => navigate({ to: homePath(capabilities) })}
 					>
-						Open workspace
+						{demo ? "Explore the demo" : "Open workspace"}
 					</Button>
 				</div>
 			</div>

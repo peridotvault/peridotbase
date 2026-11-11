@@ -12,6 +12,7 @@
 	"scripts": {
 		"dev": "turbo run dev",
 		"dev:studio": "turbo run dev --filter=@peridotbase/studio",
+		"dev:studio:demo": "turbo run dev:demo --filter=@peridotbase/studio",
 		"dev:web": "turbo run dev --filter=@peridotbase/web",
 		"build": "turbo run build",
 		"build:studio": "turbo run build --filter=@peridotbase/studio",

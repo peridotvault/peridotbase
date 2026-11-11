@@ -1,5 +1,6 @@
 export * from "./client";
 export * from "./databases";
+export * from "./demo/demo-mode";
 export * from "./errors";
 export * from "./export";
 export * from "./query";

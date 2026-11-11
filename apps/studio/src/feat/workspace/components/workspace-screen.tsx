@@ -3,6 +3,7 @@ import { Button } from "@peridotbase/ui/button";
 import { Link } from "@tanstack/react-router";
 import { CheckCircle2, CircleAlert, Loader2, Settings2, Wallet } from "lucide-react";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
+import { isDemoMode } from "@/shared/peridotbase/demo/demo-mode";
 import { useProtocolHealth, useWalletSession } from "../hooks/use-workspace";
 
 const capabilitiesList = [
@@ -20,6 +21,7 @@ const capabilitiesList = [
  * today instead of showing empty tables as if they were real.
  */
 export const WorkspaceScreen = () => {
+	const demo = isDemoMode();
 	const capabilities = useStudioCapabilities();
 	const health = useProtocolHealth();
 	const { wallet, cluster, rpcUrl, programId } = useWalletSession();
@@ -30,8 +32,9 @@ export const WorkspaceScreen = () => {
 				<header className="space-y-2">
 					<h1 className="text-2xl font-semibold tracking-tight">Workspace</h1>
 					<p className="text-sm text-muted-foreground">
-						The Studio reads your Peridotbase database directly from Solana. This page shows
-						what the connected program can do right now.
+						{demo
+							? "Demo preview of your Peridotbase workspace. This page samples the connection layout with labeled data; the table, runner, schema, index and visualizer sections browse it."
+							: "The Studio reads your Peridotbase database directly from Solana. This page shows what the connected program can do right now."}
 					</p>
 				</header>
 
@@ -58,20 +61,27 @@ export const WorkspaceScreen = () => {
 						<div className="flex items-center justify-between gap-4 px-5 py-3">
 							<dt className="text-muted-foreground">Endpoint</dt>
 							<dd className="flex items-center gap-2">
-								{health.isLoading ? (
+								{demo ? (
+									<>
+										<CheckCircle2 className="size-4 text-emerald-500" />
+										<span className="text-xs">Demo sample data · no RPC calls</span>
+									</>
+								) : health.isLoading ? (
 									<Loader2 className="size-4 animate-spin text-muted-foreground" />
 								) : health.data?.reachable ? (
 									<CheckCircle2 className="size-4 text-emerald-500" />
 								) : (
 									<CircleAlert className="size-4 text-destructive" />
 								)}
-								<span className="text-xs">
-									{health.isLoading
-										? "Checking…"
-										: health.data?.reachable
-											? `${health.data.version ?? "Solana"} · slot ${health.data.slot ?? "?"}`
-											: "No response"}
-								</span>
+								{!demo && (
+									<span className="text-xs">
+										{health.isLoading
+											? "Checking…"
+											: health.data?.reachable
+												? `${health.data.version ?? "Solana"} · slot ${health.data.slot ?? "?"}`
+												: "No response"}
+									</span>
+								)}
 							</dd>
 						</div>
 						<div className="flex items-center justify-between gap-4 px-5 py-3">
@@ -79,14 +89,20 @@ export const WorkspaceScreen = () => {
 							<dd className="flex items-center gap-2">
 								<Wallet className="size-4 text-muted-foreground" />
 								<span className="font-mono text-xs">
-									{wallet ? (wallet.label ?? wallet.address) : "Not connected"}
+									{wallet
+										? (wallet.label ?? wallet.address)
+										: demo
+											? "Demo (wallet not required)"
+											: "Not connected"}
 								</span>
 							</dd>
 						</div>
 						<div className="flex items-center justify-between gap-4 px-5 py-3">
 							<dt className="text-muted-foreground">Program</dt>
 							<dd className="font-mono text-xs">
-								{programId || "Published by peridotbase-core"}
+								{demo
+									? "Not connected (demo mode)"
+									: programId || "Published by peridotbase-core"}
 							</dd>
 						</div>
 					</dl>
@@ -94,25 +110,38 @@ export const WorkspaceScreen = () => {
 
 				<section className="rounded-lg border border-border">
 					<div className="border-b border-border px-5 py-3">
-						<h2 className="text-sm font-medium">Program capabilities</h2>
+						<h2 className="text-sm font-medium">
+							{demo ? "Program capabilities (demo)" : "Program capabilities"}
+						</h2>
 					</div>
 					<ul className="divide-y divide-border text-sm">
 						{capabilitiesList.map(([key, label]) => (
 							<li key={key} className="flex items-center justify-between gap-4 px-5 py-3">
 								<span>{label}</span>
-								<Badge variant={capabilities[key] ? "default" : "secondary"}>
-									{capabilities[key] ? "Available" : "Pending"}
+								<Badge
+									variant={demo ? "secondary" : capabilities[key] ? "default" : "secondary"}
+								>
+									{demo ? "Demo" : capabilities[key] ? "Available" : "Pending"}
 								</Badge>
 							</li>
 						))}
 					</ul>
-					{!capabilities.discovery && (
+					{demo ? (
 						<p className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
-							Account reads stay disabled until{" "}
-							<span className="font-mono">peridotbase-core</span> publishes the deployed
-							program address and its account layout. The table, schema and index screens
-							appear once they work.
+							Demo mode simulates every capability from the bundled sample database. Open any
+							section from the rail to browse tables, schema, indexes, the visualizer and the
+							query runner. Start the Studio with{" "}
+							<span className="font-mono">pnpm dev:studio:demo</span> to reproduce this view.
 						</p>
+					) : (
+						!capabilities.discovery && (
+							<p className="border-t border-border px-5 py-3 text-xs text-muted-foreground">
+								Account reads stay disabled until{" "}
+								<span className="font-mono">peridotbase-core</span> publishes the deployed
+								program address and its account layout. The table, schema and index screens
+								appear once they work.
+							</p>
+						)
 					)}
 				</section>
 

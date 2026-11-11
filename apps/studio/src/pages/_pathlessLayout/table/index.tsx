@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DemoFirstTable } from "@/shared/components/demo-first-table";
 
 export const Route = createFileRoute("/_pathlessLayout/table/")({
 	component: RouteComponent,
@@ -6,6 +7,13 @@ export const Route = createFileRoute("/_pathlessLayout/table/")({
 
 function RouteComponent() {
 	return (
-		<div className="flex-1 flex items-center justify-center">Select a table to view data</div>
+		<DemoFirstTable
+			section="table"
+			fallback={
+				<div className="flex-1 flex items-center justify-center">
+					Select a table to view data
+				</div>
+			}
+		/>
 	);
 }

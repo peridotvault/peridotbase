@@ -5,7 +5,9 @@ import { DropColumnDialog, EditTableSheet } from "@/feat/schema";
 import { TablesSidebar } from "@/feat/tables";
 import { SidebarFooter } from "@/feat/workspace";
 import { NavRail } from "@/shared/components/components/nav-rail";
+import { DemoBanner } from "@/shared/components/demo-banner";
 import { SidebarWrapper } from "@/shared/components/sidebar-wrapper";
+import { useDemoBootstrap } from "@/shared/hooks/use-demo-bootstrap";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
 import { homePath, sectionOf } from "@/shared/lib/sections";
 import { usePersonalPreferencesStore } from "@/shared/stores/personal-preferences.store";
@@ -18,6 +20,8 @@ function RouteComponent() {
 	const capabilities = useStudioCapabilities();
 	const { pathname } = useLocation();
 	const section = sectionOf(pathname);
+
+	useDemoBootstrap();
 
 	const {
 		sidebar: { mode, width },
@@ -45,6 +49,7 @@ function RouteComponent() {
 					marginLeft: sidebar && mode === "pinned" ? `${width}px` : "0",
 				}}
 			>
+				<DemoBanner />
 				<Outlet />
 			</div>
 

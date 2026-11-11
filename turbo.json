@@ -5,8 +5,13 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"outputs": ["dist/**"],
-			"env": ["NODE_ENV"],
-			"passThroughEnv": ["PUBLIC_SOLANA_RPC_URL", "PUBLIC_SOLANA_CLUSTER", "PUBLIC_SITE_URL"]
+			"env": ["NODE_ENV", "VITE_STUDIO_DEMO"],
+			"passThroughEnv": [
+				"PUBLIC_SOLANA_RPC_URL",
+				"PUBLIC_SOLANA_CLUSTER",
+				"PUBLIC_SITE_URL",
+				"VITE_STUDIO_DEMO"
+			]
 		},
 		"@peridotbase/sdk#build": {
 			"dependsOn": ["^build"],
@@ -42,6 +47,11 @@
 		},
 		"clean": {
 			"cache": false
+		},
+		"@peridotbase/studio#dev:demo": {
+			"dependsOn": ["^build"],
+			"cache": false,
+			"persistent": true
 		}
 	},
 	"globalDependencies": ["tsconfig.json", "package.json", "turbo.json", ".env", ".env.local"],

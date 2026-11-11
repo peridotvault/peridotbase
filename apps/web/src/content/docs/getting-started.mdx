@@ -33,6 +33,17 @@ The app starts at `http://localhost:3001`.
 	legitimate Peridotbase screen will ask.
 </Aside>
 
+## Try the demo (no wallet, no program)
+
+```bash
+pnpm dev:studio:demo
+```
+
+Demo mode opens the full Studio on labeled sample data: tables, schema, the query runner,
+indexes, the visualizer, and the workspace. Every screen carries a **Demo preview** banner and
+nothing is read from or written to Solana. To return to the real client, restart with
+`pnpm dev:studio`.
+
 ## Choose a cluster and RPC endpoint
 
 The workspace settings let you pick a cluster and an RPC URL:
