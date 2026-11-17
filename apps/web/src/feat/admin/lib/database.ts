@@ -38,7 +38,11 @@ const sha256Hex = async (text: string): Promise<string> => {
 	return hex(new Uint8Array(digest));
 };
 
-const pbkdf2Hex = async (salt: string, password: string, iterations: number): Promise<string> => {
+const pbkdf2Hex = async (
+	salt: string,
+	password: string,
+	iterations: number,
+): Promise<string> => {
 	const key = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, [
 		"deriveBits",
 	]);

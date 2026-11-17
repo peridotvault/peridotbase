@@ -125,5 +125,9 @@ export function ProductCard({
 				{inner}
 			</a>
 		);
-	return <a href={href} className={base}>{inner}</a>;
+	return (
+		<a href={href} className={base}>
+			{inner}
+		</a>
+	);
 }

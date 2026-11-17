@@ -30,7 +30,8 @@ const writeLockout = (lockout: Lockout): void => {
 	localStorage.setItem(LOCKOUT_KEY, JSON.stringify(lockout));
 };
 
-const secondsLeft = (until: number): number => Math.max(0, Math.ceil((until - Date.now()) / 1000));
+const secondsLeft = (until: number): number =>
+	Math.max(0, Math.ceil((until - Date.now()) / 1000));
 
 /** Username + password gate. Seed JSON ships the hash; session is an expiring localStorage
  *  token. ponytail: server-side lockout replaces this when a backend exists. */
@@ -47,7 +48,9 @@ export const LoginScreen = () => {
 
 		const lockout = readLockout();
 		if (Date.now() < lockout.until) {
-			setError(`Terlalu banyak percobaan. Coba lagi dalam ${secondsLeft(lockout.until)} detik.`);
+			setError(
+				`Terlalu banyak percobaan. Coba lagi dalam ${secondsLeft(lockout.until)} detik.`,
+			);
 			return;
 		}
 

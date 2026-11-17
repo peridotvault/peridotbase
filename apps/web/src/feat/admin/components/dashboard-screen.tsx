@@ -58,7 +58,8 @@ export const DashboardScreen = () => {
 		workspace.setProgramId(programId.trim());
 	};
 
-	const toggleDemo = () => commit({ ...db, settings: { ...db.settings, demoMode: !db.settings.demoMode } });
+	const toggleDemo = () =>
+		commit({ ...db, settings: { ...db.settings, demoMode: !db.settings.demoMode } });
 
 	const addAdmin = async () => {
 		const name = newUsername.trim();
@@ -69,7 +70,11 @@ export const DashboardScreen = () => {
 		}
 
 		const salt = newSalt();
-		const record = { username: name, salt, passwordHash: await hashPassword(salt, newPassword) };
+		const record = {
+			username: name,
+			salt,
+			passwordHash: await hashPassword(salt, newPassword),
+		};
 		commit({ ...db, admins: [...db.admins, record] });
 		setNewUsername("");
 		setNewPassword("");
@@ -77,7 +82,10 @@ export const DashboardScreen = () => {
 
 	const removeAdmin = (username: string) => {
 		if (db.admins.length <= 1 || username === user) return;
-		commit({ ...db, admins: db.admins.filter((candidate) => candidate.username !== username) });
+		commit({
+			...db,
+			admins: db.admins.filter((candidate) => candidate.username !== username),
+		});
 	};
 
 	const changeAdminPassword = async () => {
@@ -193,7 +201,10 @@ export const DashboardScreen = () => {
 						<h2 className="text-sm font-medium">Admins ({db.admins.length})</h2>
 						<ul className="divide-y divide-border text-sm">
 							{db.admins.map((admin) => (
-								<li key={admin.username} className="flex items-center justify-between gap-3 py-2">
+								<li
+									key={admin.username}
+									className="flex items-center justify-between gap-3 py-2"
+								>
 									<span className="font-mono text-xs">{admin.username}</span>
 									{admin.username !== user && db.admins.length > 1 && (
 										<Button
@@ -242,7 +253,11 @@ export const DashboardScreen = () => {
 									value={changePassword}
 									onChange={(event) => setChangePassword(event.target.value)}
 								/>
-								<Button type="button" variant="outline" onClick={() => void changeAdminPassword()}>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => void changeAdminPassword()}
+								>
 									Ubah
 								</Button>
 							</div>

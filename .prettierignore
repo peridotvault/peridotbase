@@ -4,4 +4,4 @@ dist
 .turbo
 coverage
 pnpm-lock.yaml
-apps/studio/src/routeTree.gen.ts
+**/routeTree.gen.ts

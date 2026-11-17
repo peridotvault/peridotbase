@@ -1,8 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { DOCS_URL, GITHUB_URL } from "@/shared/lib/site";
 
-const navLink =
-	"text-sm text-foreground-light transition-colors hover:text-foreground";
+const navLink = "text-sm text-foreground-light transition-colors hover:text-foreground";
 
 /** Sticky Supabase-style navbar: translucent over the hero, border-b, rounded buttons. */
 export function SiteHeader() {
