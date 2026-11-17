@@ -6,3 +6,4 @@ export * from "./query.js";
 export * from "./row.js";
 export * from "./schema.js";
 export * from "./table.js";
+export * from "./workspace.js";

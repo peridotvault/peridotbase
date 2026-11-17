@@ -1,0 +1,16 @@
+{
+	"admins": [
+		{
+			"username": "admin",
+			"salt": "1c31401328abdd70f9366233506d274",
+			"passwordHash": "pbkdf2$210000$5bc68c93613b2d655d3658d60a79b4854c9c21037c4c86417a1a6e6e8ae77eed"
+		}
+	],
+	"settings": {
+		"activeProgramId": "AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3",
+		"rpcUrl": "https://api.devnet.solana.com",
+		"cluster": "devnet",
+		"demoMode": false,
+		"siteUrl": "https://peridotbase.com"
+	}
+}

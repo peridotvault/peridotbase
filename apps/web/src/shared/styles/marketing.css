@@ -1,0 +1,149 @@
+/* Supabase-aligned design system for the whole client. Values mirror supabase.com:
+ *  Manrope body, Source Code Pro mono, brand green #3ECF8E, muted text hierarchy,
+ *  hairline borders, rounded surfaces. Light values on :root, dark under `.dark`.
+ *  Marketing and Studio shell classes carry the shared typography/canvas. */
+
+:root {
+	/* Brand */
+	--brand-default: 152 75% 60%; /* #3ecf8e */
+	--brand-600: 152 75% 38%; /* #199a5f */
+	--primary-solid: hsl(var(--brand-600));
+	--primary-solid-hover: hsl(var(--brand-default));
+
+	/* Surfaces (light) */
+	--background: #fcfcfc;
+	--background-alternative: #f8f8f8;
+	--surface-75: #ffffff;
+	--surface-100: #f8f8f8;
+	--surface-200: #f1f1f1;
+	--surface-300: #e8e8e8;
+
+	/* Foreground hierarchy (light) */
+	--foreground: #1c1c1c;
+	--foreground-light: #4d4d4d;
+	--foreground-lighter: #707070;
+	--foreground-muted: #6b6b6b;
+
+	/* Borders (light) */
+	--border-default: hsl(0 0% 0% / 0.1);
+	--border-strong: hsl(0 0% 0% / 0.2);
+	--border-alternative: hsl(0 0% 0% / 0.07);
+	--border: var(--border-default);
+
+	/* shadcn aliases: primitives resolve to Supabase values app-wide, including
+	   portaled dropdowns, dialogs and toasts. Accent is the subtle hover surface. */
+	--card: var(--surface-75);
+	--card-foreground: var(--foreground);
+	--popover: var(--surface-75);
+	--popover-foreground: var(--foreground);
+	--primary: var(--primary-solid);
+	--primary-foreground: #ffffff;
+	--secondary: var(--surface-100);
+	--secondary-foreground: var(--foreground);
+	--muted: var(--surface-100);
+	--muted-foreground: var(--foreground-light);
+	--accent: var(--surface-200);
+	--accent-foreground: var(--foreground);
+	--input: var(--border-default);
+	--ring: var(--primary-solid);
+	--sidebar: var(--background);
+	--sidebar-foreground: var(--foreground);
+	--sidebar-primary: var(--primary-solid);
+	--sidebar-primary-foreground: #ffffff;
+	--sidebar-accent: var(--surface-200);
+	--sidebar-accent-foreground: var(--foreground);
+	--sidebar-border: var(--border-default);
+	--sidebar-ring: var(--primary-solid);
+
+	--selection: var(--primary-solid);
+	--overlay: hsl(0 0% 0% / 0.5);
+
+	--container-max-width: 1280px;
+	--navbar-height: 64px;
+}
+
+.dark {
+	--primary-solid: hsl(var(--brand-default));
+	--primary-solid-hover: hsl(var(--brand-600));
+	--primary-foreground: var(--background);
+	--sidebar-primary-foreground: var(--background);
+
+	/* Surfaces (dark) */
+	--background: #1c1c1c;
+	--background-alternative: #171717;
+	--surface-75: #1c1c1c;
+	--surface-100: #222222;
+	--surface-200: #2a2a2a;
+	--surface-300: #2e2e2e;
+
+	/* Foreground hierarchy (dark) */
+	--foreground: #ededed;
+	--foreground-light: #a0a0a0;
+	--foreground-lighter: #707070;
+	--foreground-muted: #909090;
+
+	/* Borders (dark) */
+	--border-default: hsl(0 0% 100% / 0.1);
+	--border-strong: hsl(0 0% 100% / 0.2);
+	--border-alternative: hsl(0 0% 100% / 0.07);
+	--border: var(--border-default);
+}
+
+.marketing,
+.studio {
+	color: var(--foreground);
+	font-family:
+		"Manrope Variable",
+		Manrope,
+		system-ui,
+		Helvetica Neue,
+		Helvetica,
+		Arial,
+		sans-serif;
+	font-size: 1rem;
+	line-height: 1.5;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.marketing {
+	background: var(--background);
+}
+
+.marketing code,
+.marketing pre,
+.marketing kbd,
+.studio code,
+.studio pre,
+.studio kbd {
+	font-family:
+		"Source Code Pro Variable", "Source Code Pro", ui-monospace, SFMono-Regular, Menlo,
+		monospace;
+}
+
+.marketing ::selection,
+.studio ::selection {
+	background: var(--selection);
+	color: var(--background);
+}
+
+/* Supabase `.section-container`: centered max-width with horizontal padding. */
+.section-container {
+	width: 100%;
+	max-width: var(--container-max-width);
+	margin-inline: auto;
+	padding-inline: 1.5rem;
+}
+@media (min-width: 1024px) {
+	.section-container {
+		padding-inline: 2rem;
+	}
+}
+
+/* Subtle dotted grid used behind hero and stats. */
+.dot-grid {
+	background-image: radial-gradient(circle, hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+	background-size: 16px 16px;
+}

@@ -1,0 +1,48 @@
+---
+title: Introduction
+description: "Peridotbase is a Solana-native, fully on-chain relational database with a wallet-connected Studio for browsing tables, editing records, and running queries."
+---
+
+Peridotbase is a relational database that lives entirely on Solana. Tables, rows, indexes, and access rules are accounts owned by the Peridotbase program — no off-chain server, no canonical database copy, and no custodian holding your data.
+
+The Studio in this repository is the browser front end for that program. It connects to your Solana wallet, talks to an RPC endpoint you choose, and renders the database through the Peridotbase TypeScript SDK.
+
+## What you get
+
+<CardGroup cols={2}>
+	<Card title="On-chain by default" icon="rocket">
+		Every table and row is program-owned state. What the Studio shows is what the chain holds.
+	</Card>
+	<Card title="Wallet-native access" icon="key">
+		Connect any Wallet Standard wallet. Reads and writes are signed by your keys, not an API
+		token.
+	</Card>
+	<Card title="One relational model" icon="pencil">
+		A PostgreSQL-style type system, SQL-shaped queries, primary and foreign keys, and indexes.
+	</Card>
+	<Card title="Open source" icon="open-book">
+		Apache-2.0. The Studio, SDK, and configuration are all in this monorepo.
+	</Card>
+</CardGroup>
+
+## How the pieces fit
+
+- **`peridotbase-core`** — the on-chain Rust program (kept in its own repository). It owns the account layout, instructions, and access rules.
+- **`@peridotvault/peridotbase-sdk`** — the TypeScript client the Studio uses. It defines the transport, wallet, and RPC ports, plus the protocol types shared by every screen.
+- **Peridotbase web** — one React app in `apps/web`: prerendered marketing pages plus the Studio under `/studio`. The Studio is a pure client: SDK calls, Solana RPC health checks, and Wallet Standard signing.
+- **Documentation** — the site you are reading, built with Mintlify from `apps/docs`.
+
+## Current status
+
+The Studio shell, wallet connection, RPC health check, and the full table/query interface are in place, and the program is deployed on devnet. Reads, writes, DDL, queries, indexes, and live refresh run against it. Operations the program has no instruction for stay visible but report that they are pending integration instead of pretending to succeed.
+
+<Note>
+	Peridotbase never asks for a seed phrase or a private key. Wallet Standard hands the Studio a
+	public address and asks the wallet extension to sign when an instruction needs it.
+</Note>
+
+## Where to go next
+
+- [Get started](/getting-started) by connecting a wallet to a devnet RPC.
+- [Take the Studio tour](/studio) to see every section.
+- [Read the SDK guide](/sdk) if you are building your own client.

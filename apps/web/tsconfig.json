@@ -1,8 +1,11 @@
 {
-	"extends": "@peridotbase/config/tsconfig/astro",
+	"extends": "@peridotvault/peridotbase-config/tsconfig/react",
 	"compilerOptions": {
 		"noUncheckedSideEffectImports": false,
-		"baseUrl": "."
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"types": ["vite/client", "node"]
 	},
-	"include": [".astro/types.d.ts", "src", "astro.config.mjs"]
+	"include": ["src", "tests", "vite.config.ts", "vitest.config.ts"]
 }

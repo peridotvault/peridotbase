@@ -1,4 +1,3 @@
-import { IntegrationUnavailableError } from "./errors.js";
 import type { ConnectedWallet, WalletPort } from "./ports.js";
 
 type WalletAccountLike = {
@@ -11,6 +10,9 @@ type WalletFeatureLike = {
 	version?: string;
 	connect?: () => Promise<{ accounts: readonly WalletAccountLike[] }>;
 	disconnect?: () => Promise<void>;
+	signTransaction?: (
+		...inputs: { transaction: Uint8Array; account: WalletAccountLike }[]
+	) => Promise<{ signedTransaction: Uint8Array; signature: Uint8Array }[]>;
 };
 
 export type WalletStandardWallet = {
@@ -43,6 +45,13 @@ type LegacyWalletProvider = {
 	}) => Promise<{ publicKey?: { toString(): string } | null } | void>;
 	disconnect?: () => Promise<void>;
 	publicKey?: { toString(): string } | null;
+	signTransaction?: (transaction: unknown) => Promise<unknown>;
+	/**
+	 * Legacy batch signer. Phantom/Solflare present a single approval for the
+	 * whole array, unlike the Wallet Standard `solana:signTransaction` feature
+	 * which prompts once per transaction.
+	 */
+	signAllTransactions?: (transactions: unknown[]) => Promise<unknown[]>;
 };
 
 type InjectedWindow = Window & {
@@ -173,6 +182,10 @@ const legacyWallets = (): LegacyWallet[] => {
 	);
 };
 
+/** Same wallet name as the Wallet Standard announcement, matched to its injected provider. */
+const legacyProviderFor = (name: string): LegacyWalletProvider | null =>
+	legacyWallets().find((wallet) => wallet.name === name)?.provider ?? null;
+
 /**
  * Installed Solana wallets, for the connect menu. Merges the Wallet Standard registry with the
  * legacy injected providers, so a wallet that only announces one of the two still appears.
@@ -201,7 +214,7 @@ export const subscribeToWallets = (listener: () => void): (() => void) => {
 };
 
 type ActiveWallet =
-	| { kind: "standard"; wallet: WalletStandardWallet }
+	| { kind: "standard"; wallet: WalletStandardWallet; account: WalletAccountLike }
 	| { kind: "legacy"; provider: LegacyWalletProvider };
 
 /**
@@ -254,7 +267,7 @@ export const createWalletStandardPort = (): WalletPort => {
 				const account = result?.accounts[0] ?? selected.accounts?.[0];
 
 				if (account) {
-					active = { kind: "standard", wallet: selected };
+					active = { kind: "standard", wallet: selected, account };
 					wallet = { address: account.address, label: selected.name };
 
 					return wallet;
@@ -275,8 +288,88 @@ export const createWalletStandardPort = (): WalletPort => {
 				active = null;
 			}
 		},
-		signTransaction: async () => {
-			throw new IntegrationUnavailableError("wallet.signTransaction");
+		signTransactions: async (payloads) => {
+			const current = active;
+
+			if (!current) throw new Error("Connect a wallet before signing");
+
+			if (current.kind === "standard") {
+				const feature = current.wallet.features["solana:signTransaction"];
+
+				if (!feature?.signTransaction) {
+					throw new Error(`${current.wallet.name} cannot sign transactions`);
+				}
+
+				// Wallet Standard sign: one wallet prompt per transaction. A legacy
+				// injected provider signs the whole batch behind one prompt, so
+				// prefer it whenever the same wallet exposes both paths.
+				const legacyProvider = legacyProviderFor(current.wallet.name);
+
+				if (legacyProvider?.signAllTransactions) {
+					try {
+						// Sync the legacy session so it can sign; some wallets
+						// already trust the app after the standard connect.
+						await legacyProvider.connect?.({ onlyIfTrusted: true });
+					} catch {
+						// A rejected trusted connect must not skip the batch signer.
+					}
+
+					try {
+						const { Transaction } = await import("@solana/web3.js");
+						const unsigned = payloads.map((payload) => Transaction.from(payload));
+						const signed = await legacyProvider.signAllTransactions(unsigned);
+
+						return signed.map((entry) =>
+							typeof (entry as { serialize?: unknown }).serialize === "function"
+								? (entry as { serialize: () => Uint8Array }).serialize()
+								: (entry as Uint8Array),
+						);
+					} catch {
+						// Legacy path unavailable: fall through to Wallet Standard.
+					}
+				}
+
+				const signed = await feature.signTransaction(
+					...payloads.map((transaction) => ({
+						transaction,
+						account: current.account,
+					})),
+				);
+
+				return signed.map((entry) => entry.signedTransaction);
+			}
+
+			if (!current.provider.signTransaction) {
+				throw new Error("The connected wallet cannot sign transactions");
+			}
+
+			const { Transaction } = await import("@solana/web3.js");
+
+			// One approval for the whole array when the wallet supports it.
+			if (payloads.length > 1 && current.provider.signAllTransactions) {
+				const signed = await current.provider.signAllTransactions(
+					payloads.map((payload) => Transaction.from(payload)),
+				);
+
+				return signed.map((entry) =>
+					typeof (entry as { serialize?: unknown }).serialize === "function"
+						? (entry as { serialize: () => Uint8Array }).serialize()
+						: (entry as Uint8Array),
+				);
+			}
+
+			const out: Uint8Array[] = [];
+
+			for (const payload of payloads) {
+				const signed = await current.provider.signTransaction(Transaction.from(payload));
+				out.push(
+					typeof (signed as { serialize?: unknown }).serialize === "function"
+						? (signed as { serialize: () => Uint8Array }).serialize()
+						: payload,
+				);
+			}
+
+			return out;
 		},
 	};
 };

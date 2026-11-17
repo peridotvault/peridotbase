@@ -1,4 +1,5 @@
 import type { RpcPort, WalletPort } from "./ports.js";
+import type { ScopeResolver } from "./program-client.js";
 import type {
 	AddColumnPayload,
 	AlterColumnPayload,
@@ -12,6 +13,8 @@ import type {
 	ExecuteQueryRequest,
 	IndexInfo,
 	MutationResult,
+	OrganizationInfo,
+	ProjectInfo,
 	QueryResult,
 	ReadRowsQuery,
 	Relationship,
@@ -56,7 +59,13 @@ export type PeridotbaseClient = {
 	readonly programId: string | null;
 
 	getHealth: () => Promise<ProtocolHealth>;
+	/** Organizations the connected wallet created. Empty without a wallet. */
+	listOrganizations: () => Promise<OrganizationInfo[]>;
+	createOrganization: (name: string) => Promise<OrganizationInfo>;
+	listProjects: (organization: string) => Promise<ProjectInfo[]>;
+	createProject: (organization: string, name: string) => Promise<ProjectInfo>;
 	listDatabases: () => Promise<DatabaseInfo[]>;
+	createDatabase: (name: string) => Promise<DatabaseInfo>;
 	listTables: (database: string) => Promise<TableInfo[]>;
 	getTableColumns: (ref: TableRef) => Promise<ColumnInfo[]>;
 	getRelationships: (database: string) => Promise<Relationship[]>;
@@ -84,6 +93,8 @@ export type PeridotbaseClient = {
 export type PeridotbaseClientOptions = {
 	rpc: RpcPort;
 	wallet?: WalletPort | null;
-	/** Absent until `peridotbase-core` publishes the deployed program address. */
+	/** Deployed `peridotbase_core` address. Without it every program read is refused. */
 	programId?: string | null;
+	/** Organization/project selection the Studio route carries; scopes every program call. */
+	scope?: ScopeResolver;
 };

@@ -7,13 +7,13 @@ Guidance for coding agents working in this repository.
 Peridotbase is a Solana-native, fully on-chain relational database. This monorepo is the client
 side:
 
-| Path              | Package               | Role                                                           |
-| ----------------- | --------------------- | -------------------------------------------------------------- |
-| `apps/studio`     | `@peridotbase/studio` | React 19 dashboard (Vite, TanStack Router/Query/Table, Monaco) |
-| `apps/web`        | `@peridotbase/web`    | Marketing site and docs (Astro + Starlight)                    |
-| `packages/sdk`    | `@peridotbase/sdk`    | TypeScript client, protocol types, wallet/RPC ports            |
-| `packages/ui`     | `@peridotbase/ui`     | shadcn/ui primitives and the data grid                         |
-| `packages/config` | `@peridotbase/config` | Shared TS, ESLint, Prettier, Tailwind config                   |
+| Path              | Package                            | Role                                                                     |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------ |
+| `apps/web`        | `@peridotvault/peridotbase-web`    | TanStack Start app: prerendered marketing pages + Studio under `/studio` |
+| `apps/docs`       | `@peridotvault/peridotbase-docs`   | Mintlify documentation site (`docs.peridotbase.com`, MDX)                |
+| `packages/sdk`    | `@peridotvault/peridotbase-sdk`    | TypeScript client, protocol types, wallet/RPC ports                      |
+| `packages/ui`     | `@peridotvault/peridotbase-ui`     | shadcn/ui primitives and the data grid                                   |
+| `packages/config` | `@peridotvault/peridotbase-config` | Shared TS, ESLint, Prettier, Tailwind config                             |
 
 The Rust program lives in `peridotbase-core`, a separate repository. Do not expect contract code
 here. There is no backend: no API server, no database drivers, no hosted AI relay.
@@ -22,13 +22,13 @@ here. There is no backend: no API server, no database drivers, no hosted AI rela
 
 ```bash
 pnpm install
-pnpm dev                 # all apps; Studio starts in demo mode on :3001
-pnpm dev:studio          # Studio on :3001, labeled sample data
-pnpm dev:studio:real     # Studio on :3001 against the real connection screen
-pnpm dev:web             # website on :3000
+pnpm dev                 # all apps
+pnpm dev:web             # web app on :3001 (marketing + Studio, real connection screen)
+pnpm dev:web:demo        # web app on :3001 with labeled sample data
+pnpm dev:docs            # Mintlify docs on :3002
 pnpm build
 pnpm lint
-pnpm typecheck      # tsc --noEmit + astro check
+pnpm typecheck      # tsc --noEmit (web + packages)
 pnpm test
 pnpm format
 pnpm format:check
@@ -41,20 +41,19 @@ Run the relevant commands before declaring work done, and report exactly what ra
 
 - package manager: **pnpm 12.18.0** (`packageManager` field; use the pinned version).
 - task runner: **Turborepo**.
-- TypeScript **^7.0.2** in apps and packages. `packages/config` and `apps/web` pin
-  `typescript@6.0.3` for tooling that does not support TS 7 yet (typescript-eslint, astro check).
-  Do not "fix" those pins.
-- lint: ESLint flat config from `@peridotbase/config/eslint/preset`.
+- TypeScript **^7.0.2** in apps and packages. `packages/config` pins `typescript@6.0.3` for
+  tooling that does not support TS 7 yet (typescript-eslint). Do not "fix" that pin.
+- lint: ESLint flat config from `@peridotvault/peridotbase-config/eslint/preset`.
 - format: Prettier (tabs, width 95).
-- tests: Vitest in `apps/studio`.
+- tests: Vitest in `apps/web`.
 
 ## Arctis frontend architecture (mandatory)
 
-`apps/studio/src` is split into three layers:
+`apps/web/src` is split into three layers:
 
 ```
 src/
-  pages/    page components + route.tsx; every group directory has route.tsx
+  pages/    route components + route.tsx; every group directory has route.tsx
   feat/     feature modules (components, hooks, screens, stores, index.ts barrel)
   shared/   cross-feature code: api/sdk transport, hooks, lib, stores, ui helpers
 ```
@@ -74,18 +73,21 @@ Rules:
 TanStack's file router owns the runtime tree, so its filenames apply inside `pages/`:
 
 - `pages/__root.tsx` is the TanStack root route and cannot be renamed.
-- Each group (`_pathlessLayout/{indexes,runner,schema,table}`) has a `route.tsx` layout that
-  renders `<Outlet />`; `index.tsx` and `$param` pages are its children.
+- `pages/_marketing/` is the public shell: prerendered landing, changelog and roadmap.
+- `pages/studio/` is the app shell (`ssr: false`): auth, connect, and `org/$organization/$project`.
+  Each group has a `route.tsx` layout that renders `<Outlet />`; `index.tsx` and `$param` pages
+  are its children.
 - `pages/route.tsx` is the Arctis root aggregator. TanStack ignores files that export no `Route`,
-  and knip ignores this file, so it stays registration-only: it re-exports `__root`, the pathless
-  layout, and direct pages for hierarchy documentation. Do not move shell composition into it.
-- Shell composition (nav rail, sidebar, footer, shell-level dialogs) lives in
-  `pages/_pathlessLayout/route.tsx`; cross-cutting overlays live in `pages/__root.tsx`.
+  and knip ignores this file, so it stays registration-only: it re-exports `__root`, the marketing
+  shell, and the top of the Studio hierarchy. Do not move shell composition into it.
+- Marketing chrome (`shared/components/site-chrome.tsx`) lives in `pages/_marketing/route.tsx`.
+  Studio chrome (topbar, announcement bar, command palette, overlays, toaster) lives in
+  `pages/studio/route.tsx`; the document shell is `pages/__root.tsx`.
 
 Run the Arctis validator before declaring frontend work done:
 
 ```bash
-node ~/.agents/skills/frontend/scripts/validate-architecture.mjs apps/studio
+node ~/.agents/skills/frontend/scripts/validate-architecture.mjs apps/web
 ```
 
 The Arctis skills (`frontend`, `backend`, `monorepo`) are installed globally. Load the matching
@@ -95,25 +97,51 @@ precedence over the skill when they conflict; state the conflict instead of rest
 ## SDK and capability gating
 
 - All program access goes through `getPeridotbaseClient()` in
-  `apps/studio/src/shared/peridotbase/client.ts`.
-- `packages/sdk` defines the client contract, protocol types, and ports. Only `wallet` is a real
-  capability today; the rest are `false` in `PROGRAM_NOT_WIRED`.
+  `apps/web/src/shared/peridotbase/client.ts`.
+- `packages/sdk` defines the client contract, protocol types, and ports. `ProgramClient` wires every
+  implemented operation to `peridotbase_core` on devnet; `PROGRAM_NOT_WIRED` (and `ProgramNotWiredClient`)
+  only stays for clients built without a program ID. `PROGRAM_WIRED` marks the operations the program
+  serves today.
 - Use `useStudioCapabilities()` (Studio) or `isIntegrationUnavailable()` / `isSdkFailure()`
   (errors) instead of matching message strings.
-- The Studio opens without a wallet. Connecting is optional until signing ships; `/connect` stays
-  reachable from the workspace menu. Wallet discovery is Wallet Standard first, with the injected
-  Phantom/Solflare/Backpack provider as a fallback, so a missed announcement does not hide it.
-- Never add a fake REST client, mock server, or placeholder database. Unimplemented operations
-  throw `IntegrationUnavailableError("PROGRAM_NOT_WIRED")`; the UI explains that state.
+- Login is the wallet session: every scoped page (`/studio/org/**`) redirects to `/studio/auth`
+  without one; demo mode is the only no-wallet path. `/studio/connect` stays reachable from the
+  workspace menu. The marketing pages at `/` never require a wallet.
+  Wallet discovery is Wallet Standard first, with the injected Phantom/Solflare/Backpack provider
+  as a fallback, so a missed announcement does not hide it. Signing runs through
+  `signTransactions` on the WalletPort, bridged into an Anchor wallet by the program client.
+- The Studio never shows dummy data in real mode: organizations, projects and databases come
+  from `useScopeSync`/`useProjectDatabases` reads against the program; demo samples come only
+  from the env-gated `DemoPeridotbaseClient` (`VITE_STUDIO_DEMO=true`).
+- Never add a fake REST client, mock server, or placeholder database. Operations the program lacks
+  (`renameTable`, `alterColumn`, `dropColumn`, `renameColumn`, `dropIndex`) throw
+  `IntegrationUnavailableError`; the UI explains that state.
 - When an operation has no on-chain instruction, do not stub a success. Gate the control.
+
+### Program integration
+
+- Deployed devnet program: `AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3` (Anchor workspace in
+  `peridotbase-core/contracts/solana`). `DEFAULT_PROGRAM_ID` in
+  `apps/web/src/shared/stores/workspace.store.ts` points the Studio at it.
+- `@peridotvault/peridotbase-core-sdk` is the on-chain client, linked from
+  `../peridotbase-core/sdk/typescript`. `ProgramClient` in `packages/sdk/src/program-client.ts`
+  adapts it to the Studio contract. Rebuild it (`npm run build --prefix sdk/typescript`) after
+  changing the program or the IDL.
+- Chain scope is the route's organization/project slugs, hashed to u64 (FNV-1a) and mapped to the
+  organization/project catalogs, which are created on first use by the connected wallet. A
+  different creator's organization is not discovered.
+- `readRows` scans the table and filters/sorts/pages in the browser; the program has no SQL
+  pagination. Keep limits small.
+- Missing program instructions stay gated: table/column rename, column-type alteration, column
+  drops, and index drops throw `IntegrationUnavailableError`.
 
 ### Demo walkthrough exception
 
-The one allowed exception is the env-gated Studio demo, for looking around before the program
-ships:
+The one allowed exception is the env-gated Studio demo, for looking around without a wallet or an
+RPC endpoint:
 
-- `pnpm dev:studio` (and its `dev:studio:demo` alias) loads `apps/studio/.env.demo`
-  (`VITE_STUDIO_DEMO=true`). `pnpm dev:studio:real` loads no demo env.
+- `pnpm dev:web:demo` loads `apps/web/.env.demo` (`VITE_STUDIO_DEMO=true`).
+  `pnpm dev:web` loads no demo env.
 - `shared/peridotbase/client.ts` then builds `DemoPeridotbaseClient` from
   `shared/peridotbase/demo/`; every other path keeps `ProgramNotWiredClient` and
   `PROGRAM_NOT_WIRED` unchanged.
@@ -139,16 +167,22 @@ ships:
 ## AI assistant
 
 - Browser-direct provider adapters live in
-  `apps/studio/src/feat/ai-assistant/lib/direct-chat.ts`.
+  `apps/web/src/feat/ai-assistant/lib/direct-chat.ts`.
 - Supported providers: Gemini, OpenAI, Anthropic. Keys are memory-only by design; never persist
   them and never add a hosted proxy or rate-limit service.
 
-## Website
+## Web app and docs
 
-- `apps/web` is Astro + Starlight.
-- Docs live in `apps/web/src/content/docs/*.mdx`; import Starlight components explicitly
-  (`import { Aside, Card, CardGrid } from "@astrojs/starlight/components";`).
-- Changelog and roadmap data live in `apps/web/src/content-data/`.
+- `apps/web` is TanStack Start on Vite (React 19, Tailwind). One app, two halves:
+  - Marketing routes (`pages/_marketing/**`) are server-rendered and prerendered to static HTML for
+    crawlers: `/`, `/changelog`, `/roadmap`.
+  - The Studio (`pages/studio/**`) is client-only (`ssr: false`) and served from the SPA fallback.
+- Production output is `dist/client` served by any static host, with `/studio/*` falling back to
+  `dist/client/index.html`. `dist/server` exists for the prerender step only.
+- Changelog and roadmap data live in `apps/web/src/shared/content/`.
+- `apps/docs` is Mintlify: `docs.json` plus MDX files, published on `docs.peridotbase.com`. Use
+  Mintlify components (`<Note>`, `<Warning>`, `<CardGroup>`); the marketing site links to it with
+  `DOCS_URL` from `apps/web/src/shared/lib/site.ts`.
 - Write for users: describe what changed and why it matters, without implementation detail.
 
 ## Testing philosophy

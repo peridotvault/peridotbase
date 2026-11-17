@@ -29,10 +29,10 @@ export type WalletPort = {
 	/** Drops the session without touching the wallet extension itself. */
 	disconnect: () => Promise<void>;
 	/**
-	 * Signs an opaque transaction payload and returns the signature as base58. Implementations
-	 * throw `IntegrationUnavailableError` while no serializable instruction set exists.
+	 * Signs serialized transactions with the connected wallet and returns the signed bytes, in
+	 * the same order. Throws when no wallet is connected or the wallet rejects.
 	 */
-	signTransaction: (payload: Uint8Array) => Promise<string>;
+	signTransactions: (payloads: Uint8Array[]) => Promise<Uint8Array[]>;
 };
 
 /** JSON-RPC surface the Studio needs. Transport is `fetch` today; the interface stays narrow so

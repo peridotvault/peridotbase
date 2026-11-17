@@ -1,0 +1,58 @@
+{
+	"$schema": "https://mintlify.com/schema.json",
+	"name": "Peridotbase",
+	"theme": "mint",
+	"colors": {
+		"primary": "#7FDC4A",
+		"light": "#B9F58C",
+		"dark": "#0D110B"
+	},
+	"favicon": "/logo.svg",
+	"navigation": {
+		"tabs": [
+			{
+				"tab": "Docs",
+				"groups": [
+					{
+						"group": "Start here",
+						"pages": ["introduction", "getting-started", "studio"]
+					},
+					{
+						"group": "Build",
+						"pages": ["sdk", "on-chain-model"]
+					},
+					{
+						"group": "Project",
+						"pages": ["faq"]
+					}
+				]
+			}
+		],
+		"anchors": [
+			{
+				"anchor": "Website",
+				"href": "https://peridotbase.com",
+				"icon": "globe"
+			},
+			{
+				"anchor": "Studio",
+				"href": "https://peridotbase.com/studio",
+				"icon": "app-window"
+			},
+			{
+				"anchor": "GitHub",
+				"href": "https://github.com/peridotbase",
+				"icon": "github"
+			}
+		]
+	},
+	"logo": {
+		"light": "/logo.svg",
+		"dark": "/logo.svg"
+	},
+	"api": {
+		"playground": {
+			"display": "none"
+		}
+	}
+}

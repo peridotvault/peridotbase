@@ -1,8 +1,8 @@
 {
-	"name": "@peridotbase/monorepo",
+	"name": "@peridotvault/peridotbase-monorepo",
 	"private": true,
 	"type": "module",
-	"description": "Peridotbase — a Solana-native, fully on-chain relational database. Monorepo for the Studio dashboard, the marketing site, and the TypeScript SDK.",
+	"description": "Peridotbase — a Solana-native, fully on-chain relational database. Monorepo for the web app (marketing + Studio), the documentation site, and the TypeScript SDK.",
 	"license": "Apache-2.0",
 	"packageManager": "pnpm@12.18.0",
 	"engines": {
@@ -11,18 +11,15 @@
 	},
 	"scripts": {
 		"dev": "turbo run dev",
-		"dev:studio": "turbo run dev --filter=@peridotbase/studio",
-		"dev:studio:real": "turbo run dev:real --filter=@peridotbase/studio",
-		"dev:studio:demo": "turbo run dev:demo --filter=@peridotbase/studio",
-		"dev:web": "turbo run dev --filter=@peridotbase/web",
+		"dev:web": "turbo run dev --filter=@peridotvault/peridotbase-web",
+		"dev:docs": "turbo run dev --filter=@peridotvault/peridotbase-docs",
 		"build": "turbo run build",
-		"build:studio": "turbo run build --filter=@peridotbase/studio",
-		"build:web": "turbo run build --filter=@peridotbase/web",
+		"build:web": "turbo run build --filter=@peridotvault/peridotbase-web",
 		"lint": "turbo run lint",
 		"typecheck": "turbo run typecheck",
 		"test": "turbo run test",
-		"format": "prettier --write \"**/*.{ts,tsx,astro,css,json,md,mdx,yaml,yml}\"",
-		"format:check": "prettier --check \"**/*.{ts,tsx,astro,css,json,md,mdx,yaml,yml}\"",
+		"format": "prettier --write \"**/*.{ts,tsx,css,json,md,mdx,yaml,yml}\"",
+		"format:check": "prettier --check \"**/*.{ts,tsx,css,json,md,mdx,yaml,yml}\"",
 		"knip": "knip",
 		"clean": "turbo run clean && rm -rf node_modules apps/*/node_modules packages/*/node_modules .turbo",
 		"prepare": "husky"
@@ -31,7 +28,6 @@
 		"husky": "^9.1.7",
 		"knip": "^6.45.0",
 		"prettier": "^3.9.10",
-		"prettier-plugin-astro": "^1.1.2",
 		"turbo": "^2.11.10",
 		"typescript": "^7.0.2"
 	}

@@ -19,6 +19,8 @@ import type {
 	ExecuteQueryRequest,
 	IndexInfo,
 	MutationResult,
+	OrganizationInfo,
+	ProjectInfo,
 	QueryResult,
 	ReadRowsQuery,
 	Relationship,
@@ -77,6 +79,31 @@ export class ProgramNotWiredClient implements PeridotbaseClient {
 
 	listDatabases(): Promise<DatabaseInfo[]> {
 		throw new IntegrationUnavailableError("listDatabases");
+	}
+
+	listOrganizations(): Promise<OrganizationInfo[]> {
+		throw new IntegrationUnavailableError("listOrganizations");
+	}
+
+	createOrganization(_name: string): Promise<OrganizationInfo> {
+		void _name;
+		throw new IntegrationUnavailableError("createOrganization");
+	}
+
+	listProjects(_organization: string): Promise<ProjectInfo[]> {
+		void _organization;
+		throw new IntegrationUnavailableError("listProjects");
+	}
+
+	createProject(_organization: string, _name: string): Promise<ProjectInfo> {
+		void _organization;
+		void _name;
+		throw new IntegrationUnavailableError("createProject");
+	}
+
+	createDatabase(_name: string): Promise<DatabaseInfo> {
+		void _name;
+		throw new IntegrationUnavailableError("createDatabase");
 	}
 
 	listTables(_database: string): Promise<TableInfo[]> {

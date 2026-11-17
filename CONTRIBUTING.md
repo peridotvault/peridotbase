@@ -15,20 +15,22 @@ commands, and the review expectations.
 git clone <repository>
 cd peridotbase
 pnpm install
-pnpm dev:studio
+pnpm dev:web
 ```
 
-The Studio runs at `http://localhost:3001`; the website at `http://localhost:3000`.
+The web app runs at `http://localhost:3001`: marketing pages at `/`, the Studio at `/studio`.
+`pnpm dev:web:demo` swaps the Studio to labeled sample data, and `pnpm dev:docs` serves the
+documentation at `http://localhost:3002`.
 
 ## Workspace
 
-| Path              | What it is                        |
-| ----------------- | --------------------------------- |
-| `apps/studio`     | The React dashboard               |
-| `apps/web`        | Astro + Starlight site and docs   |
-| `packages/sdk`    | TypeScript SDK and protocol types |
-| `packages/ui`     | Shared UI primitives              |
-| `packages/config` | Shared configuration              |
+| Path              | What it is                                                   |
+| ----------------- | ------------------------------------------------------------ |
+| `apps/web`        | TanStack Start app: marketing pages + Studio under `/studio` |
+| `apps/docs`       | Mintlify documentation site                                  |
+| `packages/sdk`    | TypeScript SDK and protocol types                            |
+| `packages/ui`     | Shared UI primitives                                         |
+| `packages/config` | Shared configuration                                         |
 
 The on-chain program lives in `peridotbase-core`; this repository is client-side only.
 
@@ -46,7 +48,7 @@ All five must pass. If a change is website-only, still run the full set — it i
 
 ## Architecture rules
 
-The Studio follows the Arctis `pages → feat → shared` layering:
+The web app follows the Arctis `pages → feat → shared` layering:
 
 - A page may import features and shared code.
 - A feature may import shared code and its own internals.

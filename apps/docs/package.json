@@ -1,0 +1,15 @@
+{
+	"name": "@peridotvault/peridotbase-docs",
+	"private": true,
+	"version": "0.1.0",
+	"description": "Peridotbase documentation, published with Mintlify on docs.peridotbase.com.",
+	"license": "Apache-2.0",
+	"scripts": {
+		"dev": "mintlify dev --port 3002",
+		"check": "mintlify broken-links",
+		"clean": "rm -rf .mintlify .turbo"
+	},
+	"devDependencies": {
+		"mintlify": "^4.3.38"
+	}
+}

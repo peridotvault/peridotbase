@@ -1,7 +1,7 @@
 # Peridotbase
 
 <p align="center">
-  <img src="apps/web/src/assets/logo.svg" alt="Peridotbase" width="88" height="88">
+  <img src="apps/web/public/logo.svg" alt="Peridotbase" width="88" height="88">
 </p>
 
 <p align="center">
@@ -18,13 +18,17 @@
 Peridotbase is a relational database implemented as a Solana program. This monorepo holds
 everything around that program:
 
-| Path              | Package               | Role                                                                |
-| ----------------- | --------------------- | ------------------------------------------------------------------- |
-| `apps/studio`     | `@peridotbase/studio` | React 19 dashboard: tables, schema, SQL runner, indexes, visualizer |
-| `apps/web`        | `@peridotbase/web`    | Marketing site and documentation (Astro + Starlight)                |
-| `packages/sdk`    | `@peridotbase/sdk`    | TypeScript client, protocol types, wallet and RPC ports             |
-| `packages/ui`     | `@peridotbase/ui`     | Shared shadcn/ui primitives and the data grid                       |
-| `packages/config` | `@peridotbase/config` | Shared TypeScript, ESLint, Prettier, and Tailwind configuration     |
+| Path              | Package                            | Role                                                                     |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------ |
+| `apps/web`        | `@peridotvault/peridotbase-web`    | TanStack Start app: prerendered marketing pages + Studio under `/studio` |
+| `apps/docs`       | `@peridotvault/peridotbase-docs`   | Mintlify documentation site on `docs.peridotbase.com`                    |
+| `packages/sdk`    | `@peridotvault/peridotbase-sdk`    | TypeScript client, protocol types, wallet and RPC ports                  |
+| `packages/ui`     | `@peridotvault/peridotbase-ui`     | Shared shadcn/ui primitives and the data grid                            |
+| `packages/config` | `@peridotvault/peridotbase-config` | Shared TypeScript, ESLint, Prettier, and Tailwind configuration          |
+
+One web app, two halves: `/`, `/changelog` and `/roadmap` are server-rendered and prerendered for
+crawlers, while the Studio lives under `/studio` and runs entirely in the browser. Documentation is
+a separate Mintlify site.
 
 The on-chain Rust program lives in `peridotbase-core`, a separate repository. Nothing in this
 monorepo owns canonical data: the Studio is a pure client over Solana RPC and Wallet Standard.
@@ -32,24 +36,25 @@ monorepo owns canonical data: the Studio is a pure client over Solana RPC and Wa
 ## Status
 
 The Studio shell, wallet connection, RPC health checks, and the complete table/query interface
-are in place. On-chain reads, writes, DDL, queries, indexes, and live refresh are gated behind
-capability flags and turn on as `peridotbase-core` publishes each instruction. Until then, a
-gated control reports **pending integration** rather than failing silently.
+are in place, and the program is deployed on devnet
+(`AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3`). Reads, writes, DDL, queries, indexes, and live
+refresh run against the program through `@peridotvault/peridotbase-core-sdk`. Operations the
+program has no instruction for (table/column rename, column-type change, column drop, index drop)
+report **pending integration** rather than failing silently.
 
-To walk through every Studio section before the program ships, use the labeled demo. It is the
-default development mode:
+To walk through every Studio section without a wallet or RPC endpoint, use the labeled demo:
 
 ```bash
-pnpm dev:studio   # http://localhost:3001, labeled sample data
+pnpm dev:web:demo   # http://localhost:3001/studio, labeled sample data
 ```
 
 Demo mode serves sample tables, rows, schema, indexes, and query results from the browser. Every
 screen carries a **Demo preview** banner; the demo never signs a transaction, never contacts an
 RPC endpoint, and never changes the real client's capability flags. It is enabled only by
-`VITE_STUDIO_DEMO=true` (see `apps/studio/.env.demo`), and a production build never loads it.
+`VITE_STUDIO_DEMO=true` (see `apps/web/.env.demo`), and a production build never loads it.
 
-To open the real client's connection screen instead, run `pnpm dev:studio:real`. That mode shows
-the workspace status until the program ships; it keeps the same capability gates.
+To open the real client's connection screen instead, run `pnpm dev:web`. That mode shows the
+workspace status until the program ships; it keeps the same capability gates.
 
 ## Requirements
 
@@ -60,27 +65,26 @@ the workspace status until the program ships; it keeps the same capability gates
 
 ```bash
 pnpm install
-pnpm dev:studio          # http://localhost:3001, labeled demo data
-pnpm dev:studio:real     # http://localhost:3001, real connection screen
-pnpm dev:web             # http://localhost:3000
+pnpm dev:web         # http://localhost:3001, marketing + Studio
+pnpm dev:web:demo    # http://localhost:3001/studio, labeled demo data
+pnpm dev:docs        # http://localhost:3002, documentation
 ```
 
-The default Studio mode opens the full interface on sample data, with a **Demo preview** banner.
-A wallet is optional in every mode; the real mode is the one to use once the program ships. See
-[apps/web/src/content/docs/getting-started.mdx](apps/web/src/content/docs/getting-started.mdx).
+Demo mode opens the full Studio interface on sample data, with a **Demo preview** banner. A wallet
+is optional in every mode. See [https://docs.peridotbase.com](https://docs.peridotbase.com) or the
+sources in [apps/docs](apps/docs).
 
 ## Commands
 
 ```bash
-pnpm dev                 # every app through Turbo (Studio uses demo data)
-pnpm dev:studio          # Studio with labeled sample data
-pnpm dev:studio:real     # Studio against the real connection screen
-pnpm dev:studio:demo     # alias for the demo Studio
-pnpm dev:web             # website only
+pnpm dev                 # every app through Turbo
+pnpm dev:web             # web app: marketing + Studio on :3001
+pnpm dev:web:demo        # web app with labeled sample data
+pnpm dev:docs            # Mintlify docs on :3002
 pnpm build        # build every package and app
 pnpm lint         # ESLint across the workspace
-pnpm typecheck    # tsc --noEmit and astro check
-pnpm test         # Vitest (Studio)
+pnpm typecheck    # tsc --noEmit
+pnpm test         # Vitest (web)
 pnpm format       # Prettier write
 pnpm format:check # Prettier check
 pnpm knip         # unused files, exports, and dependencies
@@ -91,13 +95,21 @@ pnpm knip         # unused files, exports, and dependencies
 - **pnpm workspaces + Turborepo.** Tasks run per package with dependency-aware caching.
 - **No backend.** There is no API server, no database driver, and no hosted relay. The Studio
   talks to Solana RPC, the wallet, and (for the optional AI assistant) the provider you choose.
-- **Arctis frontend architecture.** `apps/studio/src` is split into `pages`, `feat`, and
+- **Arctis frontend architecture.** `apps/web/src` is split into `pages`, `feat`, and
   `shared`, with hierarchical route registration in `pages/**/route.tsx`. Features may import
   `shared` and their own internals, never a sibling feature's internals.
+- **TanStack Start.** The router owns the file tree; marketing routes prerender, the Studio route
+  sets `ssr: false` and hydrates on the client.
 - **Capability gating.** `Capabilities` from the SDK decides whether a section or control is
   available. Read [packages/sdk/src/types/capabilities.ts](packages/sdk/src/types/capabilities.ts).
 - **Bring-your-own-key AI.** Provider requests go directly from the browser to Gemini, OpenAI,
   or Anthropic. Keys stay in memory for the session.
+
+## Deployment
+
+`pnpm build:web` writes `dist/client` (static assets, prerendered HTML, `sitemap.xml`,
+`robots.txt`) and `dist/server` (used by the prerender step only). Serve `dist/client` from any
+static host and fall back to `index.html` for `/studio/*` so client-side navigation resolves.
 
 ## Testing
 
