@@ -65,8 +65,9 @@ export const TableSubScreen = ({
 
 				<Button
 					variant="ghost"
+					size="lg"
 					asChild
-					className="h-8! border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2 text-muted-foreground hover:text-foreground"
+					className="border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2 text-muted-foreground hover:text-foreground"
 				>
 					<Link
 						to="/studio/org/$organization/$project/table/$table"
@@ -83,7 +84,8 @@ export const TableSubScreen = ({
 					<Button
 						type="button"
 						variant="default"
-						className="h-8! border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2"
+						size="lg"
+						className="border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2"
 						onClick={action.onClick}
 					>
 						<Plus className="size-4" />

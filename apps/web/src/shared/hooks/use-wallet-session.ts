@@ -1,9 +1,13 @@
 import { clusters, type Cluster } from "@peridotvault/peridotbase-sdk";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { getWalletPort, sdkErrorMessage } from "@/shared/peridotbase";
 import { resetConnectionState } from "@/shared/stores/connection-reset";
 import { useWorkspaceStore } from "@/shared/stores/workspace.store";
+
+/** Guards the restore so several mounted readers do not race the same wallet prompt. */
+let restoring = false;
 
 /**
  * The wallet session and its actions. `connect` opens the installed wallet (Wallet Standard
@@ -22,14 +26,31 @@ export const useWalletSession = () => {
 		setProgramId,
 	} = useWorkspaceStore();
 
+	// One silent reconnect per page load, however many components read the session.
+	useEffect(() => {
+		const stored = useWorkspaceStore.getState().wallet;
+		const port = getWalletPort();
+
+		if (restoring || !stored || port.wallet) return;
+
+		restoring = true;
+
+		void port
+			.connect({ silent: true })
+			.then((connected) => {
+				// The wallet may answer with another account; only the stored one keeps the session.
+				if (connected?.address === stored.address) setWallet(connected);
+			})
+			.catch(() => {
+				// A locked or absent extension leaves the stored session readable until it expires.
+			})
+			.finally(() => {
+				restoring = false;
+			});
+	}, [setWallet]);
+
 	const connectMutation = useMutation({
-		mutationFn: async () => {
-			const port = getWalletPort();
-
-			if (!port) throw new Error("This browser has no wallet to connect.");
-
-			return port.connect();
-		},
+		mutationFn: async () => getWalletPort().connect(),
 		onSuccess: (connected) => {
 			if (!connected) {
 				toast.info(
@@ -45,7 +66,7 @@ export const useWalletSession = () => {
 	});
 
 	const disconnect = async () => {
-		await getWalletPort()?.disconnect();
+		await getWalletPort().disconnect();
 		resetConnectionState();
 		setWallet(null);
 		toast.success("Wallet disconnected");

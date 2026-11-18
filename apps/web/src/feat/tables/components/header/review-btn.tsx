@@ -21,9 +21,7 @@ const DiffLine = ({ value, added }: { value: unknown; added: boolean }) => {
 		<Line
 			className={cn(
 				"flex min-w-0 gap-1.5 px-1.5 no-underline",
-				added
-					? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-					: "bg-red-500/10 text-red-700 dark:text-red-300",
+				added ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive",
 			)}
 			title={marker ?? text}
 		>
@@ -100,7 +98,8 @@ export const ReviewBtn = ({ tableName }: { tableName: string }) => {
 				<Button
 					type="button"
 					variant="ghost"
-					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none"
+					size="lg"
+					className="border-l-0 border-y-0 border-r border-border rounded-none"
 					aria-label="Review unsaved changes"
 				>
 					Review

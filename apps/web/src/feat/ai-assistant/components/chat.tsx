@@ -27,9 +27,9 @@ export const Chat = () => {
 	// Green once the selected provider has a key; grey while the key store hydrates; red when the
 	// assistant cannot send until a key is added.
 	const indicatorColor = hasPersonalKey
-		? "bg-emerald-500"
+		? "bg-success"
 		: isByokReady
-			? "bg-red-500"
+			? "bg-destructive"
 			: "bg-zinc-500";
 
 	return (

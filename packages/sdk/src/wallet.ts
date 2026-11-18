@@ -8,7 +8,9 @@ type WalletAccountLike = {
 
 type WalletFeatureLike = {
 	version?: string;
-	connect?: () => Promise<{ accounts: readonly WalletAccountLike[] }>;
+	connect?: (input?: {
+		silent?: boolean;
+	}) => Promise<{ accounts: readonly WalletAccountLike[] }>;
 	disconnect?: () => Promise<void>;
 	signTransaction?: (
 		...inputs: { transaction: Uint8Array; account: WalletAccountLike }[]
@@ -229,12 +231,16 @@ export const createWalletStandardPort = (): WalletPort => {
 	let wallet: ConnectedWallet | null = null;
 	let active: ActiveWallet | null = null;
 
-	const connectLegacy = async (): Promise<ConnectedWallet | null> => {
+	const connectLegacy = async (options?: {
+		silent?: boolean;
+	}): Promise<ConnectedWallet | null> => {
 		for (const legacy of legacyWallets()) {
 			let result: { publicKey?: { toString(): string } | null } | void;
 
 			try {
-				result = await legacy.provider.connect?.();
+				result = await legacy.provider.connect?.({
+					onlyIfTrusted: options?.silent,
+				});
 			} catch {
 				continue;
 			}
@@ -256,14 +262,16 @@ export const createWalletStandardPort = (): WalletPort => {
 		get wallet() {
 			return wallet;
 		},
-		connect: async () => {
+		connect: async (options) => {
 			const candidates = readRegistry().filter(
 				(candidate) => supportsSolana(candidate) && candidate.features["standard:connect"],
 			);
 			const selected = candidates[0];
 
 			if (selected) {
-				const result = await selected.features["standard:connect"]?.connect?.();
+				const result = await selected.features["standard:connect"]?.connect?.({
+					silent: options?.silent,
+				});
 				const account = result?.accounts[0] ?? selected.accounts?.[0];
 
 				if (account) {
@@ -274,7 +282,7 @@ export const createWalletStandardPort = (): WalletPort => {
 				}
 			}
 
-			return connectLegacy();
+			return connectLegacy(options);
 		},
 		disconnect: async () => {
 			try {

@@ -2,22 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Check, CircleDashed, LoaderCircle } from "lucide-react";
 import { roadmapItems } from "@/shared/content/roadmap";
 import { ROADMAP_STATUS } from "@/shared/content/roadmap-helpers";
+import { seoHead } from "@/shared/lib/seo";
 
 export const Route = createFileRoute("/_marketing/roadmap")({
-	head: () => ({
-		meta: [
-			{ title: "Roadmap — Peridotbase" },
-			{
-				name: "description",
-				content: "What is done, what is in progress, and what comes next for Peridotbase.",
-			},
-			{ property: "og:title", content: "Roadmap — Peridotbase" },
-			{
-				property: "og:description",
-				content: "What is done, what is in progress, and what comes next for Peridotbase.",
-			},
-		],
-	}),
+	head: () =>
+		seoHead({
+			title: "Roadmap",
+			description:
+				"What is shipped, what is in progress, and what comes next for Peridotbase — the on-chain relational database on Solana.",
+			path: "/roadmap",
+		}),
 	component: RoadmapPage,
 });
 

@@ -18,6 +18,7 @@ export const useScopeSync = () => {
 	const cluster = useWorkspaceStore((state) => state.cluster);
 	const walletAddress = useWorkspaceStore((state) => state.wallet?.address ?? null);
 	const setScopeData = useScopeStore((state) => state.setScopeData);
+	const settleCatalog = useScopeStore((state) => state.settleCatalog);
 	const demo = isDemoMode();
 
 	const catalog = useQuery({
@@ -41,6 +42,12 @@ export const useScopeSync = () => {
 	useEffect(() => {
 		if (catalog.data) setScopeData(catalog.data);
 	}, [catalog.data, setScopeData]);
+
+	// A failed read still settles the catalog: the gate then redirects to the picker instead of
+	// waiting on a slug it cannot verify.
+	useEffect(() => {
+		if (catalog.isSuccess || catalog.isError) settleCatalog();
+	}, [catalog.isSuccess, catalog.isError, settleCatalog]);
 
 	return catalog;
 };

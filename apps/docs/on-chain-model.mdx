@@ -26,7 +26,18 @@ Types follow the PostgreSQL family: the Studio renders them under the fixed `pgs
 
 ## Rows
 
-Rows are addressed by primary-key predicate and paginated by cursor. Deletes are single-row calls; there is no cascading delete in the client — the program refuses a delete that would orphan dependent rows, and the Studio surfaces the related records.
+Rows are addressed by primary key. New tables use the record layout: one logical record is one
+deterministic `RecordAccountV3` PDA, so a primary-key lookup is a single account fetch, an update
+touches only that record plus its index claims, and a delete tombstones the same address. Directory
+lanes/pages, unique claims, and posting lists are separate accounts derived from the table and
+primary key.
+
+Tables created before the record layout still use the page/slot layout. The SDK detects the
+descriptor per table and routes reads and writes to the matching layout; a table that has a storage
+descriptor is always read from records, never from stale pages.
+
+Deletes are single-row calls; there is no cascading delete in the client. The program refuses a
+delete that would orphan dependent rows, and the Studio surfaces the related records.
 
 ## Indexes
 

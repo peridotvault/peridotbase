@@ -49,7 +49,7 @@ export const TableBodyRow = memo(function TableBodyRow({
 			className={cn(
 				"group/row flex absolute w-fit border-b items-center justify-between text-sm hover:bg-accent/20 data-[state=open]:bg-accent/40 [&_svg]:size-4",
 				isRowHighlighted &&
-					"bg-emerald-500/15 dark:bg-emerald-500/20 transition-colors duration-1000 ease-in-out",
+					"bg-success/15 dark:bg-success/20 transition-colors duration-1000 ease-in-out",
 			)}
 			style={{
 				transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll

@@ -115,7 +115,7 @@ export const FilterPopup = ({
 
 			<PopoverContent className="w-md space-y-2" align="start">
 				<div className="flex items-center gap-4">
-					<Button variant="outline" size="lg" className="text-sm" onClick={handleAddFilter}>
+					<Button variant="outline" size="lg" onClick={handleAddFilter}>
 						Add filter
 						{localFilters && localFilters.length > 0 && (
 							<Kbd className="text-xs font-normal text-primary bg-primary/10 border border-primary/30 px-1.5 py-0.5">
@@ -193,10 +193,10 @@ export const FilterPopup = ({
 				</div>
 
 				<div className="gap-2 flex justify-end">
-					<Button variant="outline" size="lg" className="text-sm" onClick={handleReset}>
+					<Button variant="outline" size="lg" onClick={handleReset}>
 						Reset
 					</Button>
-					<Button variant="default" size="lg" className="text-sm" onClick={applyFilters}>
+					<Button variant="default" size="lg" onClick={applyFilters}>
 						Apply
 					</Button>
 				</div>

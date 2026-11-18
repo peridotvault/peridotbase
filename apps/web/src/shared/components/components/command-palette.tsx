@@ -1,3 +1,4 @@
+import { Button } from "@peridotvault/peridotbase-ui/button";
 import {
 	CommandDialog,
 	CommandEmpty,
@@ -114,16 +115,18 @@ export function CommandPalette() {
 		<CommandDialog open={open} onOpenChange={handleOpenChange} className="sm:max-w-lg">
 			<div className="flex items-center border-b border-input px-2 gap-2 w-full">
 				{mode === "tables" && (
-					<button
+					<Button
 						type="button"
+						variant="ghost"
+						size="lg"
 						onClick={switchToAllMode}
 						aria-label="Back to all commands"
-						className="flex items-center gap-1.5 h-8! rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20 shrink-0"
+						className="shrink-0 bg-primary/10 text-primary hover:bg-primary/20"
 					>
 						<Table2 className="size-3.5" />
 						<span>Tables</span>
 						<ChevronLeft className="size-3 opacity-60" />
-					</button>
+					</Button>
 				)}
 				<CommandInput
 					ref={inputRef}

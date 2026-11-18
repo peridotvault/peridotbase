@@ -64,13 +64,13 @@ export const WorkspaceScreen = () => {
 							<dd className="flex items-center gap-2">
 								{demo ? (
 									<>
-										<CheckCircle2 className="size-4 text-emerald-500" />
+										<CheckCircle2 className="size-4 text-success" />
 										<span className="text-xs">Demo sample data · no RPC calls</span>
 									</>
 								) : health.isLoading ? (
 									<Loader2 className="size-4 animate-spin text-muted-foreground" />
 								) : health.data?.reachable ? (
-									<CheckCircle2 className="size-4 text-emerald-500" />
+									<CheckCircle2 className="size-4 text-success" />
 								) : (
 									<CircleAlert className="size-4 text-destructive" />
 								)}

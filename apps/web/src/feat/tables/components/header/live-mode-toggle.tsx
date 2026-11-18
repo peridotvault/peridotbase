@@ -27,12 +27,13 @@ export const LiveModeToggle = () => {
 				<Button
 					type="button"
 					variant="ghost"
+					size="lg"
 					onClick={handleToggle}
 					aria-label="Toggle Live mode"
 					aria-pressed={isLive}
 					data-active={isLive}
 					className={cn(
-						"h-8! px-2.5 border-l-0 border-y-0 border-r border-border rounded-none text-xs font-medium gap-1.5 flex items-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors",
+						"border-l-0 border-y-0 border-r border-border rounded-none gap-1.5 flex items-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors",
 						isLive && "text-foreground",
 					)}
 				>
@@ -40,22 +41,22 @@ export const LiveModeToggle = () => {
 						{isLive && status === "healthy" && isPulsing && (
 							<span
 								data-testid="live-pulse-indicator"
-								className="absolute inline-flex size-3.5 rounded-full bg-emerald-400 opacity-75 animate-ping"
+								className="absolute inline-flex size-3.5 rounded-full bg-success opacity-75 animate-ping"
 							/>
 						)}
 						<span
 							data-testid="live-status-dot"
 							className={cn("relative inline-flex size-2 rounded-full transition-colors", {
-								"bg-emerald-500": isLive && status === "healthy",
-								"bg-amber-500": isLive && status === "disconnected",
-								"bg-amber-400": !isLive && status === "paused",
+								"bg-success": isLive && status === "healthy",
+								"bg-warning": isLive && status === "disconnected",
+								"bg-warning/70": !isLive && status === "paused",
 								"bg-muted-foreground/40": !isLive && status !== "paused",
 							})}
 						/>
 					</span>
 					<span>Live</span>
 					{status === "paused" && (
-						<span className="text-[10px] text-amber-500 font-normal">(Paused)</span>
+						<span className="text-[10px] text-warning font-normal">(Paused)</span>
 					)}
 				</Button>
 			</TooltipTrigger>

@@ -200,7 +200,7 @@ export function TableCellWrapper<TData>({
 					"bg-primary/25": isSelected && !isEditing,
 					"cursor-default": !isEditing,
 					"ring-2 ring-primary": hasUpdate,
-					"bg-emerald-500/20 dark:bg-emerald-500/25 transition-colors duration-1000 ease-in-out":
+					"bg-success/20 dark:bg-success/25 transition-colors duration-1000 ease-in-out":
 						isCellHighlighted,
 				},
 				className,

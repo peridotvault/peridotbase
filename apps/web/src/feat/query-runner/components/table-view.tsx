@@ -68,8 +68,8 @@ export const TableView = ({ results }: { results: ExecuteQueryResult | null }) =
 									role="presentation"
 									onMouseDown={header.getResizeHandler()}
 									onTouchStart={header.getResizeHandler()}
-									className={`absolute top-0 right-0 h-full w-1 cursor-col-resize select-none touch-none hover:bg-blue-500 ${
-										header.column.getIsResizing() ? "bg-blue-500" : ""
+									className={`absolute top-0 right-0 h-full w-1 cursor-col-resize select-none touch-none hover:bg-brand-500 ${
+										header.column.getIsResizing() ? "bg-brand-500" : ""
 									}`}
 								/>
 							</div>

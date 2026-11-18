@@ -82,7 +82,7 @@ export const SidebarWrapper = ({
 					className={cn(
 						"absolute inset-y-0 -right-1.5 w-3 cursor-col-resize z-50 outline-none",
 						"after:absolute after:inset-y-0 after:left-1/2 after:w-px after:transition-colors",
-						"hover:after:bg-blue-400/70 active:after:bg-blue-400/70 focus-visible:after:bg-blue-400/70",
+						"hover:after:bg-brand-500/70 active:after:bg-brand-500/70 focus-visible:after:bg-brand-500/70",
 					)}
 					title="Drag to resize sidebar"
 				/>

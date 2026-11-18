@@ -41,7 +41,7 @@ const HealthRow = ({
 				<Icon
 					className={
 						state === "ok"
-							? "size-4 text-emerald-500"
+							? "size-4 text-success"
 							: state === "error"
 								? "size-4 text-destructive"
 								: "size-4 animate-spin text-muted-foreground"

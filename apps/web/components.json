@@ -5,7 +5,7 @@
 	"tsx": true,
 	"tailwind": {
 		"config": "",
-		"css": "src/index.css",
+		"css": "src/app.css",
 		"baseColor": "zinc",
 		"cssVariables": true,
 		"prefix": ""
@@ -14,14 +14,26 @@
 	"menuColor": "default",
 	"menuAccent": "bold",
 	"aliases": {
-		"components": "@/components",
+		"components": "@/shared/components",
 		"utils": "@peridotvault/peridotbase-ui/utils",
-		"ui": "@peridotvault/peridotbase-ui",
-		"lib": "@/lib",
-		"hooks": "@/hooks"
+		"ui": "@/shared/components/ui",
+		"lib": "@/shared/lib",
+		"hooks": "@/shared/hooks"
 	},
 	"registries": {
 		"@kibo-ui": "https://www.kibo-ui.com/r/{name}.json",
-		"@ai-elements": "https://registry.ai-sdk.dev/{name}.json"
+		"@ai-elements": "https://registry.ai-sdk.dev/{name}.json",
+		"@reactbits-starter": {
+			"url": "https://pro.reactbits.dev/api/r/starter/{name}.json",
+			"headers": {
+				"Authorization": "Bearer ${REACTBITS_LICENSE_KEY}"
+			}
+		},
+		"@reactbits-pro": {
+			"url": "https://pro.reactbits.dev/api/r/pro/{name}.json",
+			"headers": {
+				"Authorization": "Bearer ${REACTBITS_LICENSE_KEY}"
+			}
+		}
 	}
 }

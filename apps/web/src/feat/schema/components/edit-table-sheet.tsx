@@ -267,11 +267,11 @@ const ColumnRow = ({
 			<div className="col-span-1 flex min-w-0 flex-col gap-1.5">
 				<span className="flex items-center gap-1.5">
 					{col.isPrimaryKey ? (
-						<KeyRound aria-label="Primary key" className="size-3.5 shrink-0 text-amber-500" />
+						<KeyRound aria-label="Primary key" className="size-3.5 shrink-0 text-warning" />
 					) : col.isForeignKey ? (
 						<Link2
 							aria-label={`References ${col.referencedTable}.${col.referencedColumn}`}
-							className="size-3.5 shrink-0 text-sky-500"
+							className="size-3.5 shrink-0 text-info"
 						/>
 					) : (
 						<span className="size-3.5 shrink-0" />

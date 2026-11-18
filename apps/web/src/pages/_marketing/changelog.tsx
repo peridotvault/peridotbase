@@ -1,19 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Tag } from "lucide-react";
 import { changelog } from "@/shared/content/changelog";
+import { seoHead } from "@/shared/lib/seo";
 
 export const Route = createFileRoute("/_marketing/changelog")({
-	head: () => ({
-		meta: [
-			{ title: "Changelog — Peridotbase" },
-			{ name: "description", content: "What changed in each Peridotbase Studio release." },
-			{ property: "og:title", content: "Changelog — Peridotbase" },
-			{
-				property: "og:description",
-				content: "What changed in each Peridotbase Studio release.",
-			},
-		],
-	}),
+	head: () =>
+		seoHead({
+			title: "Changelog",
+			description:
+				"Every Peridotbase Studio release: what changed on the on-chain database, table, query and index surfaces, and why it matters.",
+			path: "/changelog",
+			type: "article",
+		}),
 	component: ChangelogPage,
 });
 

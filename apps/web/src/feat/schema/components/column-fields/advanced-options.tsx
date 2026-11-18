@@ -67,13 +67,13 @@ export const AdvancedOptions = ({
 							<Label
 								key={option.name}
 								htmlFor={`${option.name}-${idPrefix}`}
-								className="flex items-start gap-3 rounded-lg p-3 cursor-pointer hover:bg-accent/50 has-checked:bg-primary-foreground has-checked:border-blue-600"
+								className="flex items-start gap-3 rounded-lg p-3 cursor-pointer hover:bg-accent/50 has-checked:bg-primary-foreground has-checked:border-primary"
 							>
 								<Checkbox
 									id={`${option.name}-${idPrefix}`}
 									checked={values[option.name]}
 									onCheckedChange={(checked) => onChange(option.name, checked === true)}
-									className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+									className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
 									type="button"
 								/>
 								<div className="grid gap-1.5 font-normal">

@@ -23,6 +23,13 @@ const connectDevtoolsServerBus =
  */
 export const Route = createFileRoute("/studio")({
 	ssr: false,
+	// Wallet-scoped app surface: never a search result.
+	head: () => ({
+		meta: [
+			{ title: "Studio — Peridotbase" },
+			{ name: "robots", content: "noindex, nofollow" },
+		],
+	}),
 	component: StudioLayout,
 });
 

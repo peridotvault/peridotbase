@@ -44,11 +44,11 @@ export const SidebarSearchQueriesList = () => {
 	return (
 		<div className="p-3 space-y-2 border-b border-sidebar-border">
 			<div className="flex gap-2">
-				<Button className="flex-1 justify-start h-8" onClick={handleAddQuery}>
+				<Button size="lg" className="flex-1 justify-start" onClick={handleAddQuery}>
 					<Plus className="size-4" />
 					Add Query
 				</Button>
-				<Button className="flex-1 justify-start h-8" onClick={handleAddFolder}>
+				<Button size="lg" className="flex-1 justify-start" onClick={handleAddFolder}>
 					<FolderPlus className="size-4" />
 					Add Folder
 				</Button>

@@ -67,4 +67,6 @@ export const configurePeridotbase = (config: StudioConnectionConfig): void => {
 	client = null;
 };
 
-export const getWalletPort = (): WalletPort | null => walletPort;
+// Built on first use: signing in needs the port before any client read, and those reads are
+// gated on the wallet the port is meant to connect.
+export const getWalletPort = (): WalletPort => (walletPort ??= createWalletStandardPort());

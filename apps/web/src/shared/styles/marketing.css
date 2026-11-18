@@ -1,14 +1,31 @@
-/* Supabase-aligned design system for the whole client. Values mirror supabase.com:
- *  Manrope body, Source Code Pro mono, brand green #3ECF8E, muted text hierarchy,
- *  hairline borders, rounded surfaces. Light values on :root, dark under `.dark`.
- *  Marketing and Studio shell classes carry the shared typography/canvas. */
+/* Clean neutral design system. The UI is ink and grey; sage green from the logo is a
+ *  state accent only (ring, selection, links, active marker, success). Primary actions
+ *  are ink, never a brand wash. Light values on :root, dark under `.dark`. */
 
 :root {
-	/* Brand */
-	--brand-default: 152 75% 60%; /* #3ecf8e */
-	--brand-600: 152 75% 38%; /* #199a5f */
-	--primary-solid: hsl(var(--brand-600));
-	--primary-solid-hover: hsl(var(--brand-default));
+	/* Brand ramp, anchored on the logo (#589770). #87e08b is the bright logo stop and
+	   only appears in dark mode. */
+	--brand-50: #f2f8f4;
+	--brand-100: #e3f1e8;
+	--brand-200: #c6e2d1;
+	--brand-300: #9bc4ac;
+	--brand-400: #74a88a;
+	--brand-500: #589770;
+	--brand-600: #467d5c;
+	--brand-700: #3a6a4e;
+	--brand-800: #2f5540;
+	--brand-900: #264534;
+	--brand-bright: #87e08b;
+
+	/* Semantic accents */
+	--success: var(--brand-600);
+	--info: #3a6a8c;
+	--warning: #96640f;
+	--link: var(--brand-700);
+
+	/* Primary actions are ink. */
+	--primary-solid: #1c1c1c;
+	--primary-solid-hover: #333333;
 
 	/* Surfaces (light) */
 	--background: #fcfcfc;
@@ -30,14 +47,14 @@
 	--border-alternative: hsl(0 0% 0% / 0.07);
 	--border: var(--border-default);
 
-	/* shadcn aliases: primitives resolve to Supabase values app-wide, including
+	/* shadcn aliases: primitives resolve to the app tokens app-wide, including
 	   portaled dropdowns, dialogs and toasts. Accent is the subtle hover surface. */
 	--card: var(--surface-75);
 	--card-foreground: var(--foreground);
 	--popover: var(--surface-75);
 	--popover-foreground: var(--foreground);
 	--primary: var(--primary-solid);
-	--primary-foreground: #ffffff;
+	--primary-foreground: #fcfcfc;
 	--secondary: var(--surface-100);
 	--secondary-foreground: var(--foreground);
 	--muted: var(--surface-100);
@@ -45,17 +62,19 @@
 	--accent: var(--surface-200);
 	--accent-foreground: var(--foreground);
 	--input: var(--border-default);
-	--ring: var(--primary-solid);
+	--ring: color-mix(in srgb, var(--brand-600) 45%, transparent);
 	--sidebar: var(--background);
 	--sidebar-foreground: var(--foreground);
 	--sidebar-primary: var(--primary-solid);
-	--sidebar-primary-foreground: #ffffff;
+	--sidebar-primary-foreground: #fcfcfc;
 	--sidebar-accent: var(--surface-200);
 	--sidebar-accent-foreground: var(--foreground);
 	--sidebar-border: var(--border-default);
-	--sidebar-ring: var(--primary-solid);
+	--sidebar-ring: color-mix(in srgb, var(--brand-600) 45%, transparent);
 
-	--selection: var(--primary-solid);
+	--selection: var(--brand-100);
+	--selection-foreground: var(--brand-900);
+	--dot-grid-color: hsl(0 0% 0% / 0.06);
 	--overlay: hsl(0 0% 0% / 0.5);
 
 	--container-max-width: 1280px;
@@ -63,10 +82,19 @@
 }
 
 .dark {
-	--primary-solid: hsl(var(--brand-default));
-	--primary-solid-hover: hsl(var(--brand-600));
-	--primary-foreground: var(--background);
-	--sidebar-primary-foreground: var(--background);
+	--success: var(--brand-bright);
+	--info: #8fb8d8;
+	--warning: #e8b45f;
+	--link: var(--brand-bright);
+	--primary-solid: #ededed;
+	--primary-solid-hover: #ffffff;
+	--primary-foreground: #1c1c1c;
+	--sidebar-primary-foreground: #1c1c1c;
+	--ring: color-mix(in srgb, var(--brand-bright) 45%, transparent);
+	--sidebar-ring: color-mix(in srgb, var(--brand-bright) 45%, transparent);
+	--selection: color-mix(in srgb, var(--brand-bright) 25%, transparent);
+	--selection-foreground: var(--foreground);
+	--dot-grid-color: hsl(0 0% 100% / 0.06);
 
 	/* Surfaces (dark) */
 	--background: #1c1c1c;
@@ -112,6 +140,17 @@
 	background: var(--background);
 }
 
+/* Double-font system: Host Grotesk (the logo face) carries brand wordmarks and page/heading
+ *  display text; Manrope stays on every reading surface. Headings only — never body copy,
+ *  labels or data. */
+.marketing h1,
+.marketing h2,
+.studio h1,
+.studio h2 {
+	font-family:
+		"Host Grotesk Variable", "Host Grotesk", "Manrope Variable", system-ui, sans-serif;
+}
+
 .marketing code,
 .marketing pre,
 .marketing kbd,
@@ -126,7 +165,7 @@
 .marketing ::selection,
 .studio ::selection {
 	background: var(--selection);
-	color: var(--background);
+	color: var(--selection-foreground);
 }
 
 /* Supabase `.section-container`: centered max-width with horizontal padding. */
@@ -138,12 +177,33 @@
 }
 @media (min-width: 1024px) {
 	.section-container {
-		padding-inline: 2rem;
+		padding-inline: 3rem;
 	}
 }
 
+/* The one brand gradient in the product lives in the hero (shared/components/marketing.tsx),
+   rendered by the Grainient canvas from the Peridot shell. No other section carries one. */
+
 /* Subtle dotted grid used behind hero and stats. */
 .dot-grid {
-	background-image: radial-gradient(circle, hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+	background-image: radial-gradient(circle, var(--dot-grid-color) 1px, transparent 1px);
 	background-size: 16px 16px;
+}
+
+/* Full-bleed hairline that closes every marketing section, matching the Peridot shell. */
+.section-rail {
+	position: relative;
+}
+
+.section-rail::after {
+	content: "";
+	position: absolute;
+	z-index: 30;
+	bottom: 0;
+	left: 50%;
+	width: 100vw;
+	height: 1px;
+	transform: translateX(-50%);
+	background: var(--border-default);
+	pointer-events: none;
 }

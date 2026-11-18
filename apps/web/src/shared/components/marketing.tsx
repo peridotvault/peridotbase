@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
+import Grainient from "./blocks/grainient";
 
 /** Subtle dotted grid background, masked to a soft ellipse. */
 export function DotGrid({ className = "" }: { className?: string }) {
@@ -10,18 +11,21 @@ export function DotGrid({ className = "" }: { className?: string }) {
 	);
 }
 
-/** Supabase-style hero glow: dark canvas with a green radial lift at the bottom and
- *  a faint dotted grid. Decorative only. */
+/** Hero backdrop: the Peridot brand grainient, softened behind a light veil so the ink
+ *  hero copy stays readable. Decorative. */
 export function HeroGlow() {
 	return (
 		<div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-			<div
-				className="absolute inset-x-0 bottom-0 h-[40rem]"
-				style={{
-					background:
-						"radial-gradient(60rem 30rem at 50% 100%, hsl(152 75% 60% / 0.18), transparent 70%)",
-				}}
+			<Grainient
+				colors={["#0d0f0e", "#123324", "#349b65", "#87ee83"]}
+				angle={180}
+				grainAmount={0.2}
+				dpr={1}
+				interactive
+				clickSwirl
+				className="absolute inset-0 opacity-30"
 			/>
+			<div className="absolute inset-0 bg-linear-to-b from-background/85 via-background/55 to-background/20" />
 			<DotGrid className="opacity-60" />
 		</div>
 	);
@@ -32,11 +36,15 @@ type SectionProps = {
 	className?: string;
 };
 
-/** Centered max-width container with Supabase vertical rhythm. */
+/** Full-bleed section band. Backgrounds and rails span the viewport; every gutter lives inside
+ *  the section itself, so the content never sits against the rail. The page-level rail overlay
+ *  (marketing route) paints above the band. */
 export function Section({ children, className = "" }: SectionProps) {
 	return (
-		<section className={`py-16 sm:py-20 md:py-24 ${className}`}>
-			<div className="section-container">{children}</div>
+		<section className={`section-rail ${className}`}>
+			<div className={`section-container py-16 sm:py-20 md:py-24 ${className}`}>
+				{children}
+			</div>
 		</section>
 	);
 }
@@ -93,26 +101,23 @@ export function ProductCard({
 	external = false,
 	className = "",
 }: ProductCardProps) {
-	const body = (
-		<div className="flex flex-col gap-3 p-6">
-			{Icon ? (
-				<span className="flex size-10 items-center justify-center rounded-lg border border-border-default bg-surface-100 text-primary">
-					<Icon className="size-5" aria-hidden />
-				</span>
-			) : null}
-			<h3 className="text-lg font-medium tracking-tight text-foreground">{title}</h3>
-			<p className="text-sm text-foreground-light">{description}</p>
-		</div>
-	);
-
+	// Copy on top, visual underneath: one reading order, one place that looks like UI.
 	const inner = (
 		<>
+			<div className="flex flex-col gap-2 p-6">
+				<div className="flex items-center gap-2.5">
+					{Icon ? <Icon className="size-5 flex-none text-primary" aria-hidden /> : null}
+					<h3 className="text-xl font-medium tracking-tight text-foreground">{title}</h3>
+				</div>
+				<p className="text-sm text-foreground-light">{description}</p>
+			</div>
 			{media ? (
-				<div aria-hidden="true" className="overflow-hidden border-b border-border-default">
-					{media}
+				<div aria-hidden="true" className="flex flex-1 items-center p-3 sm:p-4">
+					<div className="w-full overflow-hidden rounded-lg border border-border-default bg-background-alternative shadow-sm">
+						{media}
+					</div>
 				</div>
 			) : null}
-			{body}
 		</>
 	);
 

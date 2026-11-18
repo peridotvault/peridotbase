@@ -23,9 +23,10 @@ export type WalletPort = {
 	wallet: ConnectedWallet | null;
 	/**
 	 * Opens the wallet picker. Resolves with the connected wallet, or `null` when the user
-	 * dismissed it. Rejects only on an unexpected failure.
+	 * dismissed it. Rejects only on an unexpected failure. `silent` asks the wallet to restore a
+	 * trusted session without prompting, which is how a remembered sign-in survives a reload.
 	 */
-	connect: () => Promise<ConnectedWallet | null>;
+	connect: (options?: { silent?: boolean }) => Promise<ConnectedWallet | null>;
 	/** Drops the session without touching the wallet extension itself. */
 	disconnect: () => Promise<void>;
 	/**

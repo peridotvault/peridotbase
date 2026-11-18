@@ -25,6 +25,7 @@ function RouteComponent() {
 	const { pathname } = useLocation();
 	const section = sectionOf(pathname);
 	const activeProject = useProject(organization, project);
+	const settled = useScopeStore((state) => state.catalogSettled);
 	const databases = useProjectDatabases(organization, project);
 	const { selectedDatabase, setSelectedDatabase } = useDatabaseStore();
 	const setActiveScope = useScopeStore((state) => state.setActiveScope);
@@ -46,6 +47,9 @@ function RouteComponent() {
 			if (selectedDatabase !== fallback) setSelectedDatabase(fallback);
 		}
 	}, [databases, selectedDatabase, setSelectedDatabase]);
+
+	// A refresh starts with an empty catalog; wait for the read before declaring the slug unknown.
+	if (!settled) return null;
 
 	if (!activeProject) {
 		return <Navigate to="/studio/org" replace />;

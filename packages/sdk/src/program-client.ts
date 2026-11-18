@@ -1,18 +1,25 @@
-import { AnchorProvider, Program, type Wallet } from "@coral-xyz/anchor";
+import { AnchorProvider, Program, utils as anchorUtils, type Wallet } from "@coral-xyz/anchor";
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import {
 	PeridotBase,
+	bindNameExpr,
 	coerceValue,
 	displayValue,
+	equalityTarget,
 	organizationPda,
+	parseSql,
+	predicatePasses,
 	projectPda,
 	type ColumnSpec,
 	type ColumnTypeName,
+	type Statement,
 	type SqlValue,
 	type Table,
 	type TableModel,
+	type V3Table,
 } from "@peridotvault/peridotbase-core-sdk";
 import IDL from "@peridotvault/peridotbase-core-sdk/idl";
+import { initV3Storage, loadV3Table } from "./program-v3.js";
 import type {
 	PeridotbaseClient,
 	PeridotbaseClientOptions,
@@ -307,7 +314,53 @@ export class ProgramClient implements PeridotbaseClient {
 
 	private async tableOf(ref: TableRef): Promise<Table> {
 		const sdk = await this.databaseSdk(ref.database);
+		await this.requireV3Database(sdk, ref.database);
 		return sdk.table(ref.table);
+	}
+
+	/** Resolves the table plus its storage layout; every row path branches on this. */
+	private async tableContext(ref: TableRef): Promise<{
+		sdk: PeridotBase;
+		table: Table;
+		v3: V3Table | null;
+	}> {
+		const sdk = await this.databaseSdk(ref.database);
+		await this.requireV3Database(sdk, ref.database);
+		const table = await sdk.table(ref.table);
+
+		return { sdk, table, v3: await loadV3Table(sdk, table.model.tableId) };
+	}
+
+	/**
+	 * The program rejects any account whose layout tag is not `LAYOUT_VERSION` (3)
+	 * with `IncompatibleAccountVersion`, so databases created before the
+	 * record-storage upgrade are frozen on-chain: no instruction may read or write
+	 * through their catalogs. Turn that into an actionable error instead of
+	 * letting the raw Anchor error escape.
+	 */
+	private async requireV3Database(sdk: PeridotBase, database: string): Promise<void> {
+		const info = await this.connection.getAccountInfo(sdk.databaseAddress(), "confirmed");
+		const version = info && info.data.length > 9 ? info.data[9] : -1;
+
+		if (version === 3) return;
+
+		throw new Error(
+			`Database "${database}" was created before the record-storage upgrade and is frozen by the program (layout v${version < 0 ? "?" : version}, required v3). ` +
+				"Create a new database to keep working; if its organization is also frozen, create a new organization first.",
+		);
+	}
+
+	/** Same freeze check for org/project catalogs, which gate `createDatabase`. */
+	private async requireV3Account(address: PublicKey, label: string): Promise<void> {
+		const info = await this.connection.getAccountInfo(address, "confirmed");
+		const version = info && info.data.length > 9 ? info.data[9] : -1;
+
+		if (version === 3) return;
+
+		throw new Error(
+			`This ${label} was created before the record-storage upgrade and is frozen by the program (layout v${version < 0 ? "?" : version}, required v3). ` +
+				"Create a new organization and project to keep working.",
+		);
 	}
 
 	async getHealth(): Promise<ProtocolHealth> {
@@ -447,6 +500,7 @@ export class ProgramClient implements PeridotbaseClient {
 	async createDatabase(name: string): Promise<DatabaseInfo> {
 		const scope = this.requireScope();
 		const project = await this.projectOf(scope);
+		await this.requireV3Account(project, "project");
 		const existing = await this.sdk.listDatabases(project);
 		const nextId =
 			existing.reduce(
@@ -470,14 +524,75 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async listTables(database: string): Promise<TableInfo[]> {
 		const sdk = await this.databaseSdk(database);
-		const models = await sdk.loadTables();
+		let entries: TableInfo[];
 
-		return models
-			.filter((model) => model.status === "active")
-			.map((model) => ({
-				tableName: model.name,
-				rowCount: Number(model.rowCount),
-			}));
+		try {
+			entries = (await sdk.loadTables())
+				.filter((model) => model.status === "active")
+				.map((model) => ({
+					tableName: model.name,
+					rowCount: Number(model.rowCount),
+				}));
+		} catch {
+			// Table catalogs written before layout versioning cannot be decoded by
+			// the v3 IDL, and Anchor's `all()` aborts the whole scan on the first
+			// one. Read them raw so one stale table cannot blank the sidebar; rows
+			// are unavailable, so the count is an estimate.
+			entries = await this.legacyTables(sdk);
+		}
+
+		return entries;
+	}
+
+	/** The IDL types the program namespace loosely; this is the slice we need. */
+	private rawProgram(): {
+		programId: PublicKey;
+		account: { tableCatalog: { discriminator: number[] } };
+	} {
+		const program = this.sdk.program as unknown as {
+			programId: PublicKey;
+			account: { tableCatalog: { discriminator: number[] } };
+		};
+		return program;
+	}
+
+	/** Scans table catalogs raw and decodes the pre-versioning layout by hand. */
+	private async legacyTables(sdk: PeridotBase): Promise<TableInfo[]> {
+		const anyProgram = this.rawProgram();
+		const raw = await this.connection.getProgramAccounts(anyProgram.programId, {
+			filters: [
+				{
+					memcmp: {
+						offset: 0,
+						bytes: anchorUtils.bytes.bs58.encode(
+							Buffer.from(anyProgram.account.tableCatalog.discriminator),
+						),
+					},
+				},
+			],
+		});
+		const database = sdk.databaseAddress();
+
+		const entries: TableInfo[] = [];
+
+		for (const { account } of raw) {
+			const data: Buffer = account.data;
+
+			// Pre-versioning layout: bump @8, database @9, table_id @41,
+			// name length @50, name @54.
+			if (!new PublicKey(data.slice(9, 41)).equals(database)) continue;
+
+			const length = data.readUInt32LE(50);
+			if (length === 0 || length > 64 || 54 + length + 5 > data.length) continue;
+
+			const name = data.slice(54, 54 + length).toString("utf8");
+			const status = data[54 + length + 4]; // after schema_version (u32)
+			if (!/^[\x20-\x7e]+$/.test(name) || status !== 0) continue;
+
+			entries.push({ tableName: name, rowCount: 0, rowCountEstimated: true });
+		}
+
+		return entries;
 	}
 
 	async getTableColumns(ref: TableRef): Promise<ColumnInfo[]> {
@@ -533,16 +648,22 @@ export class ProgramClient implements PeridotbaseClient {
 	}
 
 	async readRows(ref: TableRef, query: ReadRowsQuery): Promise<RowPage> {
-		const table = await this.tableOf(ref);
-		const columns = table.model.columns;
-		const scanned = await table.select();
-		const rows = scanned.map((values) => {
-			const record: RowRecord = {};
-			columns.forEach((column, index) => {
-				record[column.name] = displayValue(values[index], column);
-			});
-			return { record, values };
-		});
+		const { table, v3 } = await this.tableContext(ref);
+		const columns = v3 ? v3.columns : table.model.columns;
+		const rows = v3
+			? (await v3.scanAll({ cap: 10_000 }))
+					.filter((row) => row.live)
+					.map((row) => ({
+						record: this.rowRecord(v3.columns, row.values),
+						values: row.values,
+					}))
+			: (await table.select()).map((values) => {
+					const record: RowRecord = {};
+					columns.forEach((column, index) => {
+						record[column.name] = displayValue(values[index], column as ColumnSpec);
+					});
+					return { record, values };
+				});
 
 		const filtered = rows.filter(({ record }) =>
 			query.filters.every((filter) => {
@@ -586,13 +707,14 @@ export class ProgramClient implements PeridotbaseClient {
 	}
 
 	async insertRows(ref: TableRef, records: RowRecord[]): Promise<BulkInsertResult> {
-		const table = await this.tableOf(ref);
+		const { table, v3 } = await this.tableContext(ref);
 		const errors: Array<{ recordIndex: number; error: string }> = [];
 		let successCount = 0;
 
 		for (const [recordIndex, record] of records.entries()) {
 			try {
-				await table.insert([this.coerceRecord(table.model, record)]);
+				if (v3) await v3.insert(this.coerceColumns(v3.columns, record));
+				else await table.insert([this.coerceRecord(table.model, record)]);
 				successCount += 1;
 			} catch (error) {
 				errors.push({
@@ -615,39 +737,62 @@ export class ProgramClient implements PeridotbaseClient {
 	}
 
 	private coerceRecord(model: TableModel, record: RowRecord): Record<string, SqlValue> {
+		return this.coerceColumns(model.columns, record);
+	}
+
+	private coerceColumns(
+		columns: ReadonlyArray<{ name: string; type: ColumnTypeName }>,
+		record: RowRecord,
+	): Record<string, SqlValue> {
 		const out: Record<string, SqlValue> = {};
 
-		for (const column of model.columns) {
+		for (const column of columns) {
 			const value = record[column.name];
 			out[column.name] = coerceValue(
 				value === undefined || value === "" ? null : (value as SqlValue),
-				column,
+				column as ColumnSpec,
 			);
 		}
 
 		return out;
 	}
 
-	private primaryKeyOf(model: TableModel, record: RowRecord): SqlValue {
-		const column = model.columns[model.primaryKey];
-		return coerceValue(record[column.name] as SqlValue, column);
+	private primaryKeyOf(
+		columns: ReadonlyArray<{ name: string; type: ColumnTypeName }>,
+		primaryKey: number,
+		record: RowRecord,
+	): SqlValue {
+		const column = columns[primaryKey];
+		const primary = (record as Record<string, unknown>)[column.name];
+
+		return coerceValue(primary as SqlValue, column as ColumnSpec);
 	}
 
 	async updateRows(ref: TableRef, updates: RowUpdate[]): Promise<MutationResult> {
-		const table = await this.tableOf(ref);
-		const model = table.model;
+		const { table, v3 } = await this.tableContext(ref);
+		const columns = v3 ? v3.columns : table.model.columns;
 		let updated = 0;
 
 		for (const update of updates) {
-			const column = model.columns.findIndex((entry) => entry.name === update.columnName);
+			const column = columns.findIndex((entry) => entry.name === update.columnName);
 
 			if (column < 0) throw new Error(`unknown column: ${update.columnName}`);
 
 			const value = update.useDefault
-				? (model.columns[column].default ?? null)
-				: coerceValue(update.value as SqlValue, model.columns[column]);
+				? (columns[column].default ?? null)
+				: coerceValue(update.value as SqlValue, columns[column] as ColumnSpec);
 
-			await table.updateByKey(this.primaryKeyOf(model, update.rowData), [{ column, value }]);
+			const primaryKey = this.primaryKeyOf(
+				columns,
+				v3 ? v3.primaryKey : table.model.primaryKey,
+				update.rowData,
+			);
+
+			if (v3) {
+				await v3.update(primaryKey, [{ column: update.columnName, value }]);
+			} else {
+				await table.updateByKey(primaryKey, [{ column, value }]);
+			}
 			updated += 1;
 		}
 
@@ -655,10 +800,18 @@ export class ProgramClient implements PeridotbaseClient {
 	}
 
 	async deleteRows(ref: TableRef, keys: RowKey[]): Promise<DeleteRowsResult> {
-		const table = await this.tableOf(ref);
+		const { table, v3 } = await this.tableContext(ref);
+		const columns = v3 ? v3.columns : table.model.columns;
 
 		for (const key of keys) {
-			await table.softDeleteByKey(this.primaryKeyOf(table.model, key));
+			const primaryKey = this.primaryKeyOf(
+				columns,
+				v3 ? v3.primaryKey : table.model.primaryKey,
+				key,
+			);
+
+			if (v3) await v3.delete(primaryKey);
+			else await table.softDeleteByKey(primaryKey);
 		}
 
 		return {
@@ -670,6 +823,7 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async createTable(database: string, payload: CreateTablePayload): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(database);
+		await this.requireV3Database(sdk, database);
 		const models = await sdk.loadTables();
 		const tableId =
 			models.reduce((max, model) => (model.tableId > max ? model.tableId : max), 0n) + 1n;
@@ -696,9 +850,12 @@ export class ProgramClient implements PeridotbaseClient {
 				name: `${payload.tableName}_${field.columnName}_key`,
 				column: field.columnName,
 				unique: true,
+				// v3 derives claim/posting PDAs itself; the v2 bucket chain is unused.
+				bucketCount: 1,
 			}));
 
 		await sdk.createTable({ tableId, name: payload.tableName, columns, constraints, indexes });
+		await initV3Storage(sdk, tableId);
 
 		return { message: `Created table ${payload.tableName}` };
 	}
@@ -709,6 +866,7 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async dropTable(ref: TableRef): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(ref.database);
+		await this.requireV3Database(sdk, ref.database);
 		const table = await sdk.table(ref.table);
 		const signature = await sdk.softDropTable(table.model.tableId);
 		return { message: `Dropped table ${ref.table}`, signature };
@@ -716,6 +874,7 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async addColumn(ref: TableRef, payload: AddColumnPayload): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(ref.database);
+		await this.requireV3Database(sdk, ref.database);
 		const table = await sdk.table(ref.table);
 		const signature = await sdk.alterTable(table.model.tableId, [
 			{
@@ -760,6 +919,7 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async createIndex(ref: TableRef, payload: CreateIndexPayload): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(ref.database);
+		await this.requireV3Database(sdk, ref.database);
 		const table = await sdk.table(ref.table);
 		const column = table.model.columns.findIndex((entry) => entry.name === payload.columns[0]);
 
@@ -786,32 +946,305 @@ export class ProgramClient implements PeridotbaseClient {
 	}
 
 	async executeQuery(database: string, request: ExecuteQueryRequest): Promise<QueryResult> {
-		const sdk = await this.databaseSdk(database);
 		const started = performance.now();
-		const result = await sdk.execute(request.statement);
-		const duration = Math.round(performance.now() - started);
+		const statements = parseSql(request.statement);
+		const sdk = await this.databaseSdk(database);
+		const createdTables = new Set<string>();
+		let last: StatementResult | null = null;
+		let transactions = 0;
 
-		if (result?.kind === "select") {
-			const rows = (result.rows ?? []) as Record<string, unknown>[];
-			const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+		try {
+			// Batch mode: every write below stages an unsigned transaction and
+			// `flushBatch` packs them into as few signed transactions as the 1232
+			// byte packet allows, all under one wallet approval.
+			sdk.beginBatch();
+
+			// Staged creations are invisible to chain scans, so the script's table
+			// and index ids must come from these counters, not per-statement
+			// chain scans.
+			const models = await sdk.loadTables();
+			const ids = {
+				tableIdSeed:
+					models.reduce((max, model) => (model.tableId > max ? model.tableId : max), 0n) + 1n,
+				indexSeeds: new Map<bigint, bigint>(),
+			};
+
+			for (const statement of statements) {
+				// Staged DDL is invisible to chain reads, so a script that mixes DDL
+				// with SELECT or with writes against a table it just created must
+				// land the staged transactions first.
+				const targetsNewTable =
+					"table" in statement && createdTables.has(statement.table as string);
+				if (statement.kind === "select" || targetsNewTable) {
+					transactions += (await sdk.flushBatch()).length;
+					sdk.beginBatch();
+				}
+
+				last = await this.runStatement(database, statement, ids);
+
+				if (statement.kind === "createTable") createdTables.add(statement.name);
+				if (statement.kind === "select" || targetsNewTable) {
+					// A flush re-reads the chain, so re-seed the id counter from it.
+					const landed = await sdk.loadTables();
+					ids.tableIdSeed =
+						landed.reduce((max, model) => (model.tableId > max ? model.tableId : max), 0n) +
+						1n;
+				}
+			}
+
+			if (sdk.batching) transactions += (await sdk.flushBatch()).length;
+		} catch (error) {
+			if (sdk.batching) sdk.discardBatch();
+			throw error;
+		}
+
+		const duration = Math.round(performance.now() - started);
+		const rows = last?.rows ?? [];
+
+		return {
+			columns: last?.columns ?? [],
+			rows,
+			rowCount: rows.length,
+			duration,
+			message:
+				(last?.message ?? "Statement submitted") +
+				(transactions > 0
+					? ` (${transactions} transaction${transactions === 1 ? "" : "s"})`
+					: ""),
+		};
+	}
+
+	private async runStatement(
+		database: string,
+		statement: Statement,
+		ids: { tableIdSeed: bigint; indexSeeds: Map<bigint, bigint> },
+	): Promise<StatementResult> {
+		switch (statement.kind) {
+			case "createDatabase":
+				await this.createDatabase(statement.name);
+				return { columns: [], rows: [], message: `Created database ${statement.name}` };
+			case "createTable":
+				return this.createTableFromStatement(database, statement, ids);
+			case "createIndex":
+				return this.createIndexFromStatement(database, statement, ids);
+			case "alterTable": {
+				const sdk = await this.databaseSdk(database);
+				await this.requireV3Database(sdk, database);
+				const table = await sdk.table(statement.table);
+				await sdk.alterTable(table.model.tableId, statement.addColumns);
+				return { columns: [], rows: [], message: `Altered table ${statement.table}` };
+			}
+			case "insert":
+			case "select":
+			case "update":
+			case "delete":
+				return this.runDml(database, statement);
+			default:
+				throw new IntegrationUnavailableError(statement.kind);
+		}
+	}
+
+	/** Mirrors the core SQL executor, but creates the v3 descriptor after the catalog. */
+	private async createTableFromStatement(
+		database: string,
+		statement: Extract<Statement, { kind: "createTable" }>,
+		ids: { tableIdSeed: bigint },
+	): Promise<StatementResult> {
+		const sdk = await this.databaseSdk(database);
+		await this.requireV3Database(sdk, database);
+		const tableId = ids.tableIdSeed++;
+
+		const constraints = statement.constraints.map((constraint) => {
+			if (constraint.kind === "check") {
+				return {
+					kind: "check" as const,
+					expr: bindNameExpr(constraint.expr, statement.columns),
+				};
+			}
+
+			return constraint;
+		});
+
+		await sdk.createTable({
+			tableId,
+			name: statement.name,
+			columns: statement.columns,
+			constraints,
+			indexes: constraints
+				.filter((constraint) => constraint.kind === "unique")
+				.map((constraint) => ({
+					name: `uq_${(constraint as { column: string }).column}`,
+					column: (constraint as { column: string }).column,
+					unique: true,
+					bucketCount: 1,
+				})),
+		});
+		await initV3Storage(sdk, tableId);
+
+		return { columns: [], rows: [], message: `Created table ${statement.name}` };
+	}
+
+	private async createIndexFromStatement(
+		database: string,
+		statement: Extract<Statement, { kind: "createIndex" }>,
+		ids: { indexSeeds: Map<bigint, bigint> },
+	): Promise<StatementResult> {
+		const sdk = await this.databaseSdk(database);
+		await this.requireV3Database(sdk, database);
+		const table = await sdk.table(statement.table);
+		const column = table.model.columns.findIndex((entry) => entry.name === statement.column);
+
+		if (column < 0) throw new Error(`unknown column: ${statement.column}`);
+
+		// Staged indexes are invisible to chain reads, so a second CREATE INDEX on
+		// the same table inside one script needs this per-run seed.
+		let indexId = ids.indexSeeds.get(table.model.tableId);
+		if (indexId === undefined) {
+			indexId =
+				table.model.indexes.reduce(
+					(max, index) => (index.indexId > max ? index.indexId : max),
+					0n,
+				) + 1n;
+		}
+		ids.indexSeeds.set(table.model.tableId, indexId + 1n);
+
+		await sdk.createIndex(table.model.tableId, {
+			indexId,
+			name: statement.name,
+			column,
+			unique: statement.unique,
+			bucketCount: 1,
+		});
+
+		return { columns: [], rows: [], message: `Created index ${statement.name}` };
+	}
+
+	private async runDml(
+		database: string,
+		statement: Extract<Statement, { kind: "insert" | "select" | "update" | "delete" }>,
+	): Promise<StatementResult> {
+		const { table, v3 } = await this.tableContext({ database, table: statement.table });
+		const columns = v3 ? v3.columns : table.model.columns;
+		const specs = columns as unknown as ColumnSpec[];
+		const primaryKey = v3 ? v3.primaryKey : table.model.primaryKey;
+
+		if (statement.kind === "select") {
+			const predicate = statement.where ? bindNameExpr(statement.where, specs) : undefined;
+			const projected =
+				statement.columns === "*" ? columns.map((c) => c.name) : statement.columns;
+			const rows: Record<string, unknown>[] = [];
+			const limit = statement.limit ?? Number.POSITIVE_INFINITY;
+
+			const take = (values: readonly SqlValue[]) => {
+				if (!predicatePasses(predicate, values as SqlValue[])) return false;
+
+				const record = this.rowRecord(columns, values);
+				rows.push(
+					statement.columns === "*"
+						? record
+						: Object.fromEntries(projected.map((name) => [name, record[name]])),
+				);
+
+				return rows.length >= limit;
+			};
+
+			if (v3) {
+				let cursor = null;
+				for (;;) {
+					const page = await v3.scan({ limit: 200, cursor });
+					let done = false;
+					for (const row of page.rows) {
+						if (!row.live) continue;
+						if (take(row.values)) {
+							done = true;
+							break;
+						}
+					}
+					if (done) break;
+					cursor = page.cursor;
+					if (!page.cursor) break;
+				}
+			} else {
+				for (const values of await table.select()) if (take(values)) break;
+			}
 
 			return {
-				columns,
+				columns: projected,
 				rows,
-				rowCount: rows.length,
-				duration,
 				message: `${rows.length} row${rows.length === 1 ? "" : "s"}`,
 			};
 		}
 
-		return {
-			columns: [],
-			rows: [],
-			rowCount: 0,
-			duration,
-			message: result?.kind ? `${String(result.kind)} submitted` : "Statement submitted",
-		};
+		if (statement.kind === "insert") {
+			const names = statement.columns ?? columns.map((c) => c.name);
+			const records = statement.rows.map((row) =>
+				Object.fromEntries(names.map((name, index) => [name, row[index]])),
+			);
+
+			if (v3) {
+				for (const record of records) await v3.insert(this.coerceColumns(columns, record));
+			} else {
+				await table.insert(records.map((record) => this.coerceRecord(table.model, record)));
+			}
+
+			return {
+				columns: [],
+				rows: [],
+				message: `Inserted ${records.length} row${records.length === 1 ? "" : "s"}`,
+			};
+		}
+
+		const target = equalityTarget(statement.where, statement.table);
+
+		if (!target || target.column !== columns[primaryKey].name) {
+			throw new Error(
+				`${statement.kind.toUpperCase()} requires WHERE ${columns[primaryKey].name} = <literal>`,
+			);
+		}
+
+		const key = coerceValue(target.value as SqlValue, columns[primaryKey] as ColumnSpec);
+
+		if (statement.kind === "update") {
+			if (v3) {
+				await v3.update(key, statement.assignments);
+			} else {
+				await table.updateByKey(
+					key,
+					statement.assignments.map((assignment) => ({
+						column: table.model.columns.findIndex((entry) => entry.name === assignment.column),
+						value: coerceValue(
+							assignment.value as SqlValue,
+							specs.find((c) => c.name === assignment.column)!,
+						),
+					})),
+				);
+			}
+
+			return { columns: [], rows: [], message: `Updated 1 row` };
+		}
+
+		if (v3) await v3.delete(key);
+		else await table.softDeleteByKey(key);
+
+		return { columns: [], rows: [], message: `Deleted 1 row` };
+	}
+
+	private rowRecord(
+		columns: ReadonlyArray<{ name: string; type: ColumnTypeName }>,
+		values: readonly SqlValue[],
+	): RowRecord {
+		const record: RowRecord = {};
+		columns.forEach((column, index) => {
+			record[column.name] = displayValue(values[index], column as ColumnSpec);
+		});
+		return record;
 	}
 }
+
+type StatementResult = {
+	columns: string[];
+	rows: Record<string, unknown>[];
+	message: string;
+};
 
 export { PROGRAM_NOT_WIRED };

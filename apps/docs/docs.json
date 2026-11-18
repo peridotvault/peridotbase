@@ -3,9 +3,9 @@
 	"name": "Peridotbase",
 	"theme": "mint",
 	"colors": {
-		"primary": "#7FDC4A",
-		"light": "#B9F58C",
-		"dark": "#0D110B"
+		"primary": "#1c1c1c",
+		"light": "#ededed",
+		"dark": "#1c1c1c"
 	},
 	"favicon": "/logo.svg",
 	"navigation": {

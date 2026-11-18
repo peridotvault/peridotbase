@@ -5,6 +5,10 @@ import { useTheme } from "@/shared/hooks/use-theme";
 /** Admin shell. Client-only like Studio, served from the same app, no extra service. */
 export const Route = createFileRoute("/admin")({
 	ssr: false,
+	// Operator surface: never a search result.
+	head: () => ({
+		meta: [{ title: "Admin — Peridotbase" }, { name: "robots", content: "noindex, nofollow" }],
+	}),
 	component: AdminLayout,
 });
 

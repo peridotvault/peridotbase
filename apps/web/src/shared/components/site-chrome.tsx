@@ -1,15 +1,16 @@
+import { buttonVariants } from "@peridotvault/peridotbase-ui/button";
 import { ArrowUpRight } from "lucide-react";
 import { DOCS_URL, GITHUB_URL } from "@/shared/lib/site";
 
 const navLink = "text-sm text-foreground-light transition-colors hover:text-foreground";
 
-/** Sticky Supabase-style navbar: translucent over the hero, border-b, rounded buttons. */
+/** Sticky navbar: translucent over the hero, above every page layer, with the same rails. */
 export function SiteHeader() {
 	return (
-		<header className="sticky top-0 z-40 border-b border-border-default bg-background/90 backdrop-blur-xs">
-			<div className="section-container flex h-16 items-center justify-between gap-6">
+		<header className="sticky top-0 z-50 border-b border-border-default bg-background/90 backdrop-blur-xs">
+			<div className="section-container flex h-16 items-center justify-between gap-6 border-x border-border-default max-md:border-x-0">
 				<a
-					className="flex items-center gap-2 text-base font-semibold tracking-tight text-foreground"
+					className="flex items-center gap-2 font-display text-base font-semibold tracking-tight text-foreground"
 					href="/"
 				>
 					<img className="size-6 rounded" src="/logo.svg" alt="" width={24} height={24} />
@@ -29,16 +30,17 @@ export function SiteHeader() {
 						Changelog
 					</a>
 					<a
-						className="hidden items-center gap-1.5 rounded-md border border-border-default px-2.5 py-1 text-xs text-foreground-light transition-colors hover:text-foreground sm:flex"
+						className={buttonVariants({
+							variant: "outline",
+							size: "md",
+							className: "hidden sm:inline-flex",
+						})}
 						href={GITHUB_URL}
 					>
 						GitHub
 						<ArrowUpRight className="size-3" aria-hidden />
 					</a>
-					<a
-						className="rounded-md bg-primary-solid px-2.5 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary-solid-hover"
-						href="/studio/"
-					>
+					<a className={buttonVariants({ size: "md" })} href="/studio/">
 						Open Studio
 					</a>
 				</nav>
@@ -52,7 +54,7 @@ export function SiteFooter() {
 		<footer className="border-t border-border-default">
 			<div className="section-container grid gap-8 py-12 sm:py-16 md:grid-cols-4">
 				<div>
-					<div className="flex items-center gap-2 font-semibold text-foreground">
+					<div className="flex items-center gap-2 font-display font-semibold text-foreground">
 						<img className="size-5 rounded" src="/logo.svg" alt="" width={20} height={20} />
 						Peridotbase
 					</div>

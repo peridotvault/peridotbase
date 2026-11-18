@@ -4,13 +4,24 @@ import {
 	ArrowUpRight,
 	Database,
 	Download,
+	Fingerprint,
 	KeyRound,
 	Scale,
 	Server,
+	ShieldCheck,
 	Table2,
 	Wallet,
 } from "lucide-react";
-import { DOCS_URL, GITHUB_URL } from "@/shared/lib/site";
+import {
+	DOCS_URL,
+	GITHUB_URL,
+	LOGO_URL,
+	SITE_DESCRIPTION,
+	SITE_NAME,
+	SITE_URL,
+} from "@/shared/lib/site";
+import { seoHead } from "@/shared/lib/seo";
+import { buttonVariants } from "@peridotvault/peridotbase-ui/button";
 import {
 	DotGrid,
 	HeroGlow,
@@ -19,31 +30,52 @@ import {
 	SectionHeading,
 } from "@/shared/components/marketing";
 import {
+	AuthPreview,
 	ExportPreview,
+	ImmutablePreview,
 	IndexPreview,
 	QueryPreview,
 	TablePreview,
 } from "@/shared/components/marketing-visuals";
+import { DashboardMockup } from "@/shared/components/blocks/dashboard-mockup";
 
 /** The marketing landing: static, prerendered, crawler-readable. Section order
  *  mirrors supabase.com. */
 export const Route = createFileRoute("/_marketing/")({
-	head: () => ({
-		meta: [
-			{ title: "Peridotbase — your database, on-chain" },
-			{
-				name: "description",
-				content:
-					"A Solana-native, fully on-chain relational database. Browse tables, edit records, and run queries straight from your wallet.",
-			},
-			{ property: "og:title", content: "Peridotbase — your database, on-chain" },
-			{
-				property: "og:description",
-				content:
-					"A Solana-native, fully on-chain relational database. Browse tables, edit records, and run queries straight from your wallet.",
-			},
-		],
-	}),
+	head: () =>
+		seoHead({
+			title: "Your database, on-chain",
+			description:
+				"Peridotbase is a Solana-native, fully on-chain relational database. Create tables, indexes and records from your wallet, browse them in a familiar grid, and run SQL-style queries — no server, no API keys, no database cluster to operate.",
+			path: "/",
+			jsonLd: [
+				{
+					"@type": "Organization",
+					name: SITE_NAME,
+					url: SITE_URL,
+					logo: LOGO_URL,
+					sameAs: [GITHUB_URL, DOCS_URL],
+				},
+				{
+					"@type": "WebSite",
+					name: SITE_NAME,
+					url: SITE_URL,
+					description: SITE_DESCRIPTION,
+				},
+				{
+					"@type": "SoftwareApplication",
+					name: SITE_NAME,
+					url: SITE_URL,
+					applicationCategory: "DeveloperApplication",
+					operatingSystem: "Web",
+					description: SITE_DESCRIPTION,
+					isAccessibleForFree: true,
+					license: "https://www.apache.org/licenses/LICENSE-2.0",
+					offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+					sameAs: [GITHUB_URL, DOCS_URL],
+				},
+			],
+		}),
 	component: LandingPage,
 });
 
@@ -65,34 +97,52 @@ const WALLETS = ["Phantom", "Solflare", "Backpack", "Ledger"] as const;
 
 const PRODUCTS = [
 	{
-		title: "Tables",
+		title: "Postgres experience",
 		description:
-			"Rows and schema are Solana program accounts. Browse them like a spreadsheet; what you see is what the chain holds.",
+			"Tables, columns, types and indexes behave the way they do in Postgres — except every row is owned by a Solana program.",
 		icon: Table2,
 		media: <TablePreview />,
-		span: "md:col-span-7",
+		span: "md:col-span-6 lg:col-span-5",
 	},
 	{
-		title: "Queries",
+		title: "SQL-style reads",
 		description:
-			"SQL-shaped reads that scan program state and filter in the browser — no middle layer to trust.",
+			"Write the query you already know. The SDK scans program state and filters in the browser, with no middle layer to trust.",
 		icon: Database,
 		media: <QueryPreview />,
-		span: "md:col-span-5",
+		span: "md:col-span-6 lg:col-span-4",
 	},
 	{
-		title: "Indexes",
-		description: "Declare secondary indexes per table. The program enforces them on write.",
-		icon: KeyRound,
-		media: <IndexPreview />,
-		span: "md:col-span-5",
+		title: "Immutable by default",
+		description:
+			"Every insert, update and index change is a signed transaction with a slot and signature you can point at forever.",
+		icon: ShieldCheck,
+		media: <ImmutablePreview />,
+		span: "md:col-span-6 lg:col-span-3",
 	},
 	{
-		title: "Exports",
-		description: "CSV and JSON generated from SDK reads. Nothing leaves your machine.",
+		title: "Portable exports",
+		description:
+			"CSV and JSON generated from SDK reads in your browser. Your data leaves only when you ask it to.",
 		icon: Download,
 		media: <ExportPreview />,
-		span: "md:col-span-7",
+		span: "md:col-span-6 lg:col-span-3",
+	},
+	{
+		title: "Declared indexes",
+		description:
+			"Declare secondary indexes per table and the program enforces them on write, so lookups stay cheap as rows grow.",
+		icon: KeyRound,
+		media: <IndexPreview />,
+		span: "md:col-span-6 lg:col-span-4",
+	},
+	{
+		title: "Wallet sign-in",
+		description:
+			"No passwords, API keys or session servers — connect a wallet and sign the write.",
+		icon: Fingerprint,
+		media: <AuthPreview />,
+		span: "md:col-span-6 lg:col-span-5",
 	},
 ] as const;
 
@@ -154,48 +204,34 @@ function GithubIcon() {
 function LandingPage() {
 	return (
 		<>
-			{/* Hero — centered headline + 2 CTAs, glow + product mock below */}
-			<section className="relative flex flex-col items-center overflow-hidden pt-24 pb-16 text-center sm:pt-32 md:pt-40">
+			{/* Hero — one-line headline + CTAs, the Studio window running off the fold */}
+			<section className="relative flex h-[calc(100svh-4rem)] max-h-[880px] min-h-[600px] flex-col items-center overflow-hidden border-b border-border-default pt-24 pb-0 text-center sm:pt-32 md:pt-36">
 				<HeroGlow />
 				<div className="relative section-container flex flex-col items-center">
-					<span className="inline-flex items-center gap-2 rounded-full border border-border-default bg-surface-100 px-3 py-1 text-xs text-foreground-light">
-						<Database className="size-3.5 text-primary" aria-hidden />
-						Solana-native relational database
-					</span>
-					<h1 className="mt-6 max-w-4xl text-4xl font-medium tracking-tight text-balance text-foreground sm:text-5xl md:text-6xl">
+					<h1 className="max-w-4xl text-4xl font-medium tracking-tight text-balance text-foreground sm:text-5xl md:text-6xl">
 						Your database lives <em className="not-italic text-primary">on-chain</em>.
 					</h1>
-					<p className="mt-5 max-w-xl text-balance text-lg text-foreground-light">
-						Peridotbase stores tables, rows, and indexes as Solana program accounts. The Studio
-						browses them through your wallet — no server, no custody, no off-chain copy.
-					</p>
 					<div className="mt-8 flex flex-wrap justify-center gap-3">
-						<a
-							className="flex items-center gap-2 rounded-md bg-primary-solid px-5 py-2.5 font-semibold text-primary-foreground transition-colors hover:bg-primary-solid-hover"
-							href="/studio/"
-						>
+						<a className={buttonVariants({ size: "xl" })} href="/studio/">
 							Open the Studio
 							<ArrowRight className="size-4" aria-hidden />
 						</a>
-						<a
-							className="flex items-center gap-2 rounded-md border border-border-default px-5 py-2.5 font-semibold text-foreground transition-colors hover:border-border-strong hover:bg-surface-100"
-							href={DOCS_URL}
-						>
+						<a className={buttonVariants({ variant: "outline", size: "xl" })} href={DOCS_URL}>
 							Read the docs
 							<ArrowUpRight className="size-4" aria-hidden />
 						</a>
 					</div>
 				</div>
-				{/* Product mock below hero */}
-				<div className="relative section-container mt-16 w-full">
-					<div className="overflow-hidden rounded-xl border border-border-default bg-surface-100 shadow-2xl">
-						<TablePreview />
+				{/* Product mock: flush with the hero floor, so the window is cut by the fold */}
+				<div className="relative mt-14 min-h-0 w-full flex-1 overflow-hidden sm:mt-16">
+					<div className="section-container h-full">
+						<DashboardMockup className="h-full rounded-b-none border-b-0" />
 					</div>
 				</div>
 			</section>
 
 			{/* Trust strip — "Works with any Wallet Standard wallet" */}
-			<Section className="!pt-0 !pb-8">
+			<Section className="!pt-8 !pb-8">
 				<p className="text-center font-mono text-xs uppercase tracking-widest text-foreground-lighter">
 					Works with any Wallet Standard wallet
 				</p>
@@ -216,8 +252,8 @@ function LandingPage() {
 			<Section>
 				<SectionHeading
 					eyebrow="Product"
-					title="Everything a table needs, on-chain"
-					description="Four surfaces that mirror a real database tool — every value is program state."
+					title="A real database, on-chain"
+					description="The parts you expect from Postgres — tables, queries, auth, audit — with a Solana program as the only backend."
 				/>
 				<div className="mt-12 grid gap-4 md:grid-cols-12">
 					{PRODUCTS.map((product) => (
@@ -327,14 +363,14 @@ function LandingPage() {
 						</p>
 						<div className="mt-6 flex flex-wrap gap-3">
 							<a
-								className="flex items-center gap-2 rounded-md border border-border-default px-5 py-2.5 font-semibold text-foreground transition-colors hover:border-border-strong hover:bg-surface-100"
+								className={buttonVariants({ variant: "outline", size: "xl" })}
 								href={GITHUB_URL}
 							>
 								<GithubIcon />
 								Star on GitHub
 							</a>
 							<a
-								className="flex items-center gap-2 rounded-md border border-border-default px-5 py-2.5 font-semibold text-foreground transition-colors hover:border-border-strong hover:bg-surface-100"
+								className={buttonVariants({ variant: "outline", size: "xl" })}
 								href="/roadmap/"
 							>
 								See the roadmap
@@ -352,7 +388,7 @@ function LandingPage() {
 							Start your project on devnet today.
 						</p>
 						<a
-							className="relative mt-6 flex items-center gap-2 rounded-md bg-primary-solid px-5 py-2.5 font-semibold text-primary-foreground transition-colors hover:bg-primary-solid-hover"
+							className={buttonVariants({ size: "xl", className: "relative mt-6" })}
 							href="/studio/"
 						>
 							Open the Studio

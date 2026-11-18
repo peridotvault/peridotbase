@@ -48,7 +48,8 @@ export const RunnerHeader = ({
 				<Button
 					type="button"
 					variant="default"
-					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none bg-green-700 text-white hover:bg-green-800 gap-1 disabled:opacity-50"
+					size="lg"
+					className="border-l-0 border-y-0 border-r border-border rounded-none gap-1 disabled:opacity-50"
 					onClick={handleButtonClick}
 					disabled={isExecutingQuery}
 					aria-label="Run the query"
@@ -63,7 +64,8 @@ export const RunnerHeader = ({
 						<Button
 							type="button"
 							variant="ghost"
-							className="h-8! border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
+							size="lg"
+							className="border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
 							aria-label="Generate a query with AI"
 							onClick={() =>
 								askAssistant(
@@ -82,7 +84,8 @@ export const RunnerHeader = ({
 						<Button
 							type="button"
 							variant="ghost"
-							className="h-8! border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
+							size="lg"
+							className="border-l-0 border-y-0 border-r border-zinc-800 rounded-none"
 							aria-label="Optimize the query with AI"
 							disabled={!currentQuery.trim() || isExecutingQuery}
 							onClick={() =>
@@ -100,7 +103,8 @@ export const RunnerHeader = ({
 				<Button
 					type="button"
 					variant="ghost"
-					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					size="lg"
+					className="border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 					aria-label="Format the query"
 					onClick={handleFormatQuery}
 				>
@@ -110,7 +114,8 @@ export const RunnerHeader = ({
 				<Button
 					type="button"
 					variant="ghost"
-					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					size="lg"
+					className="border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 					aria-label="Save the query"
 					onClick={handleSaveQuery}
 				>
@@ -120,7 +125,8 @@ export const RunnerHeader = ({
 				<Button
 					type="button"
 					variant="ghost"
-					className="h-8! border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+					size="lg"
+					className="border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 					aria-label="Favorite the query"
 					onClick={handleFavorite}
 				>

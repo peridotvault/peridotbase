@@ -16,7 +16,7 @@ export const AnnouncementBar = () => {
 	return (
 		<div
 			role="status"
-			className="flex shrink-0 items-center justify-center gap-2 border-b border-amber-500/40 bg-amber-500/10 px-4 py-1.5 text-center text-xs text-amber-950 dark:text-amber-100"
+			className="flex shrink-0 items-center justify-center gap-2 border-b border-warning/40 bg-warning/10 px-4 py-1.5 text-center text-xs text-warning"
 		>
 			<span className="flex-1">
 				<strong className="font-semibold">Demo preview.</strong> Sample data only — nothing is
@@ -28,7 +28,7 @@ export const AnnouncementBar = () => {
 				size="icon-xs"
 				aria-label="Dismiss announcement for 24 hours"
 				onClick={dismiss}
-				className="shrink-0 text-inherit hover:bg-amber-500/15 hover:text-inherit"
+				className="shrink-0 text-inherit hover:bg-warning/15 hover:text-inherit"
 			>
 				<X className="size-3.5" />
 			</Button>

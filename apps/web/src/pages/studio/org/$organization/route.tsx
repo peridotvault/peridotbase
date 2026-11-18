@@ -4,7 +4,9 @@ import { OrgSidebar } from "@/feat/workspace";
 import { NavRail } from "@/shared/components/components/nav-rail";
 import { SidebarWrapper } from "@/shared/components/sidebar-wrapper";
 import { useOrganization } from "@/shared/hooks/use-scope";
+import { orgSectionOf } from "@/shared/lib/sections";
 import { usePersonalPreferencesStore } from "@/shared/stores/personal-preferences.store";
+import { useScopeStore } from "@/shared/stores/scope.store";
 
 export const Route = createFileRoute("/studio/org/$organization")({
 	component: RouteComponent,
@@ -19,26 +21,26 @@ function RouteComponent() {
 /** The org shell: rail on every org tab, sidebar only on settings. Unknown org goes to picker. */
 const OrgGate = ({ organization }: { organization: string }) => {
 	const active = useOrganization(organization);
+	const settled = useScopeStore((state) => state.catalogSettled);
 	const { pathname } = useLocation();
 
 	const {
 		sidebar: { mode, width },
 	} = usePersonalPreferencesStore();
 
+	// A refresh starts with an empty catalog; wait for the read before declaring the slug unknown.
+	if (!settled) return null;
+
 	if (!active) return <Navigate to="/studio/org" replace />;
 
-	// The project subtree renders its own rail + sidebar; only the org tabs get the org shell.
-	const segments = pathname.split("/").filter(Boolean);
-	const isOrgTab =
-		segments.length === 2 ||
-		(segments.length === 3 &&
-			segments[2] !== undefined &&
-			["team", "settings"].includes(segments[2]));
+	// The project subtree (`/org/<org>/<project>/…`) renders its own rail + sidebar; only the
+	// org-level routes get the org shell. `orgSectionOf` reads the segment after the org slug.
+	const orgSection = orgSectionOf(pathname);
 
-	if (!isOrgTab) return <Outlet />;
+	if (!orgSection) return <Outlet />;
 
 	// Projects and team are full-width; settings keeps a sidebar for future sections.
-	const showSidebar = segments[2] === "settings";
+	const showSidebar = orgSection.id === "settings";
 
 	if (!showSidebar) {
 		return (
