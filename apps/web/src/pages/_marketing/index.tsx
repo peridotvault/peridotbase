@@ -270,7 +270,7 @@ function LandingPage() {
 			</Section>
 
 			{/* Query it your way — code side-by-side */}
-			<Section className="bg-surface-100">
+			<Section className="bg-background-alternative">
 				<SectionHeading
 					eyebrow="Access"
 					title="Query it your way"
@@ -326,7 +326,7 @@ function LandingPage() {
 			</Section>
 
 			{/* Stats band */}
-			<Section className="bg-surface-100">
+			<Section className="bg-background-alternative">
 				<div className="relative">
 					<DotGrid />
 					<div className="relative grid grid-cols-2 gap-4 md:grid-cols-4">
