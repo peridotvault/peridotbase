@@ -59,7 +59,7 @@ const RowDetailsField = ({
 				<span className="flex items-center gap-1.5 text-xs text-muted-foreground">
 					{column.dataTypeLabel}
 					{column.isPrimaryKey && (
-						<span className="rounded border border-border bg-muted px-1 font-mono text-[10px]">
+						<span className="rounded-sm border border-border bg-muted px-1 font-mono text-[0.625rem]">
 							PK
 						</span>
 					)}
@@ -71,7 +71,7 @@ const RowDetailsField = ({
 						<div
 							role="group"
 							aria-label={column.columnName}
-							className="break-all rounded-md border border-input bg-muted/40 px-3 py-2 text-sm"
+							className="break-all rounded-sm border border-input bg-muted/40 px-3 py-2 text-sm"
 						>
 							{displayValue || <span className="text-muted-foreground">NULL</span>}
 						</div>

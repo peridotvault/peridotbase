@@ -1,5 +1,5 @@
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import { useCallback } from "react";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { useUpdateCell } from "../../hooks/use-update-cell";
 import { useUpdateCellStore } from "../../stores/update-cell.store";
 
@@ -16,16 +16,13 @@ export const ClearBtn = ({ tableName }: { tableName: string }) => {
 	}
 
 	return (
-		<Button
+		<ToolbarButton
 			type="button"
-			variant="secondary"
-			size="lg"
-			className="border-l-0 border-y-0 border-r border-border rounded-none"
 			onClick={handleClearUpdates}
 			aria-label="Clear changes to the table"
 			disabled={isUpdatingCell}
 		>
-			Clear Changes
-		</Button>
+			Clear changes
+		</ToolbarButton>
 	);
 };

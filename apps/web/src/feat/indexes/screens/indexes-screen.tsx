@@ -52,6 +52,15 @@ export const IndexesScreen = ({ tableName }: { tableName: string }) => {
 									{kindLabel}
 								</Badge>
 							)}
+							{row.original.nullsNotDistinct && (
+								<Badge
+									variant="outline"
+									className="text-[0.6rem] px-1.5 shrink-0"
+									title="NULLS NOT DISTINCT"
+								>
+									NULLs equal
+								</Badge>
+							)}
 						</div>
 					);
 				},
@@ -122,14 +131,14 @@ export const IndexesScreen = ({ tableName }: { tableName: string }) => {
 				header: "",
 				cell: ({ row }) => (
 					<div className="flex flex-1 justify-center items-center">
-						<IndexRowActions index={row.original} />
+						<IndexRowActions index={row.original} tableName={tableName} />
 					</div>
 				),
 				size: 50,
 				enableResizing: false,
 			},
 		],
-		[hasMethods],
+		[hasMethods, tableName],
 	);
 
 	return (

@@ -1,5 +1,4 @@
 import type { FilterType, SortDirection, SortType } from "@peridotvault/peridotbase-sdk";
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
 import {
 	Table,
@@ -15,6 +14,7 @@ import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FilterPopup } from "@/shared/components/filter-popup";
 import { ReferencedTableSortPopup } from "@/shared/components/referenced-table-sort-popup";
+import { ToolbarIconButton } from "@/shared/components/toolbar";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useTableData } from "@/shared/hooks/use-table-data";
 import type { AddRecordFormData } from "@/shared/peridotbase";
@@ -105,8 +105,8 @@ export const ReferencedTable = ({
 
 	return (
 		<div>
-			<div className="sticky top-0 left-0 right-0 h-8 border-b border-border w-full flex items-center justify-between bg-background z-50">
-				<div className="flex items-center h-full">
+			<div className="sticky top-0 right-0 left-0 z-50 flex h-8 w-full items-center justify-between gap-2 border-b border-border bg-background px-1">
+				<div className="flex items-center gap-1">
 					<FilterPopup
 						tableName={tableName}
 						schemaName={schemaName}
@@ -128,26 +128,17 @@ export const ReferencedTable = ({
 					/>
 				</div>
 
-				<div className="flex items-center h-full">
-					<Button
-						variant="ghost"
-						size="icon"
-						className="border-l border-r-0 border-y-0 border-border rounded-none text-xs h-full aspect-square size-8 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+				<div className="flex items-center gap-1">
+					<ToolbarIconButton
 						onClick={handlePrevPage}
 						disabled={!tableData?.meta?.hasPreviousPage}
 					>
-						<ArrowLeftIcon className="size-3" />
-					</Button>
+						<ArrowLeftIcon />
+					</ToolbarIconButton>
 
-					<Button
-						variant="ghost"
-						size="icon"
-						className="border-r border-l border-y-0 border-border rounded-none text-xs h-full aspect-square size-8 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-						onClick={handleNextPage}
-						disabled={!tableData?.meta?.hasNextPage}
-					>
-						<ArrowRightIcon className="size-3" />
-					</Button>
+					<ToolbarIconButton onClick={handleNextPage} disabled={!tableData?.meta?.hasNextPage}>
+						<ArrowRightIcon />
+					</ToolbarIconButton>
 				</div>
 			</div>
 

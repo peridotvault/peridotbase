@@ -3,13 +3,7 @@ import { Input } from "@peridotvault/peridotbase-ui/input";
 import { Label } from "@peridotvault/peridotbase-ui/label";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-	hashPassword,
-	loadDatabase,
-	needsRehash,
-	saveDatabase,
-	verifyPassword,
-} from "@/feat/admin/lib/database";
+import { loadDatabase, verifyPassword } from "@/feat/admin/lib/database";
 import { setSession } from "@/feat/admin/lib/session";
 
 const LOCKOUT_KEY = "peridotbase-admin-lockout";
@@ -72,17 +66,6 @@ export const LoginScreen = () => {
 			}
 
 			localStorage.removeItem(LOCKOUT_KEY);
-
-			// Upgrade a legacy SHA-256 seed hash to PBKDF2 in the overlay on first login.
-			if (needsRehash(admin)) {
-				const passwordHash = await hashPassword(admin.salt, password);
-				saveDatabase({
-					...db,
-					admins: db.admins.map((candidate) =>
-						candidate.username === admin.username ? { ...admin, passwordHash } : candidate,
-					),
-				});
-			}
 
 			setSession(admin.username);
 			void navigate({ to: "/admin" });

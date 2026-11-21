@@ -155,7 +155,7 @@ export function CommandPalette() {
 									value={tableId(table)}
 									onSelect={() => handleNavigateToTable(table.tableName, table.schemaName)}
 								>
-									<Database className="mr-2 size-4 text-primary" />
+									<Database className="size-4 text-primary" />
 									<div className="flex flex-1 items-center justify-between">
 										<span className="font-medium">{table.tableName}</span>
 										<span className="text-xs text-muted-foreground">
@@ -189,7 +189,7 @@ export function CommandPalette() {
 										keywords={["tables", ">", "go to table"]}
 										className="group"
 									>
-										<Search className="mr-2 size-4 text-primary" />
+										<Search className="size-4 text-primary" />
 										<div className="flex flex-1 items-center justify-between">
 											<div className="flex flex-col">
 												<span>Search Tables</span>
@@ -219,7 +219,7 @@ export function CommandPalette() {
 									}
 									keywords={["go", "navigate", "home", "tables"]}
 								>
-									<Table2 className="mr-2 size-4" />
+									<Table2 className="size-4" />
 									<div className="flex flex-col">
 										<span>Go to Tables</span>
 										<span className="text-xs text-muted-foreground">
@@ -239,7 +239,7 @@ export function CommandPalette() {
 								}
 								keywords={["go", "navigate", "sql", "query", "runner", "editor"]}
 							>
-								<Code className="mr-2 size-4" />
+								<Code className="size-4" />
 								<div className="flex flex-col">
 									<span>Go to Query Runner</span>
 									<span className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export function CommandPalette() {
 									}}
 									keywords={["go", "navigate", "schema", "columns"]}
 								>
-									<GitBranch className="mr-2 size-4" />
+									<GitBranch className="size-4" />
 									<div className="flex flex-col">
 										<span>Go to Schema</span>
 										<span className="text-xs text-muted-foreground">
@@ -294,7 +294,7 @@ export function CommandPalette() {
 									}}
 									keywords={["go", "navigate", "indexes", "index"]}
 								>
-									<ListTree className="mr-2 size-4" />
+									<ListTree className="size-4" />
 									<div className="flex flex-col">
 										<span>Go to Indexes</span>
 										<span className="text-xs text-muted-foreground">
@@ -312,7 +312,7 @@ export function CommandPalette() {
 								onSelect={() => handleAction(() => openOverlay("chat.assistant"))}
 								keywords={["ai", "assistant", "chat", "help"]}
 							>
-								<MessageSquare className="mr-2 size-4" />
+								<MessageSquare className="size-4" />
 								<div className="flex flex-col">
 									<span>Chat with AI Assistant</span>
 									<span className="text-xs text-muted-foreground">
@@ -330,7 +330,7 @@ export function CommandPalette() {
 								}
 								keywords={["ai", "generate", "sql", "query", "write"]}
 							>
-								<Sparkles className="mr-2 size-4" />
+								<Sparkles className="size-4" />
 								<div className="flex flex-col">
 									<span>Generate SQL with AI</span>
 									<span className="text-xs text-muted-foreground">
@@ -352,7 +352,7 @@ export function CommandPalette() {
 									}}
 									keywords={["ai", "explain", "schema", "table", "understand"]}
 								>
-									<Brain className="mr-2 size-4" />
+									<Brain className="size-4" />
 									<div className="flex flex-col">
 										<span>Explain Table Schema</span>
 										<span className="text-xs text-muted-foreground">
@@ -375,7 +375,7 @@ export function CommandPalette() {
 									}
 									keywords={["create", "new", "table"]}
 								>
-									<Plus className="mr-2 size-4" />
+									<Plus className="size-4" />
 									<div className="flex flex-col">
 										<span>Create New Table</span>
 										<span className="text-xs text-muted-foreground">
@@ -391,7 +391,7 @@ export function CommandPalette() {
 										onSelect={() => handleAction(() => openAddRecord())}
 										keywords={["add", "new", "row", "record", "insert"]}
 									>
-										<Plus className="mr-2 size-4" />
+										<Plus className="size-4" />
 										<div className="flex flex-col">
 											<span>Add New Row</span>
 											<span className="text-xs text-muted-foreground">
@@ -406,7 +406,7 @@ export function CommandPalette() {
 										onSelect={() => handleAction(() => openOverlay("records.bulk-insert"))}
 										keywords={["bulk", "insert", "import", "csv", "excel", "json"]}
 									>
-										<Upload className="mr-2 size-4" />
+										<Upload className="size-4" />
 										<div className="flex flex-col">
 											<span>Bulk Insert Records</span>
 											<span className="text-xs text-muted-foreground">
@@ -421,7 +421,7 @@ export function CommandPalette() {
 										onSelect={() => handleAction(() => openOverlay("schema.add-column"))}
 										keywords={["add", "new", "column", "schema"]}
 									>
-										<Columns2 className="mr-2 size-4" />
+										<Columns2 className="size-4" />
 										<div className="flex flex-col">
 											<span>Add Column</span>
 											<span className="text-xs text-muted-foreground">
@@ -452,7 +452,7 @@ export function CommandPalette() {
 											}}
 											keywords={["create", "add", "new", "index", "indexes"]}
 										>
-											<ListTree className="mr-2 size-4" />
+											<ListTree className="size-4" />
 											<div className="flex flex-col">
 												<span>Create Index</span>
 												<span className="text-xs text-muted-foreground">
@@ -476,7 +476,7 @@ export function CommandPalette() {
 										}}
 										keywords={["export", "download", "csv"]}
 									>
-										<Download className="mr-2 size-4" />
+										<Download className="size-4" />
 										<div className="flex flex-col">
 											<span>Export Table as CSV</span>
 											<span className="text-xs text-muted-foreground">
@@ -499,7 +499,7 @@ export function CommandPalette() {
 										}}
 										keywords={["export", "download", "json"]}
 									>
-										<Download className="mr-2 size-4" />
+										<Download className="size-4" />
 										<div className="flex flex-col">
 											<span>Export Table as JSON</span>
 											<span className="text-xs text-muted-foreground">
@@ -520,7 +520,7 @@ export function CommandPalette() {
 										}}
 										keywords={["copy", "schema", "ddl", "clipboard"]}
 									>
-										<Copy className="mr-2 size-4" />
+										<Copy className="size-4" />
 										<div className="flex flex-col">
 											<span>Copy Table Schema</span>
 											<span className="text-xs text-muted-foreground">
@@ -540,7 +540,7 @@ export function CommandPalette() {
 								}
 								keywords={["refresh", "reload", "restart"]}
 							>
-								<RotateCw className="mr-2 size-4" />
+								<RotateCw className="size-4" />
 								<div className="flex flex-col">
 									<span>Reload Application</span>
 									<span className="text-xs text-muted-foreground">
@@ -561,7 +561,7 @@ export function CommandPalette() {
 								}
 								keywords={["sidebar", "show", "hide", "toggle", "view"]}
 							>
-								<Sidebar className="mr-2 size-4" />
+								<Sidebar className="size-4" />
 								<div className="flex flex-col">
 									<span>{sidebarMode === "hidden" ? "Show" : "Hide"} Sidebar</span>
 									<span className="text-xs text-muted-foreground">
@@ -578,9 +578,9 @@ export function CommandPalette() {
 								keywords={["sidebar", "pin", "unpin"]}
 							>
 								{sidebarMode === "pinned" ? (
-									<PinOff className="mr-2 size-4" />
+									<PinOff className="size-4" />
 								) : (
-									<Pin className="mr-2 size-4" />
+									<Pin className="size-4" />
 								)}
 								<div className="flex flex-col">
 									<span>{sidebarMode === "pinned" ? "Unpin" : "Pin"} Sidebar</span>
@@ -593,7 +593,7 @@ export function CommandPalette() {
 								onSelect={() => handleAction(toggleTheme)}
 								keywords={["theme", "dark", "light", "mode", "appearance"]}
 							>
-								{isDark ? <Sun className="mr-2 size-4" /> : <Moon className="mr-2 size-4" />}
+								{isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
 								<div className="flex flex-col">
 									<span>Switch to {isDark ? "Light" : "Dark"} Mode</span>
 									<span className="text-xs text-muted-foreground">
@@ -605,7 +605,7 @@ export function CommandPalette() {
 								onSelect={() => handleAction(() => openOverlay("settings.app"))}
 								keywords={["settings", "preferences", "configure", "options"]}
 							>
-								<Settings className="mr-2 size-4" />
+								<Settings className="size-4" />
 								<div className="flex flex-col">
 									<span>Settings & Preferences</span>
 									<span className="text-xs text-muted-foreground">
@@ -632,7 +632,7 @@ export function CommandPalette() {
 													handleNavigateToTable(table.tableName, table.schemaName)
 												}
 											>
-												<Database className="mr-2 size-4" />
+												<Database className="size-4" />
 												<div className="flex flex-col">
 													<span>{table.tableName}</span>
 													<span className="text-xs text-muted-foreground">
@@ -649,7 +649,7 @@ export function CommandPalette() {
 											>
 												<span className="text-xs">
 													+{tablesList.length - 5} more tables — press{" "}
-													<Kbd className="rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">
+													<Kbd className="rounded-sm border bg-muted px-1 py-0.5 font-mono text-[0.625rem]">
 														&gt;
 													</Kbd>{" "}
 													to see all

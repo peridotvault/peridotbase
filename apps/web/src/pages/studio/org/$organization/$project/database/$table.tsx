@@ -1,6 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@peridotvault/peridotbase-ui/tabs";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { IndexesScreen } from "@/feat/indexes";
+import { PoliciesScreen } from "@/feat/policies";
 import { SchemaScreen } from "@/feat/schema";
 import { TableScreen } from "@/feat/tables";
 import { useDataSearch, useDataTab } from "@/shared/hooks/use-data-tab";
@@ -9,7 +10,7 @@ import { useStudioScope } from "@/shared/hooks/use-studio-scope";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { DATA_TABLE_PATH, DATA_TAB_PARAM, type DataTab } from "@/shared/lib/sections";
 
-export const Route = createFileRoute("/studio/org/$organization/$project/table/$table")({
+export const Route = createFileRoute("/studio/org/$organization/$project/database/$table")({
 	component: RouteComponent,
 });
 
@@ -37,7 +38,9 @@ const DataView = ({ tableName }: { tableName: string }) => {
 			? "schema"
 			: requested === "indexes" && canIndexes
 				? "indexes"
-				: "table";
+				: requested === "policies" && canSchema
+					? "policies"
+					: "table";
 
 	const handleTabChange = (value: string) => {
 		void navigate({
@@ -49,12 +52,13 @@ const DataView = ({ tableName }: { tableName: string }) => {
 
 	return (
 		<main key={`${schemaName}.${tableName}`} className="flex-1 flex flex-col overflow-hidden">
-			<div className="flex items-center gap-2 border-b border-border px-3 py-2">
+			<div className="flex items-center gap-2 border-b border-border px-1 py-1">
 				<Tabs value={active} onValueChange={handleTabChange}>
 					<TabsList>
 						<TabsTrigger value="table">Table</TabsTrigger>
 						{canSchema && <TabsTrigger value="schema">Schema</TabsTrigger>}
 						{canIndexes && <TabsTrigger value="indexes">Indexes</TabsTrigger>}
+						{canSchema && <TabsTrigger value="policies">Policies</TabsTrigger>}
 					</TabsList>
 				</Tabs>
 			</div>
@@ -63,6 +67,8 @@ const DataView = ({ tableName }: { tableName: string }) => {
 					<SchemaScreen tableName={tableName} />
 				) : active === "indexes" ? (
 					<IndexesScreen tableName={tableName} />
+				) : active === "policies" ? (
+					<PoliciesScreen tableName={tableName} />
 				) : (
 					<TableScreen tableName={tableName} />
 				)}

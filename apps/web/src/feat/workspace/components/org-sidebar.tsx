@@ -11,7 +11,7 @@ export const OrgSidebar = ({ organization }: { organization: string }) => {
 			<Link
 				to="/studio/org/$organization/settings"
 				params={{ organization }}
-				className="rounded-md bg-sidebar-accent px-3 py-2 font-medium text-sidebar-accent-foreground"
+				className="rounded-sm bg-sidebar-accent px-3 py-2 font-medium text-sidebar-accent-foreground"
 				aria-current="page"
 			>
 				General

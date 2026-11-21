@@ -13,7 +13,7 @@ const VARIANTS = {
 	),
 	ghost: buttonVariants({ variant: "ghost", size: "icon-sm" }),
 	outline:
-		"inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-input bg-background text-muted-foreground transition-colors hover:text-foreground [&_svg]:size-3.5",
+		"inline-flex size-7 shrink-0 items-center justify-center rounded-sm border border-input bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground [&_svg]:size-3.5",
 };
 
 const ICON_TRANSITION =

@@ -8,10 +8,10 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@peridotvault/peridotbase-ui/alert-dialog";
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import type { OnChangeFn, Row, RowSelectionState } from "@tanstack/react-table";
 import { useCallback, useState } from "react";
 import type { TableRecord } from "@/feat/tables/table.type";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useDeleteCells } from "../../hooks/use-delete-cell";
 
@@ -61,23 +61,21 @@ export const DeleteBtn = ({
 
 	return (
 		<>
-			<Button
+			<ToolbarButton
 				type="button"
 				variant="destructive"
-				size="lg"
-				className="border-l-0 border-y-0 border-r border-border text-white rounded-none"
 				onClick={handleDeleteClick}
 				aria-label="Delete the selected record"
 				disabled={isDeletingCells || Boolean(disabledReason)}
 				title={disabledReason}
 			>
-				Delete Record
+				Delete record
 				{selectedRows?.length > 1 && (
-					<span className="ml-1.5 px-1.5 text-[10px] bg-white/20 border border-white/20 rounded">
+					<span className="rounded-full bg-destructive/15 px-1.5 text-[0.625rem] leading-4 tabular-nums">
 						{selectedRows?.length}
 					</span>
 				)}
-			</Button>
+			</ToolbarButton>
 
 			<AlertDialog open={isOpenConfirmDialog} onOpenChange={setIsOpenConfirmDialog}>
 				<AlertDialogContent>

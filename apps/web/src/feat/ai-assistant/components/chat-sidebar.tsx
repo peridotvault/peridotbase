@@ -272,7 +272,7 @@ export const ChatSidebar = () => {
 						onClick={controller.clear}
 						disabled={controller.isLoading}
 					>
-						<Plus className="size-4 mr-1" />
+						<Plus className="size-4" />
 						New Chat
 					</Button>
 				) : null

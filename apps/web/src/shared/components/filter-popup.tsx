@@ -96,17 +96,15 @@ export const FilterPopup = ({
 				<Button
 					type="button"
 					variant="ghost"
-					className={cn(
-						"border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors",
-						variant === "sheet" ? "text-xs h-full" : "size-8! aspect-square",
-					)}
+					size="sm"
+					className={cn("gap-1.5", variant === "sheet" && "h-full")}
 					aria-label="Filter table data"
 					data-active={hasActiveFilters}
 				>
-					<Filter className="size-4" />
+					<Filter />
 					{variant === "sheet" && "Filter"}
 					{variant === "sheet" && hasActiveFilters && (
-						<Kbd className="text-[10px] font-normal text-primary bg-primary/10 border border-primary/30 px-1.5 py-0.5">
+						<Kbd className="border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[0.625rem] font-normal text-primary">
 							{filters.length}
 						</Kbd>
 					)}

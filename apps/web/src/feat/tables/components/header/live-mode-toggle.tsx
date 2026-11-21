@@ -1,7 +1,7 @@
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@peridotvault/peridotbase-ui/tooltip";
 import { cn } from "@peridotvault/peridotbase-ui/utils";
 import { useCallback } from "react";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { useLiveModeStore } from "../../stores/live-mode.store";
 
 export const LiveModeToggle = () => {
@@ -24,24 +24,19 @@ export const LiveModeToggle = () => {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Button
+				<ToolbarButton
 					type="button"
-					variant="ghost"
-					size="lg"
 					onClick={handleToggle}
 					aria-label="Toggle Live mode"
 					aria-pressed={isLive}
 					data-active={isLive}
-					className={cn(
-						"border-l-0 border-y-0 border-r border-border rounded-none gap-1.5 flex items-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors",
-						isLive && "text-foreground",
-					)}
+					className={cn("gap-1.5", isLive && "text-foreground")}
 				>
 					<span className="relative flex size-2 items-center justify-center">
 						{isLive && status === "healthy" && isPulsing && (
 							<span
 								data-testid="live-pulse-indicator"
-								className="absolute inline-flex size-3.5 rounded-full bg-success opacity-75 animate-ping"
+								className="absolute inline-flex size-3.5 animate-ping rounded-full bg-success opacity-75"
 							/>
 						)}
 						<span
@@ -55,10 +50,8 @@ export const LiveModeToggle = () => {
 						/>
 					</span>
 					<span>Live</span>
-					{status === "paused" && (
-						<span className="text-[10px] text-warning font-normal">(Paused)</span>
-					)}
-				</Button>
+					{status === "paused" && <span className="font-normal text-warning">(Paused)</span>}
+				</ToolbarButton>
 			</TooltipTrigger>
 			<TooltipContent side="bottom">{tooltipText}</TooltipContent>
 		</Tooltip>

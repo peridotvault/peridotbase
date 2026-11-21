@@ -5,6 +5,7 @@ import { Link, Navigate, useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { PageHeader, PageShell, Panel, PanelBody } from "@/shared/components/page";
 import { useOrganization } from "@/shared/hooks/use-scope";
 import { useRefreshCatalog } from "@/shared/hooks/use-refresh-catalog";
 import { getPeridotbaseClient } from "@/shared/peridotbase/client";
@@ -49,44 +50,46 @@ export const ProjectsScreen = ({ organization }: { organization: string }) => {
 	};
 
 	return (
-		<main className="flex-1 overflow-y-auto">
-			<div className="mx-auto w-full max-w-4xl space-y-6 px-6 py-10">
-				<header className="space-y-1">
-					<p className="text-xs text-muted-foreground">{activeOrganization.name}</p>
-					<h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-					<p className="text-sm text-muted-foreground">
-						{organizationProjects.length} project{organizationProjects.length === 1 ? "" : "s"}
-					</p>
-				</header>
+		<PageShell>
+			<PageHeader
+				eyebrow={activeOrganization.name}
+				title="Projects"
+				description={`${organizationProjects.length} project${organizationProjects.length === 1 ? "" : "s"}`}
+			/>
 
-				{organizationProjects.length === 0 ? (
-					<p className="rounded-lg border border-border px-5 py-4 text-sm text-muted-foreground">
-						No projects yet. Create one below to open the Studio.
-					</p>
-				) : (
-					<ul className="grid gap-3 sm:grid-cols-2">
-						{organizationProjects.map((project) => (
-							<li key={project.slug}>
-								<Link
-									to="/studio/org/$organization/$project"
-									params={{ organization, project: project.slug }}
-									className="block rounded-lg border border-border px-5 py-4 transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-								>
-									<div className="flex items-center justify-between gap-3">
-										<span className="truncate text-sm font-medium">{project.name}</span>
-										<Badge variant="default">on-chain</Badge>
-									</div>
-									<p className="mt-1 font-mono text-xs text-muted-foreground">
-										{project.address.slice(0, 8)}…
-									</p>
-								</Link>
-							</li>
-						))}
-					</ul>
-				)}
+			{organizationProjects.length === 0 ? (
+				<p className="rounded-lg border border-border px-5 py-4 text-sm text-muted-foreground">
+					No projects yet. Create one below to open the Studio.
+				</p>
+			) : (
+				<ul className="grid gap-3 sm:grid-cols-2">
+					{organizationProjects.map((project) => (
+						<li key={project.slug}>
+							<Link
+								to="/studio/org/$organization/$project"
+								params={{ organization, project: project.slug }}
+								className="group flex flex-col rounded-lg border border-border px-5 py-4 transition-colors hover:border-muted-foreground/30 hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+							>
+								<div className="flex min-w-0 items-center justify-between gap-3">
+									<span className="truncate text-sm font-medium" title={project.name}>
+										{project.name}
+									</span>
+									<Badge variant="default" className="shrink-0">
+										on-chain
+									</Badge>
+								</div>
+								<p className="mt-1 truncate font-mono text-xs text-muted-foreground">
+									{project.address.slice(0, 8)}…
+								</p>
+							</Link>
+						</li>
+					))}
+				</ul>
+			)}
 
-				<section className="rounded-lg border border-border p-5">
-					<h2 className="mb-3 text-sm font-medium">New project</h2>
+			<Panel>
+				<PanelBody className="space-y-3">
+					<h2 className="text-sm font-medium">New project</h2>
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<Input
 							aria-label="Project name"
@@ -103,15 +106,15 @@ export const ProjectsScreen = ({ organization }: { organization: string }) => {
 							onClick={() => void handleCreate()}
 							disabled={isCreating || !name.trim()}
 						>
-							<Plus className="mr-2 size-4" />
+							<Plus />
 							Create
 						</Button>
 					</div>
-					<p className="mt-2 text-xs text-muted-foreground">
+					<p className="text-xs text-muted-foreground">
 						Creating signs one transaction with the connected wallet.
 					</p>
-				</section>
-			</div>
-		</main>
+				</PanelBody>
+			</Panel>
+		</PageShell>
 	);
 };

@@ -25,6 +25,8 @@ type OverlayId =
 	// of these components per table.
 	| `tables.rename-table.${string}`
 	| `tables.delete-table.${string}`
+	| `tables.duplicate-table.${string}`
+	| `tables.settings.${string}`
 	| "command-palette.root"
 	| "settings.app"
 	| "chat.assistant";

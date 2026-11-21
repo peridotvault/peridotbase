@@ -81,7 +81,7 @@ export const initV3Storage = async (
 	return storage;
 };
 
-/** Loads a v3 table, or `null` when the table still uses the v2 page layout. */
+/** Loads a v3 table, or `null` when the table has no v3 storage descriptor. */
 export const loadV3Table = async (
 	client: PeridotBase,
 	tableId: bigint,

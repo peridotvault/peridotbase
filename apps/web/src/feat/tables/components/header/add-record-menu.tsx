@@ -1,4 +1,3 @@
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -6,6 +5,7 @@ import {
 	DropdownMenuTrigger,
 } from "@peridotvault/peridotbase-ui/dropdown-menu";
 import { Plus } from "lucide-react";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { openAddRecord } from "@/shared/stores/add-record.store";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 
@@ -15,16 +15,10 @@ export const AddRecordMenu = () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button
-					type="button"
-					variant="default"
-					size="lg"
-					className="border-l-0 border-y-0 border-r border-border rounded-none flex items-center gap-2"
-					aria-label="Add records to the table"
-				>
-					<Plus className="size-4" />
-					Add Record
-				</Button>
+				<ToolbarButton type="button" variant="default" aria-label="Add records to the table">
+					<Plus />
+					Add record
+				</ToolbarButton>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-48">
 				<DropdownMenuItem onClick={() => openAddRecord()}>Add Record</DropdownMenuItem>

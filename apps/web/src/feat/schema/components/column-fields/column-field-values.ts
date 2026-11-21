@@ -7,8 +7,9 @@ export const columnFieldSchema = z.object({
 	isPrimaryKey: z.boolean(),
 	isNullable: z.boolean(),
 	isUnique: z.boolean(),
-	isIdentity: z.boolean(),
 	isArray: z.boolean(),
+	/** ENUM/DOMAIN catalog name this column references, when any. */
+	typeName: z.string().optional(),
 });
 
 export type ColumnFieldValues = z.infer<typeof columnFieldSchema>;
@@ -20,13 +21,12 @@ export const DEFAULT_COLUMN_FIELD: ColumnFieldValues = {
 	isPrimaryKey: false,
 	isNullable: true,
 	isUnique: false,
-	isIdentity: false,
 	isArray: false,
 };
 
 export type ColumnOptionName = keyof Pick<
 	ColumnFieldValues,
-	"isNullable" | "isUnique" | "isIdentity" | "isArray"
+	"isNullable" | "isUnique" | "isArray"
 >;
 
 export type ColumnOption = {

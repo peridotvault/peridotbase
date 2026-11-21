@@ -4,11 +4,11 @@ import { DOCS_URL, GITHUB_URL } from "@/shared/lib/site";
 
 const navLink = "text-sm text-foreground-light transition-colors hover:text-foreground";
 
-/** Sticky navbar: translucent over the hero, above every page layer, with the same rails. */
+/** Sticky navbar: the top layer, opaque so no rail or content shows through it. */
 export function SiteHeader() {
 	return (
-		<header className="sticky top-0 z-50 border-b border-border-default bg-background/90 backdrop-blur-xs">
-			<div className="section-container flex h-16 items-center justify-between gap-6 border-x border-border-default max-md:border-x-0">
+		<header className="sticky top-0 z-50 border-b border-border-default bg-background">
+			<div className="section-container flex h-16 items-center justify-between gap-6">
 				<a
 					className="flex items-center gap-2 font-display text-base font-semibold tracking-tight text-foreground"
 					href="/"

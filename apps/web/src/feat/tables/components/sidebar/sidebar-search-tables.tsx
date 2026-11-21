@@ -20,7 +20,6 @@ export const SidebarSearchTables = () => {
 	const { openOverlay } = useOverlayStore();
 	const { ddl } = useStudioCapabilities();
 
-	// todo: fix this shit
 	useHotkeys(
 		"/",
 		(event) => {

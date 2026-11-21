@@ -31,10 +31,10 @@ function BrandMark() {
 }
 
 /**
- * React Bits Pro `auth-3`, re-cut for Peridotbase: the same centered card over a full-bleed
- * backdrop, with a brand panel on the right. Sign-in here means connecting a Solana wallet,
- * so the email form and OAuth buttons are replaced by the wallet action and detected wallets.
- * Harmonized to the Supabase tokens (`bg-surface-75`, `border-border-default`, primary green).
+ * The Studio sign-in: a centered card over a dot-grid backdrop, with the product line beside it.
+ * Sign-in means connecting a Solana wallet, so the email form and OAuth buttons are replaced by
+ * the wallet action and the detected wallets. Uses the Studio tokens only — the marketing surface
+ * tokens are scoped to `.marketing` and would render as empty borders here.
  */
 export function Auth3({
 	wallets,
@@ -54,20 +54,24 @@ export function Auth3({
 
 	return (
 		<div className="relative flex min-h-dvh w-full items-center justify-center overflow-hidden bg-background p-6">
-			{/* Backdrop: neutral dot grid, no external asset. */}
-			<div aria-hidden="true" className="dot-grid absolute inset-0 opacity-50" />
+			<div
+				aria-hidden="true"
+				className="pointer-events-none absolute inset-0 opacity-50 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:22px_22px]"
+			/>
 
-			<div className="relative z-10 mx-auto flex w-full max-w-[1100px] items-center justify-center gap-12">
+			<div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-center gap-12">
 				<motion.div
 					initial={enter.initial}
 					animate={enter.animate}
 					transition={{ duration: reduceMotion ? 0.2 : 0.6, ease: EASE }}
-					className="w-full max-w-md rounded-2xl border border-border-default bg-surface-75 p-8 shadow-2xl"
+					className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-lg"
 				>
 					<BrandMark />
 
-					<h1 className="mt-8 text-3xl font-medium tracking-tight text-foreground">Sign in</h1>
-					<p className="mt-2 text-sm text-foreground-light">
+					<h1 className="mt-8 text-2xl font-semibold tracking-tight text-foreground">
+						Sign in
+					</h1>
+					<p className="mt-2 text-sm text-muted-foreground">
 						{isDemo
 							? "Demo mode opens labeled sample data and never touches Solana."
 							: "Connect the wallet that owns your database. The wallet is the account."}
@@ -91,11 +95,11 @@ export function Auth3({
 					{!isDemo && (
 						<>
 							<div className="my-6 flex items-center gap-3" aria-hidden="true">
-								<span className="h-px flex-1 bg-border-default" />
-								<span className="font-mono text-xs text-foreground-lighter">
+								<span className="h-px flex-1 bg-border" />
+								<span className="font-mono text-xs text-muted-foreground">
 									Detected wallets
 								</span>
-								<span className="h-px flex-1 bg-border-default" />
+								<span className="h-px flex-1 bg-border" />
 							</div>
 
 							{wallets.length > 0 ? (
@@ -103,24 +107,24 @@ export function Auth3({
 									{wallets.map((name) => (
 										<li
 											key={name}
-											className="flex h-11 items-center gap-3 rounded-md border border-border-default bg-surface-100 px-4 text-sm font-medium text-foreground"
+											className="flex h-11 items-center gap-3 rounded-sm border border-border bg-muted/40 px-4 text-sm font-medium text-foreground"
 										>
-											<Wallet className="size-4 text-foreground-lighter" aria-hidden />
-											{name}
-											<span className="ml-auto font-mono text-xs text-foreground-lighter">
+											<Wallet className="size-4 text-muted-foreground" aria-hidden />
+											<span className="truncate">{name}</span>
+											<span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground">
 												Standard
 											</span>
 										</li>
 									))}
 								</ul>
 							) : (
-								<p className="rounded-md border border-border-default bg-surface-100 px-4 py-3 text-sm text-foreground-light">
+								<p className="rounded-sm border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
 									No Solana wallet detected. Install Phantom, Solflare, or Backpack, then
 									reload.
 								</p>
 							)}
 
-							<p className="mt-6 text-center text-sm text-foreground-light">
+							<p className="mt-6 text-center text-sm text-muted-foreground">
 								Wallets are discovered through Wallet Standard. Nothing leaves this browser
 								until you sign.
 							</p>
@@ -135,7 +139,7 @@ export function Auth3({
 					className="hidden max-w-sm lg:block"
 				>
 					<p className="text-4xl font-medium tracking-tight text-foreground">Peridotbase</p>
-					<p className="mt-4 max-w-[26ch] text-lg leading-relaxed text-foreground-light">
+					<p className="mt-4 max-w-[26ch] text-lg leading-relaxed text-pretty text-muted-foreground">
 						Tables, rows, and indexes live on Solana. Sign in with the wallet that owns them.
 					</p>
 				</motion.div>

@@ -9,7 +9,7 @@ import {
 import { Label } from "@peridotvault/peridotbase-ui/label";
 import { Settings } from "lucide-react";
 import type { ColumnFieldValues, ColumnOptionName } from "./column-field-values";
-import { ARRAY_COMPATIBLE_TYPES, COLUMN_OPTIONS, SERIAL_TYPES } from "./column-types";
+import { ARRAY_COMPATIBLE_TYPES, COLUMN_OPTIONS } from "./column-types";
 
 export const AdvancedOptions = ({
 	idPrefix,
@@ -26,8 +26,6 @@ export const AdvancedOptions = ({
 		switch (optionName) {
 			case "isNullable":
 				return !isPrimaryKey;
-			case "isIdentity":
-				return !SERIAL_TYPES.includes(columnType);
 			case "isArray":
 				return ARRAY_COMPATIBLE_TYPES.includes(columnType);
 			default:

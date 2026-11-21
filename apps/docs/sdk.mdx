@@ -64,7 +64,11 @@ Writes return a `MutationResult` with the signature the wallet approved. Errors 
 ```ts
 await client.createTable({ tableName: "projects", fields: [...] });
 await client.addColumn(ref, { columnName: "archived", columnType: "boolean" });
-await client.alterColumn(ref, "archived", { isNullable: false });
+await client.alterColumn(ref, "archived", {
+	columnType: "boolean",
+	isNullable: true,
+	defaultValue: "false",
+});
 await client.renameTable(ref, { newTableName: "projects_v2" });
 ```
 

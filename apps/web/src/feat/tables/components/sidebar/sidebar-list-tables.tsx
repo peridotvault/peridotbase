@@ -1,6 +1,7 @@
 import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
 import { useQueryState } from "nuqs";
 import { useEffect, useMemo } from "react";
+import { SidebarDroppedTables } from "./sidebar-dropped-tables";
 import { SidebarListTablesItem } from "./sidebar-list-tables-item";
 import { useTablesList } from "@/shared/hooks/use-tables-list";
 import { CONSTANTS } from "@/shared/utils/constants";
@@ -99,6 +100,7 @@ export const SidebarListTables = () => {
 					</div>
 				)}
 			</div>
+			<SidebarDroppedTables />
 		</>
 	);
 };

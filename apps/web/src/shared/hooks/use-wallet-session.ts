@@ -15,16 +15,8 @@ let restoring = false;
  * The session is the Studio's sign-in: every organization is derived from the wallet address.
  */
 export const useWalletSession = () => {
-	const {
-		wallet,
-		setWallet,
-		rpcUrl,
-		cluster,
-		programId,
-		setRpcUrl,
-		setCluster,
-		setProgramId,
-	} = useWorkspaceStore();
+	const { wallet, setWallet, rpcUrl, cluster, programId, setRpcUrl, setCluster } =
+		useWorkspaceStore();
 
 	// One silent reconnect per page load, however many components read the session.
 	useEffect(() => {
@@ -82,7 +74,6 @@ export const useWalletSession = () => {
 		programId,
 		setRpcUrl,
 		setCluster,
-		setProgramId,
 	};
 };
 

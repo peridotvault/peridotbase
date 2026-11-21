@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import {
 	ArrowRight,
 	ArrowUpRight,
@@ -7,7 +8,6 @@ import {
 	Fingerprint,
 	KeyRound,
 	Scale,
-	Server,
 	ShieldCheck,
 	Table2,
 	Wallet,
@@ -38,6 +38,15 @@ import {
 	TablePreview,
 } from "@/shared/components/marketing-visuals";
 import { DashboardMockup } from "@/shared/components/blocks/dashboard-mockup";
+import { FrameworkTabs } from "@/shared/components/blocks/framework-tabs";
+import { HowItWorks } from "@/shared/components/blocks/how-it-works";
+
+/** three.js is heavy and decorative, so it loads after hydration. */
+const GlassCoins = lazy(() =>
+	import("@/shared/components/blocks/glass-coins").then((module) => ({
+		default: module.GlassCoins,
+	})),
+);
 
 /** The marketing landing: static, prerendered, crawler-readable. Section order
  *  mirrors supabase.com. */
@@ -78,20 +87,6 @@ export const Route = createFileRoute("/_marketing/")({
 		}),
 	component: LandingPage,
 });
-
-const SNIPPET = `import {
-  createPeridotbaseClient,
-  createRpcPort,
-  createWalletStandardPort,
-} from "@peridotvault/peridotbase-sdk";
-
-const client = createPeridotbaseClient({
-  rpc: createRpcPort({ url: "https://api.devnet.solana.com", cluster: "devnet" }),
-  wallet: createWalletStandardPort(),
-  programId: null, // published by peridotbase-core
-});
-
-const tables = await client.listTables(database);`;
 
 const WALLETS = ["Phantom", "Solflare", "Backpack", "Ledger"] as const;
 
@@ -144,49 +139,6 @@ const PRODUCTS = [
 		media: <AuthPreview />,
 		span: "md:col-span-6 lg:col-span-5",
 	},
-] as const;
-
-const ACCESS_POINTS = [
-	{
-		title: "Typed SDK client",
-		body: "One client for tables, schema, queries, and indexes — wired straight to the program.",
-		icon: Database,
-	},
-	{
-		title: "SQL-shaped reads",
-		body: "PostgreSQL-style types and familiar query shapes. No proprietary API to learn.",
-		icon: Table2,
-	},
-	{
-		title: "Wallet-signed writes",
-		body: "Every mutation is an instruction your wallet signs. Keys never leave the extension.",
-		icon: Wallet,
-	},
-] as const;
-
-const STEPS = [
-	{
-		title: "Connect",
-		body: "Pick an installed wallet. Peridotbase receives a public address and nothing else.",
-		icon: Wallet,
-	},
-	{
-		title: "Point at an RPC",
-		body: "Choose a cluster or paste a custom endpoint. The Studio checks it with a slot and version call.",
-		icon: Server,
-	},
-	{
-		title: "Browse",
-		body: "Open a database, then move between tables, schema, queries, and indexes.",
-		icon: Table2,
-	},
-] as const;
-
-const STATS = [
-	{ value: "0", label: "servers in the middle", icon: Server },
-	{ value: "100%", label: "of state on Solana", icon: Database },
-	{ value: "0", label: "keys we ever hold", icon: KeyRound },
-	{ value: "1", label: "relational model", icon: Table2 },
 ] as const;
 
 function GithubIcon() {
@@ -269,99 +221,29 @@ function LandingPage() {
 				</div>
 			</Section>
 
-			{/* Query it your way — code side-by-side */}
+			{/* Access — framework switcher: heading left, morphing code right */}
 			<Section className="bg-background-alternative">
-				<SectionHeading
-					eyebrow="Access"
-					title="Query it your way"
-					description="Three ways in, one program underneath."
-				/>
-				<div className="mt-12 grid gap-4 md:grid-cols-2">
-					<ul className="space-y-4">
-						{ACCESS_POINTS.map((point) => (
-							<li
-								key={point.title}
-								className="flex items-start gap-4 rounded-lg border border-border-default bg-surface-75 p-6"
-							>
-								<span className="flex size-10 flex-none items-center justify-center rounded-lg border border-border-default bg-surface-200 text-primary">
-									<point.icon className="size-5" aria-hidden />
-								</span>
-								<div>
-									<h3 className="font-medium text-foreground">{point.title}</h3>
-									<p className="mt-1 text-sm text-foreground-light">{point.body}</p>
-								</div>
-							</li>
-						))}
-					</ul>
-					<pre className="overflow-x-auto rounded-lg border border-border-default bg-surface-75 p-6 font-mono text-sm leading-relaxed text-foreground">
-						<code>{SNIPPET}</code>
-					</pre>
-				</div>
+				<FrameworkTabs />
 			</Section>
 
-			{/* Steps */}
-			<Section>
-				<SectionHeading eyebrow="Get started" title="From wallet to table in three steps" />
-				<div className="mt-12 grid gap-4 md:grid-cols-3">
-					{STEPS.map((step, index) => (
-						<div
-							key={step.title}
-							className="flex flex-col gap-4 rounded-lg border border-border-default bg-surface-75 p-6"
-						>
-							<div className="flex items-center justify-between">
-								<span className="flex size-10 items-center justify-center rounded-lg border border-border-default bg-surface-200 text-primary">
-									<step.icon className="size-5" aria-hidden />
-								</span>
-								<p className="font-mono text-xs text-primary">0{index + 1}</p>
-							</div>
-							<div>
-								<h3 className="text-xl font-medium tracking-tight text-foreground">
-									{step.title}
-								</h3>
-								<p className="mt-1 text-sm text-foreground-light">{step.body}</p>
-							</div>
-						</div>
-					))}
-				</div>
+			{/* How it works — one tab per flow, no side rails so the graph breathes */}
+			<Section rails={false}>
+				<HowItWorks />
 			</Section>
 
-			{/* Stats band */}
+			{/* Open source + start CTA */}
 			<Section className="bg-background-alternative">
-				<div className="relative">
-					<DotGrid />
-					<div className="relative grid grid-cols-2 gap-4 md:grid-cols-4">
-						{STATS.map((stat) => (
-							<div
-								key={stat.label}
-								className="relative flex flex-col gap-3 rounded-lg border border-border-default bg-surface-75 p-6"
-							>
-								<span className="flex size-10 items-center justify-center rounded-lg border border-border-default bg-surface-200 text-primary">
-									<stat.icon className="size-5" aria-hidden />
-								</span>
-								<p className="text-5xl font-medium tracking-tight text-foreground tabular-nums">
-									{stat.value}
-								</p>
-								<p className="text-sm text-foreground-light">{stat.label}</p>
-							</div>
-						))}
-					</div>
-				</div>
-			</Section>
-
-			{/* Open source CTA */}
-			<Section>
-				<div className="grid gap-4 md:grid-cols-2">
-					<div className="rounded-xl border border-border-default bg-surface-75 p-8 md:p-12">
-						<h2 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-							Open source from day one
-						</h2>
-						<p className="mt-3 max-w-xl text-foreground-light">
-							The Studio, SDK, and configuration are Apache-2.0, with fork attribution
-							preserved. The program publishes each instruction to{" "}
-							<code className="font-mono text-primary">peridotbase-core</code> — no Studio
-							rewrite required.
+				<div className="grid gap-4 lg:grid-cols-5">
+					<div className="relative flex flex-col overflow-hidden rounded-xl border border-border-default bg-surface-75 p-8 md:p-12 lg:col-span-3">
+						<DotGrid />
+						<p className="relative flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+							<Scale className="size-4 text-primary" aria-hidden />
+							Open source
 						</p>
-						<div className="mt-6 flex flex-wrap gap-3">
+						<h2 className="relative mt-4 max-w-lg text-3xl font-medium tracking-tight text-balance text-foreground sm:text-4xl">
+							The Studio and SDK are Apache-2.0.
+						</h2>
+						<div className="relative mt-auto flex flex-wrap gap-3 pt-8">
 							<a
 								className={buttonVariants({ variant: "outline", size: "xl" })}
 								href={GITHUB_URL}
@@ -371,29 +253,22 @@ function LandingPage() {
 							</a>
 							<a
 								className={buttonVariants({ variant: "outline", size: "xl" })}
-								href="/roadmap/"
+								href={DOCS_URL}
 							>
-								See the roadmap
-								<ArrowRight className="size-4" aria-hidden />
+								Read the docs
+								<ArrowUpRight className="size-4" aria-hidden />
 							</a>
 						</div>
 					</div>
-					<div className="relative flex flex-col items-start justify-center overflow-hidden rounded-xl border border-border-default bg-surface-100 p-8 md:p-12">
-						<DotGrid />
-						<p className="relative flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-foreground-lighter">
-							<Scale className="size-4 text-primary" aria-hidden />
-							Apache-2.0
-						</p>
-						<p className="relative mt-3 text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-							Start your project on devnet today.
-						</p>
-						<a
-							className={buttonVariants({ size: "xl", className: "relative mt-6" })}
-							href="/studio/"
-						>
-							Open the Studio
-							<ArrowRight className="size-4" aria-hidden />
-						</a>
+					<div className="relative overflow-hidden rounded-xl border border-border-default bg-surface-100 lg:col-span-2">
+						<Suspense fallback={<div className="min-h-[320px]" />}>
+							<GlassCoins
+								pattern="ring"
+								colors={["#87e08b", "#589770"]}
+								backgroundColor="#252525"
+								className="min-h-[320px]"
+							/>
+						</Suspense>
 					</div>
 				</div>
 			</Section>

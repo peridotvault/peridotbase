@@ -11,6 +11,9 @@ import type {
 	RenameTablePayload,
 	TableInfo,
 	TableRef,
+	TableGuards,
+	TableStorage,
+	SetTablePartitioningPayload,
 } from "@peridotvault/peridotbase-sdk";
 import { getPeridotbaseClient } from "./client";
 
@@ -40,6 +43,12 @@ export const getTables = (db?: string | null): Promise<TableInfo[]> => {
 	if (!db) throw new Error("Select a database first");
 
 	return getPeridotbaseClient().listTables(db);
+};
+
+export const getDroppedTables = (db?: string | null): Promise<TableInfo[]> => {
+	if (!db) throw new Error("Select a database first");
+
+	return getPeridotbaseClient().listDroppedTables(db);
 };
 
 export type SchemaGraphTable = TableInfo & { columns: ColumnInfo[] };
@@ -121,6 +130,114 @@ export const deleteTable = ({
 	db?: string | null;
 }): Promise<MutationResult> =>
 	getPeridotbaseClient().dropTable(ref(db, tableName, schemaName));
+
+export const duplicateTable = ({
+	tableName,
+	newTableName,
+	schemaName,
+	db,
+}: {
+	tableName: string;
+	newTableName: string;
+	schemaName?: string;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().duplicateTable(ref(db, tableName, schemaName), newTableName);
+
+export const closeDroppedTable = ({
+	tableName,
+	schemaName,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().closeDroppedTable(ref(db, tableName, schemaName));
+
+export const restoreTable = ({
+	tableName,
+	schemaName,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().restoreTable(ref(db, tableName, schemaName));
+
+export const getTableComment = (
+	tableName: string,
+	db?: string | null,
+	schemaName?: string,
+): Promise<string | null> =>
+	getPeridotbaseClient().getTableComment(ref(db, tableName, schemaName));
+
+export const setTableComment = ({
+	tableName,
+	schemaName,
+	comment,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	comment: string;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().setTableComment(ref(db, tableName, schemaName), comment);
+
+export const getTableGuards = (
+	tableName: string,
+	db?: string | null,
+	schemaName?: string,
+): Promise<TableGuards> =>
+	getPeridotbaseClient().getTableGuards(ref(db, tableName, schemaName));
+
+export const setTableGuards = ({
+	tableName,
+	schemaName,
+	guards,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	guards: Partial<TableGuards>;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().setTableGuards(ref(db, tableName, schemaName), guards);
+
+export const getTableStorage = (
+	tableName: string,
+	db?: string | null,
+	schemaName?: string,
+): Promise<TableStorage> =>
+	getPeridotbaseClient().getTableStorage(ref(db, tableName, schemaName));
+
+export const setTableHistoryLimit = ({
+	tableName,
+	schemaName,
+	limit,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	limit: number;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().setTableHistoryLimit(ref(db, tableName, schemaName), limit);
+
+export const setTablePartitioning = ({
+	tableName,
+	schemaName,
+	payload,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	payload: SetTablePartitioningPayload;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().setTablePartitioning(ref(db, tableName, schemaName), payload);
 
 export const renameTable = ({
 	tableName,
@@ -230,3 +347,54 @@ export const dropIndex = ({
 	db?: string | null;
 }): Promise<MutationResult> =>
 	getPeridotbaseClient().dropIndex(ref(db, tableName, schemaName), indexName);
+
+export const getRelationships = (db?: string | null) => {
+	if (!db) throw new Error("Select a database first");
+
+	return getPeridotbaseClient().getRelationships(db);
+};
+
+export const createForeignKey = (
+	tableName: string,
+	db: string | null | undefined,
+	schemaName: string | undefined,
+	payload: { column: string; parentTable: string; parentColumn?: string },
+) => getPeridotbaseClient().createForeignKey(ref(db, tableName, schemaName), payload);
+
+export const dropForeignKey = (
+	tableName: string,
+	db: string | null | undefined,
+	schemaName: string | undefined,
+	payload: { fkId: string; parentTable: string },
+) => getPeridotbaseClient().dropForeignKey(ref(db, tableName, schemaName), payload);
+
+export const createCompositeForeignKey = (
+	tableName: string,
+	db: string | null | undefined,
+	schemaName: string | undefined,
+	payload: {
+		childColumns: string[];
+		parentTable: string;
+		parentIndexId?: string;
+		match?: "simple" | "full";
+	},
+) => getPeridotbaseClient().createCompositeForeignKey(ref(db, tableName, schemaName), payload);
+
+export const setIndexNullsNotDistinct = ({
+	tableName,
+	schemaName,
+	indexName,
+	nullsNotDistinct,
+	db,
+}: {
+	tableName: string;
+	schemaName?: string;
+	indexName: string;
+	nullsNotDistinct: boolean;
+	db?: string | null;
+}): Promise<MutationResult> =>
+	getPeridotbaseClient().setIndexNullsNotDistinct(
+		ref(db, tableName, schemaName),
+		indexName,
+		nullsNotDistinct,
+	);

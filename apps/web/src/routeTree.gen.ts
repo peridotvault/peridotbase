@@ -29,20 +29,14 @@ import { Route as StudioOrgOrganizationProjectRouteRouteImport } from './pages/s
 import { Route as StudioOrgOrganizationSettingsRouteImport } from './pages/studio/org/$organization/settings'
 import { Route as StudioOrgOrganizationTeamRouteImport } from './pages/studio/org/$organization/team'
 import { Route as StudioOrgOrganizationProjectIndexRouteImport } from './pages/studio/org/$organization/$project/index'
-import { Route as StudioOrgOrganizationProjectIndexesRouteRouteImport } from './pages/studio/org/$organization/$project/indexes/route'
+import { Route as StudioOrgOrganizationProjectDatabaseRouteRouteImport } from './pages/studio/org/$organization/$project/database/route'
 import { Route as StudioOrgOrganizationProjectRunnerRouteRouteImport } from './pages/studio/org/$organization/$project/runner/route'
-import { Route as StudioOrgOrganizationProjectSchemaRouteRouteImport } from './pages/studio/org/$organization/$project/schema/route'
-import { Route as StudioOrgOrganizationProjectTableRouteRouteImport } from './pages/studio/org/$organization/$project/table/route'
 import { Route as StudioOrgOrganizationProjectVisualizerRouteImport } from './pages/studio/org/$organization/$project/visualizer'
 import { Route as StudioOrgOrganizationProjectWorkspaceRouteImport } from './pages/studio/org/$organization/$project/workspace'
-import { Route as StudioOrgOrganizationProjectIndexesIndexRouteImport } from './pages/studio/org/$organization/$project/indexes/index'
-import { Route as StudioOrgOrganizationProjectIndexesTableRouteImport } from './pages/studio/org/$organization/$project/indexes/$table'
+import { Route as StudioOrgOrganizationProjectDatabaseIndexRouteImport } from './pages/studio/org/$organization/$project/database/index'
+import { Route as StudioOrgOrganizationProjectDatabaseTableRouteImport } from './pages/studio/org/$organization/$project/database/$table'
 import { Route as StudioOrgOrganizationProjectRunnerIndexRouteImport } from './pages/studio/org/$organization/$project/runner/index'
 import { Route as StudioOrgOrganizationProjectRunnerQueryIdRouteImport } from './pages/studio/org/$organization/$project/runner/$queryId'
-import { Route as StudioOrgOrganizationProjectSchemaIndexRouteImport } from './pages/studio/org/$organization/$project/schema/index'
-import { Route as StudioOrgOrganizationProjectSchemaTableRouteImport } from './pages/studio/org/$organization/$project/schema/$table'
-import { Route as StudioOrgOrganizationProjectTableIndexRouteImport } from './pages/studio/org/$organization/$project/table/index'
-import { Route as StudioOrgOrganizationProjectTableTableRouteImport } from './pages/studio/org/$organization/$project/table/$table'
 
 const MarketingRouteRoute = MarketingRouteRouteImport.update({
   id: '/_marketing',
@@ -149,28 +143,16 @@ const StudioOrgOrganizationProjectIndexRoute =
     path: '/',
     getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
   } as any)
-const StudioOrgOrganizationProjectIndexesRouteRoute =
-  StudioOrgOrganizationProjectIndexesRouteRouteImport.update({
-    id: '/indexes',
-    path: '/indexes',
+const StudioOrgOrganizationProjectDatabaseRouteRoute =
+  StudioOrgOrganizationProjectDatabaseRouteRouteImport.update({
+    id: '/database',
+    path: '/database',
     getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
   } as any)
 const StudioOrgOrganizationProjectRunnerRouteRoute =
   StudioOrgOrganizationProjectRunnerRouteRouteImport.update({
     id: '/runner',
     path: '/runner',
-    getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectSchemaRouteRoute =
-  StudioOrgOrganizationProjectSchemaRouteRouteImport.update({
-    id: '/schema',
-    path: '/schema',
-    getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectTableRouteRoute =
-  StudioOrgOrganizationProjectTableRouteRouteImport.update({
-    id: '/table',
-    path: '/table',
     getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
   } as any)
 const StudioOrgOrganizationProjectVisualizerRoute =
@@ -185,17 +167,17 @@ const StudioOrgOrganizationProjectWorkspaceRoute =
     path: '/workspace',
     getParentRoute: () => StudioOrgOrganizationProjectRouteRoute,
   } as any)
-const StudioOrgOrganizationProjectIndexesIndexRoute =
-  StudioOrgOrganizationProjectIndexesIndexRouteImport.update({
+const StudioOrgOrganizationProjectDatabaseIndexRoute =
+  StudioOrgOrganizationProjectDatabaseIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => StudioOrgOrganizationProjectIndexesRouteRoute,
+    getParentRoute: () => StudioOrgOrganizationProjectDatabaseRouteRoute,
   } as any)
-const StudioOrgOrganizationProjectIndexesTableRoute =
-  StudioOrgOrganizationProjectIndexesTableRouteImport.update({
+const StudioOrgOrganizationProjectDatabaseTableRoute =
+  StudioOrgOrganizationProjectDatabaseTableRouteImport.update({
     id: '/$table',
     path: '/$table',
-    getParentRoute: () => StudioOrgOrganizationProjectIndexesRouteRoute,
+    getParentRoute: () => StudioOrgOrganizationProjectDatabaseRouteRoute,
   } as any)
 const StudioOrgOrganizationProjectRunnerIndexRoute =
   StudioOrgOrganizationProjectRunnerIndexRouteImport.update({
@@ -208,30 +190,6 @@ const StudioOrgOrganizationProjectRunnerQueryIdRoute =
     id: '/$queryId',
     path: '/$queryId',
     getParentRoute: () => StudioOrgOrganizationProjectRunnerRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectSchemaIndexRoute =
-  StudioOrgOrganizationProjectSchemaIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => StudioOrgOrganizationProjectSchemaRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectSchemaTableRoute =
-  StudioOrgOrganizationProjectSchemaTableRouteImport.update({
-    id: '/$table',
-    path: '/$table',
-    getParentRoute: () => StudioOrgOrganizationProjectSchemaRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectTableIndexRoute =
-  StudioOrgOrganizationProjectTableIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => StudioOrgOrganizationProjectTableRouteRoute,
-  } as any)
-const StudioOrgOrganizationProjectTableTableRoute =
-  StudioOrgOrganizationProjectTableTableRouteImport.update({
-    id: '/$table',
-    path: '/$table',
-    getParentRoute: () => StudioOrgOrganizationProjectTableRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -253,21 +211,15 @@ export interface FileRoutesByFullPath {
   '/studio/org/$organization/settings': typeof StudioOrgOrganizationSettingsRoute
   '/studio/org/$organization/team': typeof StudioOrgOrganizationTeamRoute
   '/studio/org/$organization/': typeof StudioOrgOrganizationIndexRoute
-  '/studio/org/$organization/$project/indexes': typeof StudioOrgOrganizationProjectIndexesRouteRouteWithChildren
+  '/studio/org/$organization/$project/database': typeof StudioOrgOrganizationProjectDatabaseRouteRouteWithChildren
   '/studio/org/$organization/$project/runner': typeof StudioOrgOrganizationProjectRunnerRouteRouteWithChildren
-  '/studio/org/$organization/$project/schema': typeof StudioOrgOrganizationProjectSchemaRouteRouteWithChildren
-  '/studio/org/$organization/$project/table': typeof StudioOrgOrganizationProjectTableRouteRouteWithChildren
   '/studio/org/$organization/$project/visualizer': typeof StudioOrgOrganizationProjectVisualizerRoute
   '/studio/org/$organization/$project/workspace': typeof StudioOrgOrganizationProjectWorkspaceRoute
   '/studio/org/$organization/$project/': typeof StudioOrgOrganizationProjectIndexRoute
-  '/studio/org/$organization/$project/indexes/$table': typeof StudioOrgOrganizationProjectIndexesTableRoute
+  '/studio/org/$organization/$project/database/$table': typeof StudioOrgOrganizationProjectDatabaseTableRoute
   '/studio/org/$organization/$project/runner/$queryId': typeof StudioOrgOrganizationProjectRunnerQueryIdRoute
-  '/studio/org/$organization/$project/schema/$table': typeof StudioOrgOrganizationProjectSchemaTableRoute
-  '/studio/org/$organization/$project/table/$table': typeof StudioOrgOrganizationProjectTableTableRoute
-  '/studio/org/$organization/$project/indexes/': typeof StudioOrgOrganizationProjectIndexesIndexRoute
+  '/studio/org/$organization/$project/database/': typeof StudioOrgOrganizationProjectDatabaseIndexRoute
   '/studio/org/$organization/$project/runner/': typeof StudioOrgOrganizationProjectRunnerIndexRoute
-  '/studio/org/$organization/$project/schema/': typeof StudioOrgOrganizationProjectSchemaIndexRoute
-  '/studio/org/$organization/$project/table/': typeof StudioOrgOrganizationProjectTableIndexRoute
 }
 export interface FileRoutesByTo {
   '/changelog': typeof MarketingChangelogRoute
@@ -286,14 +238,10 @@ export interface FileRoutesByTo {
   '/studio/org/$organization/$project/visualizer': typeof StudioOrgOrganizationProjectVisualizerRoute
   '/studio/org/$organization/$project/workspace': typeof StudioOrgOrganizationProjectWorkspaceRoute
   '/studio/org/$organization/$project': typeof StudioOrgOrganizationProjectIndexRoute
-  '/studio/org/$organization/$project/indexes/$table': typeof StudioOrgOrganizationProjectIndexesTableRoute
+  '/studio/org/$organization/$project/database/$table': typeof StudioOrgOrganizationProjectDatabaseTableRoute
   '/studio/org/$organization/$project/runner/$queryId': typeof StudioOrgOrganizationProjectRunnerQueryIdRoute
-  '/studio/org/$organization/$project/schema/$table': typeof StudioOrgOrganizationProjectSchemaTableRoute
-  '/studio/org/$organization/$project/table/$table': typeof StudioOrgOrganizationProjectTableTableRoute
-  '/studio/org/$organization/$project/indexes': typeof StudioOrgOrganizationProjectIndexesIndexRoute
+  '/studio/org/$organization/$project/database': typeof StudioOrgOrganizationProjectDatabaseIndexRoute
   '/studio/org/$organization/$project/runner': typeof StudioOrgOrganizationProjectRunnerIndexRoute
-  '/studio/org/$organization/$project/schema': typeof StudioOrgOrganizationProjectSchemaIndexRoute
-  '/studio/org/$organization/$project/table': typeof StudioOrgOrganizationProjectTableIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -316,21 +264,15 @@ export interface FileRoutesById {
   '/studio/org/$organization/settings': typeof StudioOrgOrganizationSettingsRoute
   '/studio/org/$organization/team': typeof StudioOrgOrganizationTeamRoute
   '/studio/org/$organization/': typeof StudioOrgOrganizationIndexRoute
-  '/studio/org/$organization/$project/indexes': typeof StudioOrgOrganizationProjectIndexesRouteRouteWithChildren
+  '/studio/org/$organization/$project/database': typeof StudioOrgOrganizationProjectDatabaseRouteRouteWithChildren
   '/studio/org/$organization/$project/runner': typeof StudioOrgOrganizationProjectRunnerRouteRouteWithChildren
-  '/studio/org/$organization/$project/schema': typeof StudioOrgOrganizationProjectSchemaRouteRouteWithChildren
-  '/studio/org/$organization/$project/table': typeof StudioOrgOrganizationProjectTableRouteRouteWithChildren
   '/studio/org/$organization/$project/visualizer': typeof StudioOrgOrganizationProjectVisualizerRoute
   '/studio/org/$organization/$project/workspace': typeof StudioOrgOrganizationProjectWorkspaceRoute
   '/studio/org/$organization/$project/': typeof StudioOrgOrganizationProjectIndexRoute
-  '/studio/org/$organization/$project/indexes/$table': typeof StudioOrgOrganizationProjectIndexesTableRoute
+  '/studio/org/$organization/$project/database/$table': typeof StudioOrgOrganizationProjectDatabaseTableRoute
   '/studio/org/$organization/$project/runner/$queryId': typeof StudioOrgOrganizationProjectRunnerQueryIdRoute
-  '/studio/org/$organization/$project/schema/$table': typeof StudioOrgOrganizationProjectSchemaTableRoute
-  '/studio/org/$organization/$project/table/$table': typeof StudioOrgOrganizationProjectTableTableRoute
-  '/studio/org/$organization/$project/indexes/': typeof StudioOrgOrganizationProjectIndexesIndexRoute
+  '/studio/org/$organization/$project/database/': typeof StudioOrgOrganizationProjectDatabaseIndexRoute
   '/studio/org/$organization/$project/runner/': typeof StudioOrgOrganizationProjectRunnerIndexRoute
-  '/studio/org/$organization/$project/schema/': typeof StudioOrgOrganizationProjectSchemaIndexRoute
-  '/studio/org/$organization/$project/table/': typeof StudioOrgOrganizationProjectTableIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -353,21 +295,15 @@ export interface FileRouteTypes {
     | '/studio/org/$organization/settings'
     | '/studio/org/$organization/team'
     | '/studio/org/$organization/'
-    | '/studio/org/$organization/$project/indexes'
+    | '/studio/org/$organization/$project/database'
     | '/studio/org/$organization/$project/runner'
-    | '/studio/org/$organization/$project/schema'
-    | '/studio/org/$organization/$project/table'
     | '/studio/org/$organization/$project/visualizer'
     | '/studio/org/$organization/$project/workspace'
     | '/studio/org/$organization/$project/'
-    | '/studio/org/$organization/$project/indexes/$table'
+    | '/studio/org/$organization/$project/database/$table'
     | '/studio/org/$organization/$project/runner/$queryId'
-    | '/studio/org/$organization/$project/schema/$table'
-    | '/studio/org/$organization/$project/table/$table'
-    | '/studio/org/$organization/$project/indexes/'
+    | '/studio/org/$organization/$project/database/'
     | '/studio/org/$organization/$project/runner/'
-    | '/studio/org/$organization/$project/schema/'
-    | '/studio/org/$organization/$project/table/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/changelog'
@@ -386,14 +322,10 @@ export interface FileRouteTypes {
     | '/studio/org/$organization/$project/visualizer'
     | '/studio/org/$organization/$project/workspace'
     | '/studio/org/$organization/$project'
-    | '/studio/org/$organization/$project/indexes/$table'
+    | '/studio/org/$organization/$project/database/$table'
     | '/studio/org/$organization/$project/runner/$queryId'
-    | '/studio/org/$organization/$project/schema/$table'
-    | '/studio/org/$organization/$project/table/$table'
-    | '/studio/org/$organization/$project/indexes'
+    | '/studio/org/$organization/$project/database'
     | '/studio/org/$organization/$project/runner'
-    | '/studio/org/$organization/$project/schema'
-    | '/studio/org/$organization/$project/table'
   id:
     | '__root__'
     | '/_marketing'
@@ -415,21 +347,15 @@ export interface FileRouteTypes {
     | '/studio/org/$organization/settings'
     | '/studio/org/$organization/team'
     | '/studio/org/$organization/'
-    | '/studio/org/$organization/$project/indexes'
+    | '/studio/org/$organization/$project/database'
     | '/studio/org/$organization/$project/runner'
-    | '/studio/org/$organization/$project/schema'
-    | '/studio/org/$organization/$project/table'
     | '/studio/org/$organization/$project/visualizer'
     | '/studio/org/$organization/$project/workspace'
     | '/studio/org/$organization/$project/'
-    | '/studio/org/$organization/$project/indexes/$table'
+    | '/studio/org/$organization/$project/database/$table'
     | '/studio/org/$organization/$project/runner/$queryId'
-    | '/studio/org/$organization/$project/schema/$table'
-    | '/studio/org/$organization/$project/table/$table'
-    | '/studio/org/$organization/$project/indexes/'
+    | '/studio/org/$organization/$project/database/'
     | '/studio/org/$organization/$project/runner/'
-    | '/studio/org/$organization/$project/schema/'
-    | '/studio/org/$organization/$project/table/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -580,11 +506,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioOrgOrganizationProjectIndexRouteImport
       parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
     }
-    '/studio/org/$organization/$project/indexes': {
-      id: '/studio/org/$organization/$project/indexes'
-      path: '/indexes'
-      fullPath: '/studio/org/$organization/$project/indexes'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectIndexesRouteRouteImport
+    '/studio/org/$organization/$project/database': {
+      id: '/studio/org/$organization/$project/database'
+      path: '/database'
+      fullPath: '/studio/org/$organization/$project/database'
+      preLoaderRoute: typeof StudioOrgOrganizationProjectDatabaseRouteRouteImport
       parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
     }
     '/studio/org/$organization/$project/runner': {
@@ -592,20 +518,6 @@ declare module '@tanstack/react-router' {
       path: '/runner'
       fullPath: '/studio/org/$organization/$project/runner'
       preLoaderRoute: typeof StudioOrgOrganizationProjectRunnerRouteRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
-    }
-    '/studio/org/$organization/$project/schema': {
-      id: '/studio/org/$organization/$project/schema'
-      path: '/schema'
-      fullPath: '/studio/org/$organization/$project/schema'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectSchemaRouteRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
-    }
-    '/studio/org/$organization/$project/table': {
-      id: '/studio/org/$organization/$project/table'
-      path: '/table'
-      fullPath: '/studio/org/$organization/$project/table'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectTableRouteRouteImport
       parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
     }
     '/studio/org/$organization/$project/visualizer': {
@@ -622,19 +534,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudioOrgOrganizationProjectWorkspaceRouteImport
       parentRoute: typeof StudioOrgOrganizationProjectRouteRoute
     }
-    '/studio/org/$organization/$project/indexes/': {
-      id: '/studio/org/$organization/$project/indexes/'
+    '/studio/org/$organization/$project/database/': {
+      id: '/studio/org/$organization/$project/database/'
       path: '/'
-      fullPath: '/studio/org/$organization/$project/indexes/'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectIndexesIndexRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectIndexesRouteRoute
+      fullPath: '/studio/org/$organization/$project/database/'
+      preLoaderRoute: typeof StudioOrgOrganizationProjectDatabaseIndexRouteImport
+      parentRoute: typeof StudioOrgOrganizationProjectDatabaseRouteRoute
     }
-    '/studio/org/$organization/$project/indexes/$table': {
-      id: '/studio/org/$organization/$project/indexes/$table'
+    '/studio/org/$organization/$project/database/$table': {
+      id: '/studio/org/$organization/$project/database/$table'
       path: '/$table'
-      fullPath: '/studio/org/$organization/$project/indexes/$table'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectIndexesTableRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectIndexesRouteRoute
+      fullPath: '/studio/org/$organization/$project/database/$table'
+      preLoaderRoute: typeof StudioOrgOrganizationProjectDatabaseTableRouteImport
+      parentRoute: typeof StudioOrgOrganizationProjectDatabaseRouteRoute
     }
     '/studio/org/$organization/$project/runner/': {
       id: '/studio/org/$organization/$project/runner/'
@@ -649,34 +561,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/studio/org/$organization/$project/runner/$queryId'
       preLoaderRoute: typeof StudioOrgOrganizationProjectRunnerQueryIdRouteImport
       parentRoute: typeof StudioOrgOrganizationProjectRunnerRouteRoute
-    }
-    '/studio/org/$organization/$project/schema/': {
-      id: '/studio/org/$organization/$project/schema/'
-      path: '/'
-      fullPath: '/studio/org/$organization/$project/schema/'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectSchemaIndexRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectSchemaRouteRoute
-    }
-    '/studio/org/$organization/$project/schema/$table': {
-      id: '/studio/org/$organization/$project/schema/$table'
-      path: '/$table'
-      fullPath: '/studio/org/$organization/$project/schema/$table'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectSchemaTableRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectSchemaRouteRoute
-    }
-    '/studio/org/$organization/$project/table/': {
-      id: '/studio/org/$organization/$project/table/'
-      path: '/'
-      fullPath: '/studio/org/$organization/$project/table/'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectTableIndexRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectTableRouteRoute
-    }
-    '/studio/org/$organization/$project/table/$table': {
-      id: '/studio/org/$organization/$project/table/$table'
-      path: '/$table'
-      fullPath: '/studio/org/$organization/$project/table/$table'
-      preLoaderRoute: typeof StudioOrgOrganizationProjectTableTableRouteImport
-      parentRoute: typeof StudioOrgOrganizationProjectTableRouteRoute
     }
   }
 }
@@ -713,22 +597,22 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
-interface StudioOrgOrganizationProjectIndexesRouteRouteChildren {
-  StudioOrgOrganizationProjectIndexesTableRoute: typeof StudioOrgOrganizationProjectIndexesTableRoute
-  StudioOrgOrganizationProjectIndexesIndexRoute: typeof StudioOrgOrganizationProjectIndexesIndexRoute
+interface StudioOrgOrganizationProjectDatabaseRouteRouteChildren {
+  StudioOrgOrganizationProjectDatabaseTableRoute: typeof StudioOrgOrganizationProjectDatabaseTableRoute
+  StudioOrgOrganizationProjectDatabaseIndexRoute: typeof StudioOrgOrganizationProjectDatabaseIndexRoute
 }
 
-const StudioOrgOrganizationProjectIndexesRouteRouteChildren: StudioOrgOrganizationProjectIndexesRouteRouteChildren =
+const StudioOrgOrganizationProjectDatabaseRouteRouteChildren: StudioOrgOrganizationProjectDatabaseRouteRouteChildren =
   {
-    StudioOrgOrganizationProjectIndexesTableRoute:
-      StudioOrgOrganizationProjectIndexesTableRoute,
-    StudioOrgOrganizationProjectIndexesIndexRoute:
-      StudioOrgOrganizationProjectIndexesIndexRoute,
+    StudioOrgOrganizationProjectDatabaseTableRoute:
+      StudioOrgOrganizationProjectDatabaseTableRoute,
+    StudioOrgOrganizationProjectDatabaseIndexRoute:
+      StudioOrgOrganizationProjectDatabaseIndexRoute,
   }
 
-const StudioOrgOrganizationProjectIndexesRouteRouteWithChildren =
-  StudioOrgOrganizationProjectIndexesRouteRoute._addFileChildren(
-    StudioOrgOrganizationProjectIndexesRouteRouteChildren,
+const StudioOrgOrganizationProjectDatabaseRouteRouteWithChildren =
+  StudioOrgOrganizationProjectDatabaseRouteRoute._addFileChildren(
+    StudioOrgOrganizationProjectDatabaseRouteRouteChildren,
   )
 
 interface StudioOrgOrganizationProjectRunnerRouteRouteChildren {
@@ -749,47 +633,9 @@ const StudioOrgOrganizationProjectRunnerRouteRouteWithChildren =
     StudioOrgOrganizationProjectRunnerRouteRouteChildren,
   )
 
-interface StudioOrgOrganizationProjectSchemaRouteRouteChildren {
-  StudioOrgOrganizationProjectSchemaTableRoute: typeof StudioOrgOrganizationProjectSchemaTableRoute
-  StudioOrgOrganizationProjectSchemaIndexRoute: typeof StudioOrgOrganizationProjectSchemaIndexRoute
-}
-
-const StudioOrgOrganizationProjectSchemaRouteRouteChildren: StudioOrgOrganizationProjectSchemaRouteRouteChildren =
-  {
-    StudioOrgOrganizationProjectSchemaTableRoute:
-      StudioOrgOrganizationProjectSchemaTableRoute,
-    StudioOrgOrganizationProjectSchemaIndexRoute:
-      StudioOrgOrganizationProjectSchemaIndexRoute,
-  }
-
-const StudioOrgOrganizationProjectSchemaRouteRouteWithChildren =
-  StudioOrgOrganizationProjectSchemaRouteRoute._addFileChildren(
-    StudioOrgOrganizationProjectSchemaRouteRouteChildren,
-  )
-
-interface StudioOrgOrganizationProjectTableRouteRouteChildren {
-  StudioOrgOrganizationProjectTableTableRoute: typeof StudioOrgOrganizationProjectTableTableRoute
-  StudioOrgOrganizationProjectTableIndexRoute: typeof StudioOrgOrganizationProjectTableIndexRoute
-}
-
-const StudioOrgOrganizationProjectTableRouteRouteChildren: StudioOrgOrganizationProjectTableRouteRouteChildren =
-  {
-    StudioOrgOrganizationProjectTableTableRoute:
-      StudioOrgOrganizationProjectTableTableRoute,
-    StudioOrgOrganizationProjectTableIndexRoute:
-      StudioOrgOrganizationProjectTableIndexRoute,
-  }
-
-const StudioOrgOrganizationProjectTableRouteRouteWithChildren =
-  StudioOrgOrganizationProjectTableRouteRoute._addFileChildren(
-    StudioOrgOrganizationProjectTableRouteRouteChildren,
-  )
-
 interface StudioOrgOrganizationProjectRouteRouteChildren {
-  StudioOrgOrganizationProjectIndexesRouteRoute: typeof StudioOrgOrganizationProjectIndexesRouteRouteWithChildren
+  StudioOrgOrganizationProjectDatabaseRouteRoute: typeof StudioOrgOrganizationProjectDatabaseRouteRouteWithChildren
   StudioOrgOrganizationProjectRunnerRouteRoute: typeof StudioOrgOrganizationProjectRunnerRouteRouteWithChildren
-  StudioOrgOrganizationProjectSchemaRouteRoute: typeof StudioOrgOrganizationProjectSchemaRouteRouteWithChildren
-  StudioOrgOrganizationProjectTableRouteRoute: typeof StudioOrgOrganizationProjectTableRouteRouteWithChildren
   StudioOrgOrganizationProjectVisualizerRoute: typeof StudioOrgOrganizationProjectVisualizerRoute
   StudioOrgOrganizationProjectWorkspaceRoute: typeof StudioOrgOrganizationProjectWorkspaceRoute
   StudioOrgOrganizationProjectIndexRoute: typeof StudioOrgOrganizationProjectIndexRoute
@@ -797,14 +643,10 @@ interface StudioOrgOrganizationProjectRouteRouteChildren {
 
 const StudioOrgOrganizationProjectRouteRouteChildren: StudioOrgOrganizationProjectRouteRouteChildren =
   {
-    StudioOrgOrganizationProjectIndexesRouteRoute:
-      StudioOrgOrganizationProjectIndexesRouteRouteWithChildren,
+    StudioOrgOrganizationProjectDatabaseRouteRoute:
+      StudioOrgOrganizationProjectDatabaseRouteRouteWithChildren,
     StudioOrgOrganizationProjectRunnerRouteRoute:
       StudioOrgOrganizationProjectRunnerRouteRouteWithChildren,
-    StudioOrgOrganizationProjectSchemaRouteRoute:
-      StudioOrgOrganizationProjectSchemaRouteRouteWithChildren,
-    StudioOrgOrganizationProjectTableRouteRoute:
-      StudioOrgOrganizationProjectTableRouteRouteWithChildren,
     StudioOrgOrganizationProjectVisualizerRoute:
       StudioOrgOrganizationProjectVisualizerRoute,
     StudioOrgOrganizationProjectWorkspaceRoute:

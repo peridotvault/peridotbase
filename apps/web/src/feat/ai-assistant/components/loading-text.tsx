@@ -13,7 +13,7 @@ const variants = [
 			<span
 				{...props}
 				className={cn(
-					"bg-[linear-gradient(110deg,#bfbfbf,35%,#000,50%,#bfbfbf,75%,#bfbfbf)] dark:bg-[linear-gradient(110deg,#404040,35%,#fff,50%,#404040,75%,#404040)]",
+					"bg-[linear-gradient(110deg,var(--muted-foreground),35%,var(--foreground),50%,var(--muted-foreground),75%,var(--muted-foreground))]",
 					"bg-size-[200%_100%] bg-clip-text text-transparent",
 					"animate-shine",
 					className,

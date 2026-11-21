@@ -7,7 +7,7 @@ export const DefaultValueField = ({
 }: ComponentProps<typeof Input> & { invalid: boolean }) => (
 	<div className="flex flex-col gap-2">
 		<Input
-			placeholder="NULL"
+			placeholder="NULL, uuidv7(), now(), current_signer()"
 			className={invalid ? "border-destructive ring-destructive ring-1" : ""}
 			{...props}
 		/>

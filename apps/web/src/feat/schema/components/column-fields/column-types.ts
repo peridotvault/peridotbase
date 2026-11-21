@@ -2,15 +2,19 @@ import type { StandardizedDataType } from "@peridotvault/peridotbase-sdk";
 import type { ColumnOption } from "./column-field-values";
 
 /**
- * The column types the Peridotbase program knows. `serial` and `bigserial` are accepted by the
- * create-column form as identity shorthand; every other value is a wire-level protocol type.
+ * Column types the create-table form offers. Every value maps to a wire-level
+ * program type; unknown types are rejected instead of silently becoming TEXT.
  */
-export type FormColumnType = StandardizedDataType | "serial" | "bigserial";
+export type FormColumnType = StandardizedDataType | "address";
 
 export const PSQL_TYPES = {
 	numeric: [
-		{ value: "smallint", label: "smallint", description: "Signed two-byte integer" },
-		{ value: "int", label: "int", description: "Signed four-byte integer" },
+		{
+			value: "smallint",
+			label: "smallint",
+			description: "Signed two-byte integer (stored as bigint)",
+		},
+		{ value: "int", label: "int", description: "Signed four-byte integer (stored as bigint)" },
 		{ value: "bigint", label: "bigint", description: "Signed eight-byte integer" },
 		{ value: "float", label: "float", description: "Single precision floating-point number" },
 		{
@@ -22,12 +26,6 @@ export const PSQL_TYPES = {
 			value: "numeric",
 			label: "numeric",
 			description: "Exact numeric of selectable precision",
-		},
-		{ value: "serial", label: "serial", description: "Auto-incrementing four-byte integer" },
-		{
-			value: "bigserial",
-			label: "bigserial",
-			description: "Auto-incrementing eight-byte integer",
 		},
 	],
 	text: [
@@ -51,38 +49,18 @@ export const PSQL_TYPES = {
 			description: "Date and time with a time zone",
 		},
 	],
-	json: [
-		{ value: "json", label: "json", description: "JSON document" },
-		{ value: "jsonb", label: "jsonb", description: "Binary JSON document" },
-	],
-	binary: [{ value: "bytea", label: "bytea", description: "Binary data" }],
+	json: [],
+	binary: [],
 	other: [
-		{ value: "array", label: "array", description: "Array of another type" },
-		{ value: "enum", label: "enum", description: "One of a fixed set of labels" },
+		{
+			value: "address",
+			label: "address",
+			description: "32-byte Solana wallet/program address",
+		},
 	],
 } satisfies Record<string, { value: FormColumnType; label: string; description: string }[]>;
 
-// Serial types auto-increment, so they cannot also be identity columns.
-export const SERIAL_TYPES: string[] = ["serial", "bigserial"];
-
-export const ARRAY_COMPATIBLE_TYPES: string[] = [
-	"smallint",
-	"int",
-	"bigint",
-	"float",
-	"double",
-	"numeric",
-	"text",
-	"varchar",
-	"char",
-	"uuid",
-	"boolean",
-	"date",
-	"time",
-	"timestamp",
-	"timestamptz",
-	"bytea",
-];
+export const ARRAY_COMPATIBLE_TYPES: string[] = [];
 
 export const COLUMN_OPTIONS: ColumnOption[] = [
 	{
@@ -94,11 +72,6 @@ export const COLUMN_OPTIONS: ColumnOption[] = [
 		name: "isUnique",
 		label: "Is Unique",
 		description: "Enforce if values in the column should be unique across rows",
-	},
-	{
-		name: "isIdentity",
-		label: "Is Identity",
-		description: "Automatically assign a sequential unique number to the column",
 	},
 	{
 		name: "isArray",

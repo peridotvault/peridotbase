@@ -260,9 +260,9 @@ export const CodeEditor = ({
 								kind: monaco.languages.CompletionItemKind.Snippet,
 								insertText: [
 									"CREATE TABLE ${1:table_name} (",
-									"    ${2:id} SERIAL PRIMARY KEY,",
+									"    ${2:id} UUID PRIMARY KEY DEFAULT uuidv7(),",
 									"    ${3:column_name} ${4:VARCHAR(255)} ${5:NOT NULL},",
-									"    created_at TIMESTAMP DEFAULT NOW()",
+									"    created_at TIMESTAMP NOT NULL DEFAULT now()",
 									");",
 								].join("\n"),
 								insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,

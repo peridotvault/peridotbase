@@ -48,13 +48,13 @@ const CreateIndexFormContent = ({ tableName }: { tableName: string }) => {
 	const columnNames = [...new Set(tableCols?.map(({ columnName }) => columnName) ?? [])];
 
 	const toggleColumn = (columnName: string) => {
-		const next = selectedColumns.includes(columnName)
-			? selectedColumns.filter((column) => column !== columnName)
-			: [...selectedColumns, columnName];
+		// The program cannot add a composite index after CREATE TABLE, so this form
+		// builds single-column indexes only.
+		const next = selectedColumns.includes(columnName) ? [] : [columnName];
 
 		setValue("columns", next, { shouldValidate: isSubmitted });
 
-		// The suggested name follows the columns until the user types their own.
+		// The suggested name follows the column until the user types their own.
 		if (!dirtyFields.indexName) {
 			setValue(
 				"indexName",
@@ -67,7 +67,10 @@ const CreateIndexFormContent = ({ tableName }: { tableName: string }) => {
 	return (
 		<form onSubmit={handleSubmit((data) => createIndex(data))} className="space-y-6">
 			<div className="space-y-2">
-				<Label className="text-xs">Columns, in index order</Label>
+				<Label className="text-xs">Column</Label>
+				<p className="text-xs text-muted-foreground">
+					Composite indexes are declared while the table is created.
+				</p>
 				{isLoadingTableCols ? (
 					<Spinner size="size-5" />
 				) : (

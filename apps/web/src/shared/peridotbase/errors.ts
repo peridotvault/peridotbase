@@ -18,6 +18,9 @@ export const sdkErrorMessage = (error: unknown, fallback: string): string => {
 			? `Table "${name}" already exists in this database`
 			: "A table with this name already exists in this database";
 	}
+	if (isForeignKeyViolation(error)) {
+		return "Foreign key violation: the referenced row does not exist, or another row still references this one.";
+	}
 	if (error instanceof Error && error.message) return error.message;
 	if (typeof error === "string" && error) return error;
 	return fallback;
@@ -32,6 +35,24 @@ export const isDuplicateTableName = (error: unknown): boolean => {
 		code === "DuplicateTableName" ||
 		canonicalCode === "TABLE_ALREADY_EXISTS" ||
 		(error instanceof Error && error.message.includes("DuplicateTableName"))
+	);
+};
+
+/** True when the program rejected a write because a foreign key would break. */
+export const isForeignKeyViolation = (error: unknown): boolean => {
+	if (!error || typeof error !== "object") return false;
+	const record = error as { canonicalCode?: unknown; code?: unknown; message?: unknown };
+
+	return (
+		record.canonicalCode === "FOREIGN_KEY_VIOLATION" ||
+		record.code === "ForeignKeyViolation" ||
+		record.code === "MissingForeignKeyAccount" ||
+		record.code === "ForeignKeyCounterUnderflow" ||
+		record.code === "ForeignKeyChildNotEmpty" ||
+		(typeof record.message === "string" &&
+			/ForeignKey(Violation|ChildNotEmpty|CounterUnderflow)|MissingForeignKeyAccount/.test(
+				record.message,
+			))
 	);
 };
 

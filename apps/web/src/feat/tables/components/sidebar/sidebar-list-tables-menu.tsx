@@ -23,10 +23,12 @@ import { Label } from "@peridotvault/peridotbase-ui/label";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
 	ClipboardCopy,
+	CopyPlus,
 	Download,
 	EllipsisVertical,
 	FileCode,
 	Pencil,
+	Settings2,
 	Trash2,
 	Type,
 } from "lucide-react";
@@ -42,7 +44,9 @@ import { DATA_TABLE_PATH } from "@/shared/lib/sections";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { CONSTANTS } from "@/shared/utils/constants";
 import { useDeleteTable } from "../../hooks/use-delete-table";
+import { useDuplicateTable } from "../../hooks/use-duplicate-table";
 import { useRenameTable } from "../../hooks/use-rename-table";
+import { TableSettingsDialog } from "../table-settings-dialog";
 import { tableId } from "@/shared/utils/table-id";
 
 export const SidebarListTablesMenu = ({
@@ -59,11 +63,13 @@ export const SidebarListTablesMenu = ({
 	const { copyTableSchema, isCopyingSchema } = useCopyTableSchema();
 	const { exportFile, isExportingFile } = useExportFile();
 	const { deleteTable, isDeletingTable } = useDeleteTable();
+	const { duplicateTable, isDuplicatingTable } = useDuplicateTable({ tableName, schemaName });
 	const { renameTable, isRenamingTable } = useRenameTable({ tableName, schemaName });
 	const { openOverlay, closeOverlay, isOverlayOpen } = useOverlayStore();
 	const { setEditingTable } = useSchemaEditStore();
 	const capabilities = useStudioCapabilities();
 	const [newTableName, setNewTableName] = useState(tableName);
+	const [duplicateName, setDuplicateName] = useState(`${tableName}_copy`);
 
 	const isOpenTable = params.table === tableName && openSchema === schemaName;
 
@@ -71,6 +77,8 @@ export const SidebarListTablesMenu = ({
 	const overlayKey = tableId({ schemaName, tableName });
 	const renameOverlayId = `tables.rename-table.${overlayKey}` as const;
 	const deleteOverlayId = `tables.delete-table.${overlayKey}` as const;
+	const duplicateOverlayId = `tables.duplicate-table.${overlayKey}` as const;
+	const settingsOverlayId = `tables.settings.${overlayKey}` as const;
 
 	const handleRenameDialogChange = (open: boolean) => {
 		if (open) {
@@ -99,6 +107,33 @@ export const SidebarListTablesMenu = ({
 			}
 		} catch {
 			// Error notification handled by toast.promise in useRenameTable
+		}
+	};
+
+	const handleDuplicateDialogChange = (open: boolean) => {
+		if (open) {
+			setDuplicateName(`${tableName}_copy`);
+			openOverlay(duplicateOverlayId);
+		} else {
+			closeOverlay(duplicateOverlayId);
+		}
+	};
+
+	const handleDuplicate = async () => {
+		const trimmed = duplicateName.trim();
+
+		if (!trimmed || trimmed === tableName) return;
+
+		try {
+			await duplicateTable(trimmed);
+			handleDuplicateDialogChange(false);
+			navigate({
+				to: DATA_TABLE_PATH,
+				params: { ...scope, table: trimmed },
+				search: { [CONSTANTS.TABLE_SCHEMA]: schemaName },
+			});
+		} catch {
+			// Error notification handled by toast.promise in useDuplicateTable
 		}
 	};
 
@@ -169,6 +204,14 @@ export const SidebarListTablesMenu = ({
 									<Pencil className="size-4" />
 									Edit table
 								</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => openOverlay(settingsOverlayId)}>
+									<Settings2 className="size-4" />
+									Table settings
+								</DropdownMenuItem>
+								<DropdownMenuItem onClick={() => handleDuplicateDialogChange(true)}>
+									<CopyPlus className="size-4" />
+									Duplicate table
+								</DropdownMenuItem>
 							</>
 						)}
 						<DropdownMenuSub>
@@ -226,6 +269,26 @@ export const SidebarListTablesMenu = ({
 				tableName={tableName}
 				onDelete={handleDelete}
 				isDeleting={isDeletingTable}
+			/>
+
+			<DuplicateTableDialog
+				tableName={tableName}
+				duplicateName={duplicateName}
+				setDuplicateName={setDuplicateName}
+				isOpen={isOverlayOpen(duplicateOverlayId)}
+				onOpenChange={handleDuplicateDialogChange}
+				onDuplicate={handleDuplicate}
+				isDuplicating={isDuplicatingTable}
+			/>
+
+			<TableSettingsDialog
+				tableName={tableName}
+				schemaName={schemaName}
+				open={isOverlayOpen(settingsOverlayId)}
+				onOpenChange={(open) => {
+					if (open) openOverlay(settingsOverlayId);
+					else closeOverlay(settingsOverlayId);
+				}}
 			/>
 		</>
 	);
@@ -291,6 +354,71 @@ const RenameTableDialog = ({
 					</Button>
 					<Button onClick={onRename} disabled={isDisabled || isRenaming}>
 						{isRenaming ? "Renaming..." : "Rename Table"}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+};
+
+const DuplicateTableDialog = ({
+	tableName,
+	duplicateName,
+	setDuplicateName,
+	isOpen,
+	onOpenChange,
+	onDuplicate,
+	isDuplicating,
+}: {
+	tableName: string;
+	duplicateName: string;
+	setDuplicateName: (value: string) => void;
+	isOpen: boolean;
+	onOpenChange: (open: boolean) => void;
+	onDuplicate: () => void;
+	isDuplicating: boolean;
+}) => {
+	const trimmed = duplicateName.trim();
+	const isDisabled = !trimmed || trimmed === tableName;
+
+	return (
+		<Dialog open={isOpen} onOpenChange={onOpenChange}>
+			<DialogContent className="max-w-md">
+				<DialogHeader>
+					<DialogTitle>Duplicate Table</DialogTitle>
+					<DialogDescription>
+						Copy the columns, constraints and indexes of "{tableName}". Rows are not copied, so
+						the new table starts empty.
+					</DialogDescription>
+				</DialogHeader>
+
+				<div className="space-y-2">
+					<Label htmlFor="duplicate-table-name">New table name</Label>
+					<Input
+						id="duplicate-table-name"
+						value={duplicateName}
+						onChange={(event) => setDuplicateName(event.target.value)}
+						placeholder="table_copy"
+						autoFocus
+						disabled={isDuplicating}
+						onKeyDown={(event) => {
+							if (event.key === "Enter" && !isDisabled && !isDuplicating) {
+								onDuplicate();
+							}
+						}}
+					/>
+				</div>
+
+				<DialogFooter className="gap-2">
+					<Button
+						variant="outline"
+						onClick={() => onOpenChange(false)}
+						disabled={isDuplicating}
+					>
+						Cancel
+					</Button>
+					<Button onClick={onDuplicate} disabled={isDisabled || isDuplicating}>
+						{isDuplicating ? "Duplicating..." : "Duplicate Table"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

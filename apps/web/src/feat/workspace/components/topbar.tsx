@@ -69,9 +69,9 @@ export const BRANCH_OPTIONS = [
 ] as const;
 
 const crumbLabel =
-	"inline-flex max-w-40 items-center gap-1 truncate rounded-l-md px-2 py-1 text-sm transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+	"inline-flex max-w-40 items-center gap-1 truncate rounded-sm px-2 py-1 text-sm transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 const crumbChevron =
-	"inline-flex shrink-0 items-center rounded-r-md px-1 py-1 transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+	"inline-flex shrink-0 items-center rounded-sm px-1 py-1 transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
 const crumbStatic =
 	"inline-flex max-w-40 cursor-default items-center gap-1 truncate px-2 py-1 text-sm";
 
@@ -116,7 +116,7 @@ export const StudioTopbar = () => {
 					type="button"
 					onClick={() => navigate({ to: "/studio/org" })}
 					aria-label="Peridotbase home"
-					className="flex size-8 items-center justify-center rounded-md transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+					className="flex size-8 items-center justify-center rounded-sm transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
 				>
 					<img src="/logo.svg" alt="" className="size-6" />
 				</button>
@@ -264,11 +264,11 @@ export const StudioTopbar = () => {
 				<DropdownMenu>
 					<DropdownMenuTrigger
 						className={cn(
-							"flex items-center gap-2 rounded-md px-2 py-1 text-sm transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+							"flex items-center gap-2 rounded-sm px-2 py-1 text-sm transition-colors hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
 						)}
 						aria-label="Account"
 					>
-						<span className="flex size-6 items-center justify-center rounded-full bg-muted text-[10px] font-semibold uppercase text-muted-foreground">
+						<span className="flex size-6 items-center justify-center rounded-full bg-muted text-[0.625rem] font-semibold uppercase text-muted-foreground">
 							{(wallet?.label ?? wallet?.address ?? "?").slice(0, 2)}
 						</span>
 						<span className="hidden max-w-32 truncate font-mono text-xs text-muted-foreground sm:inline">

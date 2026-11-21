@@ -37,22 +37,19 @@ export const PROJECT_ROOT = "/studio/org/$organization/$project" as const;
 
 export const SECTION_PATHS = {
 	overview: PROJECT_ROOT,
-	// ponytail: the Data view still lives on the legacy `/table` path so existing links keep
-	// working; rename to `/data` with redirects when routes are next touched.
-	database: `${PROJECT_ROOT}/table`,
+	database: `${PROJECT_ROOT}/database`,
 	runner: `${PROJECT_ROOT}/runner`,
 	visualizer: `${PROJECT_ROOT}/visualizer`,
 	workspace: `${PROJECT_ROOT}/workspace`,
 } as const;
 
 /** Host route for the unified Data view: table data plus schema and indexes tabs. */
-// ponytail: same legacy `/table` path as above; rename together with SECTION_PATHS.data.
-export const DATA_TABLE_PATH = `${PROJECT_ROOT}/table/$table` as const;
+export const DATA_TABLE_PATH = `${PROJECT_ROOT}/database/$table` as const;
 
 /** Search key for the active Data tab; absent means the data grid. */
 export const DATA_TAB_PARAM = "tab" as const;
 
-export type DataTab = "table" | "schema" | "indexes";
+export type DataTab = "table" | "schema" | "indexes" | "policies";
 
 /** Org-level rail items, in display order: projects, team, org settings. */
 export const ORG_SECTIONS = [
@@ -123,14 +120,13 @@ export const orgSectionOf = (pathname: string): (typeof ORG_SECTIONS)[number] | 
 	return ORG_SECTIONS.find((section) => section.id === segment);
 };
 
-/** The section a pathname is in; legacy table, schema and indexes URLs all resolve to Data. */
+/** The section a pathname is in. */
 export const sectionOf = (pathname: string): (typeof SECTIONS)[number] | undefined => {
 	const segments = pathname.split("/").filter(Boolean);
 
 	if (segments[0] !== "studio" || segments[1] !== "org") return undefined;
 
-	const raw = segments[4] ?? "overview";
-	const segment = raw === "table" || raw === "schema" || raw === "indexes" ? "database" : raw;
+	const segment = segments[4] ?? "overview";
 
 	return SECTIONS.find((section) => section.id === segment);
 };

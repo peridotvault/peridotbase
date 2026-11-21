@@ -273,7 +273,7 @@ export const AddRecordField = ({
 						<div
 							role="group"
 							aria-label={`${columnName} stored value`}
-							className="truncate rounded-md border border-input bg-muted/40 px-3 py-2 font-mono text-xs"
+							className="truncate rounded-sm border border-input bg-muted/40 px-3 py-2 font-mono text-xs"
 						>
 							{storedText}
 						</div>

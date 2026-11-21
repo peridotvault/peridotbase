@@ -37,11 +37,10 @@ type RegisterApi = {
 };
 
 /**
- * The pre-Wallet-Standard shape Phantom, Solflare and Backpack still inject. It is the fallback
- * path: a wallet that exposes it can connect even when its Wallet Standard announcement never
- * reaches the page.
+ * The injected shape Phantom, Solflare and Backpack expose. It is the fallback path: a wallet
+ * that exposes it can connect even when its Wallet Standard announcement never reaches the page.
  */
-type LegacyWalletProvider = {
+type InjectedWalletProvider = {
 	connect?: (options?: {
 		onlyIfTrusted?: boolean;
 	}) => Promise<{ publicKey?: { toString(): string } | null } | void>;
@@ -49,18 +48,18 @@ type LegacyWalletProvider = {
 	publicKey?: { toString(): string } | null;
 	signTransaction?: (transaction: unknown) => Promise<unknown>;
 	/**
-	 * Legacy batch signer. Phantom/Solflare present a single approval for the
-	 * whole array, unlike the Wallet Standard `solana:signTransaction` feature
-	 * which prompts once per transaction.
+	 * Batch signer. Phantom/Solflare present a single approval for the whole array,
+	 * unlike the Wallet Standard `solana:signTransaction` feature which prompts once
+	 * per transaction.
 	 */
 	signAllTransactions?: (transactions: unknown[]) => Promise<unknown[]>;
 };
 
 type InjectedWindow = Window & {
-	phantom?: { solana?: LegacyWalletProvider };
-	solflare?: LegacyWalletProvider;
-	backpack?: LegacyWalletProvider;
-	solana?: LegacyWalletProvider & {
+	phantom?: { solana?: InjectedWalletProvider };
+	solflare?: InjectedWalletProvider;
+	backpack?: InjectedWalletProvider;
+	solana?: InjectedWalletProvider & {
 		isPhantom?: boolean;
 		isSolflare?: boolean;
 		isBackpack?: boolean;
@@ -141,7 +140,7 @@ const readRegistry = (): WalletStandardWallet[] => {
 	for (const delay of FIRST_ANNOUNCE_DELAYS_MS) {
 		window.setTimeout(() => {
 			announceWallets();
-			// Legacy providers inject without an announcement, so a late list also picks them up.
+			// Injected providers load without an announcement, so a late list also picks them up.
 			notifyRegistry();
 		}, delay);
 	}
@@ -155,14 +154,14 @@ const supportsSolana = (wallet: WalletStandardWallet) =>
 const injected = (): InjectedWindow | null =>
 	typeof window === "undefined" ? null : (window as InjectedWindow);
 
-type LegacyWallet = { name: string; provider: LegacyWalletProvider };
+type InjectedWallet = { name: string; provider: InjectedWalletProvider };
 
-const legacyWallets = (): LegacyWallet[] => {
+const injectedWallets = (): InjectedWallet[] => {
 	const target = injected();
 
 	if (!target) return [];
 
-	const candidates: Array<{ name: string; provider?: LegacyWalletProvider }> = [
+	const candidates: Array<{ name: string; provider?: InjectedWalletProvider }> = [
 		{
 			name: "Phantom",
 			provider:
@@ -179,27 +178,27 @@ const legacyWallets = (): LegacyWallet[] => {
 	];
 
 	return candidates.filter(
-		(candidate): candidate is LegacyWallet =>
+		(candidate): candidate is InjectedWallet =>
 			typeof candidate.provider?.connect === "function",
 	);
 };
 
 /** Same wallet name as the Wallet Standard announcement, matched to its injected provider. */
-const legacyProviderFor = (name: string): LegacyWalletProvider | null =>
-	legacyWallets().find((wallet) => wallet.name === name)?.provider ?? null;
+const injectedProviderFor = (name: string): InjectedWalletProvider | null =>
+	injectedWallets().find((wallet) => wallet.name === name)?.provider ?? null;
 
 /**
  * Installed Solana wallets, for the connect menu. Merges the Wallet Standard registry with the
- * legacy injected providers, so a wallet that only announces one of the two still appears.
+ * injected providers, so a wallet that only announces one of the two still appears.
  */
 export const listInstalledWallets = (): InstalledWallet[] => {
 	const standard = readRegistry()
 		.filter(supportsSolana)
 		.map((wallet) => ({ name: wallet.name, icon: wallet.icon ?? null }));
-	const legacy = legacyWallets().map((wallet) => ({ name: wallet.name, icon: null }));
+	const injectedList = injectedWallets().map((wallet) => ({ name: wallet.name, icon: null }));
 	const names = new Set(standard.map((wallet) => wallet.name));
 
-	return [...standard, ...legacy.filter((wallet) => !names.has(wallet.name))];
+	return [...standard, ...injectedList.filter((wallet) => !names.has(wallet.name))];
 };
 
 /**
@@ -217,10 +216,10 @@ export const subscribeToWallets = (listener: () => void): (() => void) => {
 
 type ActiveWallet =
 	| { kind: "standard"; wallet: WalletStandardWallet; account: WalletAccountLike }
-	| { kind: "legacy"; provider: LegacyWalletProvider };
+	| { kind: "injected"; provider: InjectedWalletProvider };
 
 /**
- * Wallet Standard implementation of the SDK's `WalletPort`, with a legacy injected-provider
+ * Wallet Standard implementation of the SDK's `WalletPort`, with an injected-provider
  * fallback for wallets that never reach the registry.
  *
  * `connect` is real: it asks the installed wallet for an account. Signing is intentionally
@@ -231,26 +230,26 @@ export const createWalletStandardPort = (): WalletPort => {
 	let wallet: ConnectedWallet | null = null;
 	let active: ActiveWallet | null = null;
 
-	const connectLegacy = async (options?: {
+	const connectInjected = async (options?: {
 		silent?: boolean;
 	}): Promise<ConnectedWallet | null> => {
-		for (const legacy of legacyWallets()) {
+		for (const injectedWallet of injectedWallets()) {
 			let result: { publicKey?: { toString(): string } | null } | void;
 
 			try {
-				result = await legacy.provider.connect?.({
+				result = await injectedWallet.provider.connect?.({
 					onlyIfTrusted: options?.silent,
 				});
 			} catch {
 				continue;
 			}
 
-			const publicKey = result?.publicKey ?? legacy.provider.publicKey;
+			const publicKey = result?.publicKey ?? injectedWallet.provider.publicKey;
 
 			if (!publicKey) continue;
 
-			active = { kind: "legacy", provider: legacy.provider };
-			wallet = { address: publicKey.toString(), label: legacy.name };
+			active = { kind: "injected", provider: injectedWallet.provider };
+			wallet = { address: publicKey.toString(), label: injectedWallet.name };
 
 			return wallet;
 		}
@@ -282,13 +281,13 @@ export const createWalletStandardPort = (): WalletPort => {
 				}
 			}
 
-			return connectLegacy(options);
+			return connectInjected(options);
 		},
 		disconnect: async () => {
 			try {
 				if (active?.kind === "standard") {
 					await active.wallet.features["standard:disconnect"]?.disconnect?.();
-				} else if (active?.kind === "legacy") {
+				} else if (active?.kind === "injected") {
 					await active.provider.disconnect?.();
 				}
 			} finally {
@@ -308,16 +307,16 @@ export const createWalletStandardPort = (): WalletPort => {
 					throw new Error(`${current.wallet.name} cannot sign transactions`);
 				}
 
-				// Wallet Standard sign: one wallet prompt per transaction. A legacy
-				// injected provider signs the whole batch behind one prompt, so
-				// prefer it whenever the same wallet exposes both paths.
-				const legacyProvider = legacyProviderFor(current.wallet.name);
+				// Wallet Standard sign: one wallet prompt per transaction. An injected
+				// provider signs the whole batch behind one prompt, so prefer it
+				// whenever the same wallet exposes both paths.
+				const injectedProvider = injectedProviderFor(current.wallet.name);
 
-				if (legacyProvider?.signAllTransactions) {
+				if (injectedProvider?.signAllTransactions) {
 					try {
-						// Sync the legacy session so it can sign; some wallets
+						// Sync the injected session so it can sign; some wallets
 						// already trust the app after the standard connect.
-						await legacyProvider.connect?.({ onlyIfTrusted: true });
+						await injectedProvider.connect?.({ onlyIfTrusted: true });
 					} catch {
 						// A rejected trusted connect must not skip the batch signer.
 					}
@@ -325,7 +324,7 @@ export const createWalletStandardPort = (): WalletPort => {
 					try {
 						const { Transaction } = await import("@solana/web3.js");
 						const unsigned = payloads.map((payload) => Transaction.from(payload));
-						const signed = await legacyProvider.signAllTransactions(unsigned);
+						const signed = await injectedProvider.signAllTransactions(unsigned);
 
 						return signed.map((entry) =>
 							typeof (entry as { serialize?: unknown }).serialize === "function"
@@ -333,7 +332,7 @@ export const createWalletStandardPort = (): WalletPort => {
 								: (entry as Uint8Array),
 						);
 					} catch {
-						// Legacy path unavailable: fall through to Wallet Standard.
+						// Injected path unavailable: fall through to Wallet Standard.
 					}
 				}
 

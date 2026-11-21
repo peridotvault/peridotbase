@@ -21,3 +21,11 @@ export class Program {
 		);
 	}
 }
+
+export class BN {
+	constructor() {
+		throw new Error(
+			"Anchor is browser-only in this app; server rendering must not build a client",
+		);
+	}
+}

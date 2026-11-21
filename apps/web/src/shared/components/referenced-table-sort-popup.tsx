@@ -73,14 +73,11 @@ export const ReferencedTableSortPopup = ({
 	return (
 		<Popover modal={true} open={isOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger asChild>
-				<Button
-					variant="ghost"
-					className="border-r border-l-0 border-y-0 border-border rounded-none text-xs h-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
-				>
-					<ArrowUpDown className="size-4" />
+				<Button variant="ghost" size="sm" className="gap-1.5">
+					<ArrowUpDown />
 					Sort
 					{hasActiveSorts && (
-						<Kbd className="text-[10px] font-normal text-primary bg-primary/10 border border-primary/30 px-1.5 py-0.5">
+						<Kbd className="border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[0.625rem] font-normal text-primary">
 							{sorts.length}
 						</Kbd>
 					)}

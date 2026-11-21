@@ -1,12 +1,16 @@
 import type { Cluster, ConnectedWallet } from "@peridotvault/peridotbase-sdk";
-import { DEFAULT_CLUSTER } from "@peridotvault/peridotbase-sdk";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import deployment from "@/shared/config/deployment.json";
 import { configurePeridotbase } from "@/shared/peridotbase";
 
-export const DEFAULT_RPC_URL = "https://api.devnet.solana.com";
-/** Deployed `peridotbase_core` devnet address (see peridotbase-core/contracts/solana/Anchor.toml). */
-export const DEFAULT_PROGRAM_ID = "AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3";
+/**
+ * Deployment config lives in `src/shared/config/deployment.json`, not in localStorage: the
+ * program address belongs to the build, so every browser must agree on it.
+ */
+export const DEFAULT_RPC_URL = deployment.rpcUrl;
+export const DEFAULT_CLUSTER = deployment.cluster as Cluster;
+export const DEFAULT_PROGRAM_ID = deployment.programId;
 
 /** How long a remembered wallet session stays valid without connecting again. */
 export const WALLET_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -22,7 +26,7 @@ type WorkspaceStore = {
 	/** Endpoint every SDK read goes through. */
 	rpcUrl: string;
 	cluster: Cluster;
-	/** Filled in once `peridotbase-core` publishes its deployed address. */
+	/** Build-time program address from `src/shared/config/deployment.json`; never persisted. */
 	programId: string;
 	/**
 	 * The active wallet session. Persisted for {@link WALLET_SESSION_TTL_MS} so a reload stays
@@ -33,7 +37,6 @@ type WorkspaceStore = {
 	walletExpiresAt: number | null;
 	setRpcUrl: (rpcUrl: string) => void;
 	setCluster: (cluster: Cluster) => void;
-	setProgramId: (programId: string) => void;
 	setWallet: (wallet: ConnectedWallet | null) => void;
 };
 
@@ -74,10 +77,6 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
 				set({ cluster });
 				applyConnection({ ...get(), cluster });
 			},
-			setProgramId: (programId) => {
-				set({ programId });
-				applyConnection({ ...get(), programId });
-			},
 			setWallet: (wallet) => {
 				set({
 					wallet,
@@ -90,10 +89,9 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
 		}),
 		{
 			name: "peridotbase-workspace",
-			partialize: ({ rpcUrl, cluster, programId, wallet, walletExpiresAt }) => ({
+			partialize: ({ rpcUrl, cluster, wallet, walletExpiresAt }) => ({
 				rpcUrl,
 				cluster,
-				programId,
 				wallet,
 				walletExpiresAt,
 			}),
@@ -113,7 +111,7 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
 						)
 							? stored.cluster
 							: DEFAULT_CLUSTER,
-					programId: stored.programId || DEFAULT_PROGRAM_ID,
+					programId: DEFAULT_PROGRAM_ID,
 					wallet,
 					walletExpiresAt: wallet ? (stored.walletExpiresAt ?? null) : null,
 				};

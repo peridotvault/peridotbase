@@ -1,6 +1,7 @@
 import { TooltipProvider } from "@peridotvault/peridotbase-ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import NotFound from "@/shared/components/not-found";
 import { OG_IMAGE, SITE_NAME } from "@/shared/lib/site";
 import { queryClient } from "@/shared/lib/query-client";
 import "@/polyfills";
@@ -26,6 +27,7 @@ export const Route = createRootRoute({
 			{ rel: "mask-icon", href: "/favicon.svg", color: "#589770" },
 		],
 	}),
+	notFoundComponent: NotFound,
 	component: RootComponent,
 });
 

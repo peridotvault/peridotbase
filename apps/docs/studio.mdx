@@ -36,9 +36,17 @@ chain.
 
 The runner uses the fixed `pgsql` dialect: Peridotbase exposes one relational model, so there is no engine picker to configure.
 
-Only these column types parse: `BOOL`, `INT`/`BIGINT`, `TEXT`/`VARCHAR(n)`, `UUID`,
-`DECIMAL(precision, scale)`. There is no `AUTO_INCREMENT` (pass the value in `INSERT`), no
-`TIMESTAMP`/`ENUM`, and no `FOREIGN KEY` — keep references in the application instead.
+Column types it parses: `BOOL`, `INT`/`BIGINT`, `TEXT`/`VARCHAR(n)`, `UUID`,
+`DECIMAL(precision, scale)`, `TIMESTAMP`, `DATE`, `TIME`, `INTERVAL`, `INET`, `CIDR`, `MACADDR`,
+`BIT(n)`, `VARBIT(n)`, `MONEY` and the range types. `SERIAL`/`AUTO_INCREMENT` are rejected (the
+program keeps no sequences, so pass the value in `INSERT`), and so are clock defaults such as
+`CURRENT_TIMESTAMP` or `now()` — the chain has no clock, so write the value yourself.
+
+`REFERENCES` and `FOREIGN KEY` create a real on-chain key, single-column or composite, with
+`RESTRICT` or `NO ACTION` (cascades are not available). The program only accepts a key into a
+unique parent key and only while the child table is empty, which is why a `CREATE TABLE` script
+costs one extra transaction per referencing table. `ALTER TABLE ... ADD FOREIGN KEY` works on an
+existing empty table; drop a key from the table settings instead of SQL.
 
 ## Indexes
 

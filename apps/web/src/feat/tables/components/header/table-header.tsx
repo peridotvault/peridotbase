@@ -1,6 +1,7 @@
 import type { OnChangeFn, Row, RowSelectionState } from "@tanstack/react-table";
 import { useQueryState } from "nuqs";
 import { FilterPopup } from "@/shared/components/filter-popup";
+import { Toolbar } from "@/shared/components/toolbar";
 import type { TableRecord } from "@/feat/tables/table.type";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
@@ -38,36 +39,39 @@ export const TableHeader = ({
 	const [, setDirection] = useQueryState(CONSTANTS.TABLE_STATE_KEYS.DIRECTION);
 
 	return (
-		<header className="max-h-8 overflow-hidden border-b border-border w-full flex items-center justify-between bg-background sticky top-0 left-0 right-0 z-0">
-			<div className="flex items-center ">
-				<RefetchBtn tableName={tableName} />
-				{canLiveMode && <LiveModeToggle />}
-				<FilterPopup
-					tableName={tableName}
-					schemaName={schemaName}
-					filters={filters}
-					onApply={(next) => {
-						setFilters(next);
-						setCursor(null);
-						setDirection(null);
-					}}
-				/>
-				<ColumnPreferencesMenu tableName={tableName} />
-				<AddRecordMenu />
-				<SaveBtn
-					tableName={tableName}
-					setRowSelection={setRowSelection}
-					disabledReason={rowMutationReason}
-				/>
-				<ReviewBtn tableName={tableName} />
-				<ClearBtn tableName={tableName} />
-				<DeleteBtn
-					tableName={tableName}
-					selectedRows={selectedRows}
-					setRowSelection={setRowSelection}
-					disabledReason={rowMutationReason}
-				/>
-			</div>
-		</header>
+		<Toolbar
+			actions={
+				<>
+					<SaveBtn
+						tableName={tableName}
+						setRowSelection={setRowSelection}
+						disabledReason={rowMutationReason}
+					/>
+					<ReviewBtn tableName={tableName} />
+					<ClearBtn tableName={tableName} />
+					<DeleteBtn
+						tableName={tableName}
+						selectedRows={selectedRows}
+						setRowSelection={setRowSelection}
+						disabledReason={rowMutationReason}
+					/>
+				</>
+			}
+		>
+			<RefetchBtn tableName={tableName} />
+			{canLiveMode && <LiveModeToggle />}
+			<FilterPopup
+				tableName={tableName}
+				schemaName={schemaName}
+				filters={filters}
+				onApply={(next) => {
+					setFilters(next);
+					setCursor(null);
+					setDirection(null);
+				}}
+			/>
+			<ColumnPreferencesMenu tableName={tableName} />
+			<AddRecordMenu />
+		</Toolbar>
 	);
 };

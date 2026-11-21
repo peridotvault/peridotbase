@@ -34,14 +34,26 @@ export function HeroGlow() {
 type SectionProps = {
 	children: ReactNode;
 	className?: string;
+	/** Set false to mask the page-wide rail hairlines behind this band. The cover assumes
+	 *  the section sits on `bg-background`. */
+	rails?: boolean;
 };
 
 /** Full-bleed section band. Backgrounds and rails span the viewport; every gutter lives inside
  *  the section itself, so the content never sits against the rail. The page-level rail overlay
- *  (marketing route) paints above the band. */
-export function Section({ children, className = "" }: SectionProps) {
+ *  (marketing route) paints above the band, so hiding it means painting over it. */
+export function Section({ children, className = "", rails = true }: SectionProps) {
 	return (
 		<section className={`section-rail ${className}`}>
+			{rails ? null : (
+				<div
+					aria-hidden="true"
+					className="pointer-events-none absolute inset-y-0 left-1/2 z-50 hidden w-full max-w-(--container-max-width) -translate-x-1/2 md:block"
+				>
+					<span className="absolute inset-y-0 -left-px w-0.5 bg-background" />
+					<span className="absolute inset-y-0 -right-px w-0.5 bg-background" />
+				</div>
+			)}
 			<div className={`section-container py-16 sm:py-20 md:py-24 ${className}`}>
 				{children}
 			</div>

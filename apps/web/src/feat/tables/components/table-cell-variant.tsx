@@ -767,7 +767,7 @@ export const TableDateCell = memo(
 						onOpenChange={onPickerOpenChange}
 						onEscapeKeyDown={onCancel}
 						placeholder="Pick a date"
-						className="size-full px-2! py-1.5! rounded-none border-none p-0 text-sm shadow-none hover:bg-transparent! focus-visible:ring-0 bg-transparent dark:bg-transparent! [&_svg]:hidden"
+						className="size-full px-2! py-1.5! rounded-none border-none p-0 text-sm shadow-none hover:bg-transparent! focus-visible:ring-0 bg-transparent! [&_svg]:hidden"
 					/>
 				) : (
 					<CellContent value={currentValue}>

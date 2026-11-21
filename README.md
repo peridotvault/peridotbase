@@ -37,7 +37,7 @@ monorepo owns canonical data: the Studio is a pure client over Solana RPC and Wa
 
 The Studio shell, wallet connection, RPC health checks, and the complete table/query interface
 are in place, and the program is deployed on devnet
-(`AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3`). Reads, writes, DDL, queries, indexes, and live
+(`A1f5kLvsBbJr3z1CHSWHFJwWZXNXgknBotPNMosbb3mJ`). Reads, writes, DDL, queries, indexes, and live
 refresh run against the program through `@peridotvault/peridotbase-core-sdk`. Operations the
 program has no instruction for (table/column rename, column-type change, column drop, index drop)
 report **pending integration** rather than failing silently.

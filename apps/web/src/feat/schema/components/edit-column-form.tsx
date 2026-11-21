@@ -12,7 +12,6 @@ import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { useAlterColumn } from "../hooks/use-alter-column";
 import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
 import { columnFieldSchema } from "./column-fields/column-field-values";
-import { ColumnTypeField } from "./column-fields/column-type-field";
 import { DefaultValueField } from "./column-fields/default-value-field";
 import { FormActions } from "./column-fields/form-actions";
 
@@ -70,7 +69,7 @@ export const EditColumnForm = ({ tableName }: { tableName: string }) => {
 			title={editingColumn ? `Edit ${editingColumn.columnName}` : "Edit column"}
 			description={
 				editingColumn
-					? `Update the type, nullability, and default value for "${editingColumn.columnName}".`
+					? `Update the default value for "${editingColumn.columnName}". Type and nullability are fixed on chain.`
 					: "Update the selected column."
 			}
 			open={isOverlayOpen("schema.edit-column")}
@@ -95,7 +94,7 @@ export const EditColumnForm = ({ tableName }: { tableName: string }) => {
 
 						<div className="space-y-2">
 							<Label>Column type</Label>
-							<ColumnTypeField control={methods.control} name="columnType" />
+							<Input value={editingColumn?.dataTypeLabel ?? ""} readOnly disabled />
 						</div>
 
 						<div className="space-y-2">
@@ -115,6 +114,7 @@ export const EditColumnForm = ({ tableName }: { tableName: string }) => {
 									<Checkbox
 										id="edit-column-nullable"
 										checked={Boolean(field.value)}
+										disabled
 										onCheckedChange={(checked) => field.onChange(checked === true)}
 									/>
 									<div className="space-y-1">
@@ -122,7 +122,7 @@ export const EditColumnForm = ({ tableName }: { tableName: string }) => {
 											Nullable
 										</Label>
 										<p className="text-xs text-muted-foreground">
-											Allow this column to store NULL values.
+											Nullability is fixed when the column is created.
 										</p>
 									</div>
 								</div>

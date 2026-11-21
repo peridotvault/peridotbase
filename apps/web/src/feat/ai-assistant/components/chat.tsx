@@ -30,7 +30,7 @@ export const Chat = () => {
 		? "bg-success"
 		: isByokReady
 			? "bg-destructive"
-			: "bg-zinc-500";
+			: "bg-muted-foreground/40";
 
 	return (
 		<>
@@ -38,7 +38,7 @@ export const Chat = () => {
 				<TooltipTrigger asChild>
 					<Button
 						variant="ghost"
-						className="rounded-none size-12 relative text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+						className="relative size-12 rounded-none text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors"
 						aria-label="Open AI assistant"
 						onPointerEnter={loadChatSidebar}
 						onFocus={loadChatSidebar}

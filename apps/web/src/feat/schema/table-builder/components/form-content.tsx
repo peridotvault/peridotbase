@@ -5,6 +5,7 @@ import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { DEFAULT_COLUMN_FIELD } from "../../components/column-fields/column-field-values";
 import type { AddTableFormData } from "../types";
 import { FieldRow } from "./field-row";
+import { IndexSection } from "./index-section";
 
 export const FormContent = () => {
 	const { control } = useFormContext<AddTableFormData>();
@@ -87,6 +88,8 @@ export const FormContent = () => {
 					Add New Column
 				</Button>
 			</div>
+
+			<IndexSection />
 		</div>
 	);
 };

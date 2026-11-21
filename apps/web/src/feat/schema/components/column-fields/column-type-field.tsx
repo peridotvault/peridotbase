@@ -18,7 +18,7 @@ import {
 	type FieldValues,
 } from "react-hook-form";
 import type { ColumnOptionName } from "./column-field-values";
-import { ARRAY_COMPATIBLE_TYPES, PSQL_TYPES, SERIAL_TYPES } from "./column-types";
+import { ARRAY_COMPATIBLE_TYPES, PSQL_TYPES } from "./column-types";
 
 /**
  * `onIncompatibleOptions` receives the column options the picked type rules out, for forms
@@ -37,10 +37,7 @@ export const ColumnTypeField = <T extends FieldValues>({
 	const typeGroups = PSQL_TYPES;
 
 	const incompatibleOptions = (type: string): ColumnOptionName[] => {
-		return [
-			...(SERIAL_TYPES.includes(type) ? (["isIdentity"] as const) : []),
-			...(ARRAY_COMPATIBLE_TYPES.includes(type) ? [] : (["isArray"] as const)),
-		];
+		return [...(ARRAY_COMPATIBLE_TYPES.includes(type) ? [] : (["isArray"] as const))];
 	};
 
 	return (

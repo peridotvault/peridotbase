@@ -6,6 +6,7 @@ import { Undo2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { isMac } from "@/shared/lib/platform";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { formatCellValue } from "@/shared/utils/format-cell-value";
 import { useUpdateCell } from "../../hooks/use-update-cell";
 import { type CellUpdate, useUpdateCellStore } from "../../stores/update-cell.store";
@@ -95,15 +96,9 @@ export const ReviewBtn = ({ tableName }: { tableName: string }) => {
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					size="lg"
-					className="border-l-0 border-y-0 border-r border-border rounded-none"
-					aria-label="Review unsaved changes"
-				>
+				<ToolbarButton type="button" aria-label="Review unsaved changes">
 					Review
-				</Button>
+				</ToolbarButton>
 			</PopoverTrigger>
 			<PopoverContent align="start" className="w-[28rem] gap-0 overflow-hidden rounded-sm p-0">
 				<div className="flex h-8 items-center justify-between border-b px-3 text-muted-foreground">

@@ -7,6 +7,10 @@ export const indexInfoSchema = z.object({
 	method: z.string().nullable(),
 	kind: z.enum(["primary", "unique-constraint", "index"]),
 	definition: z.string().nullable(),
+	/** On-chain index id; set for indexes decoded from the catalog. */
+	indexId: z.string().optional(),
+	/** Decoded `NULLS NOT DISTINCT` flag. */
+	nullsNotDistinct: z.boolean().optional(),
 });
 
 export type IndexInfo = z.infer<typeof indexInfoSchema>;

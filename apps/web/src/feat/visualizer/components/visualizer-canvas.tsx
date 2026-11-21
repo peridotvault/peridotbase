@@ -142,7 +142,7 @@ const Canvas = ({ tables, edges }: CanvasProps) => {
 			onNodeClick={(_, node) => focusFromCanvas(node.id === focused ? "" : node.id)}
 			onNodeDoubleClick={(_, node) =>
 				void navigate({
-					to: "/studio/org/$organization/$project/table/$table",
+					to: "/studio/org/$organization/$project/database/$table",
 					params: { ...scope, table: node.data.table.tableName },
 					search: { [CONSTANTS.TABLE_SCHEMA]: node.data.table.schemaName },
 				})

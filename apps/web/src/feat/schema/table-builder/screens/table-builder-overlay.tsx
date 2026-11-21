@@ -12,7 +12,17 @@ import { type AddTableFormData, addTableSchema, toCreateTablePayload } from "../
 
 const defaultValues = {
 	tableName: "",
-	fields: [DEFAULT_COLUMN_FIELD],
+	fields: [
+		{
+			...DEFAULT_COLUMN_FIELD,
+			columnName: "id",
+			columnType: "uuid",
+			defaultValue: "uuidv7()",
+			isPrimaryKey: true,
+			isNullable: false,
+		},
+	],
+	indexes: [],
 } satisfies AddTableFormData;
 
 export const TableBuilderOverlay = () => {

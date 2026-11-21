@@ -32,9 +32,9 @@ touches only that record plus its index claims, and a delete tombstones the same
 lanes/pages, unique claims, and posting lists are separate accounts derived from the table and
 primary key.
 
-Tables created before the record layout still use the page/slot layout. The SDK detects the
-descriptor per table and routes reads and writes to the matching layout; a table that has a storage
-descriptor is always read from records, never from stale pages.
+Tables created before the record layout still use the page/slot layout. The Studio is
+record-layout only: it opens a table through its storage descriptor and reports a table without one
+as unsupported instead of reading stale pages.
 
 Deletes are single-row calls; there is no cascading delete in the client. The program refuses a
 delete that would orphan dependent rows, and the Studio surfaces the related records.

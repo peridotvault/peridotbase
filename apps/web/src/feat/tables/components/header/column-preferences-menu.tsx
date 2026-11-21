@@ -1,5 +1,6 @@
 import { Button } from "@peridotvault/peridotbase-ui/button";
 import { Checkbox } from "@peridotvault/peridotbase-ui/checkbox";
+import { Input } from "@peridotvault/peridotbase-ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@peridotvault/peridotbase-ui/popover";
 import { Separator } from "@peridotvault/peridotbase-ui/separator";
 import { cn } from "@peridotvault/peridotbase-ui/utils";
@@ -13,6 +14,7 @@ import {
 	Settings2,
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
+import { ToolbarIconButton } from "@/shared/components/toolbar";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useColumnPreferences } from "../../hooks/use-column-preferences";
@@ -66,18 +68,14 @@ export const ColumnPreferencesMenu = ({ tableName }: { tableName: string }) => {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button
+				<ToolbarIconButton
 					type="button"
-					variant="ghost"
-					className={cn(
-						"size-8! aspect-square border-l-0 border-y-0 border-r border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors",
-						isCustomized && "text-foreground",
-					)}
+					className={cn(isCustomized && "text-foreground")}
 					aria-label="Manage columns"
 					data-active={isCustomized}
 				>
-					<Settings2 className="size-4" />
-				</Button>
+					<Settings2 />
+				</ToolbarIconButton>
 			</PopoverTrigger>
 			<PopoverContent
 				align="start"
@@ -89,14 +87,14 @@ export const ColumnPreferencesMenu = ({ tableName }: { tableName: string }) => {
 			>
 				<div className="flex items-center gap-2 p-2">
 					<div className="relative flex-1">
-						<Search className="absolute left-2 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
-						<input
+						<Search className="pointer-events-none absolute top-1/2 left-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+						<Input
 							ref={searchRef}
 							type="text"
-							placeholder="Search columns..."
+							placeholder="Search columns…"
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							className="w-full h-8 pl-7 pr-2 text-sm bg-transparent rounded-md border border-border focus:outline-none focus:ring-1 focus:ring-ring"
+							className="pl-7"
 							aria-label="Search columns"
 						/>
 					</div>
@@ -144,7 +142,7 @@ export const ColumnPreferencesMenu = ({ tableName }: { tableName: string }) => {
 								}
 								onDragEnd={() => setDrag(null)}
 								className={cn(
-									"group flex items-center gap-1.5 px-2 py-1 rounded-md",
+									"group flex items-center gap-1.5 px-2 py-1 rounded-sm",
 									drag?.name === name && "bg-muted text-muted-foreground",
 								)}
 							>

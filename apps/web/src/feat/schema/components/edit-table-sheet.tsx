@@ -11,19 +11,17 @@ import {
 	AlertDialogTitle,
 } from "@peridotvault/peridotbase-ui/alert-dialog";
 import { Button } from "@peridotvault/peridotbase-ui/button";
-import { Input } from "@peridotvault/peridotbase-ui/input";
 import { cn } from "@peridotvault/peridotbase-ui/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, KeyRound, Link2 } from "lucide-react";
 import { type ReactNode, useEffect } from "react";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { SheetSidebar } from "@/shared/components/sheet-sidebar";
 import { useTableCols } from "@/shared/hooks/use-table-cols";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { type ColumnChange, planColumnChanges, useEditTable } from "../hooks/use-edit-table";
 import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
-import { ColumnTypeField } from "./column-fields/column-type-field";
 
 const editTableFormSchema = z.object({
 	fields: z
@@ -155,13 +153,11 @@ const EditTableSheetContent = ({
 					<FormProvider {...methods}>
 						<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full">
 							<div className="-mx-5 -mt-6 divide-y divide-border">
-								{tableCols.map((col, i) => (
+								{tableCols.map((col) => (
 									<ColumnRow
 										key={col.columnName}
 										col={col}
-										index={i}
 										change={changeByColumn.get(col.columnName)}
-										newColumnName={fields[i]?.columnName.trim() ?? ""}
 									/>
 								))}
 							</div>
@@ -240,7 +236,7 @@ const Chip = ({
 	<span
 		title={title}
 		className={cn(
-			"truncate rounded border border-border bg-muted/40 px-1.5 font-mono text-[10px] leading-4 text-muted-foreground",
+			"truncate rounded-sm border border-border bg-muted/40 px-1.5 font-mono text-[0.625rem] leading-4 text-muted-foreground",
 			className,
 		)}
 	>
@@ -250,18 +246,11 @@ const Chip = ({
 
 const ColumnRow = ({
 	col,
-	index,
 	change,
-	newColumnName,
 }: {
 	col: ColumnInfoSchemaType;
-	index: number;
 	change: ColumnChange | undefined;
-	newColumnName: string;
 }) => {
-	const { control, register, formState } = useFormContext<EditTableFormValues>();
-	const nameError = formState.errors.fields?.[index]?.columnName?.message;
-
 	return (
 		<div className={cn("grid grid-cols-3 gap-4 px-5 py-3", change && "bg-primary/5")}>
 			<div className="col-span-1 flex min-w-0 flex-col gap-1.5">
@@ -295,24 +284,11 @@ const ColumnRow = ({
 						</Chip>
 					)}
 				</div>
-				{change?.newColumnName !== undefined && (
-					<span className="flex min-w-0 items-center gap-1 pl-5 font-mono text-[11px] text-primary">
-						<ArrowRight className="size-3 shrink-0" />
-						<span className="truncate">{newColumnName}</span>
-					</span>
-				)}
 			</div>
-			<div className="col-span-2 grid grid-cols-2 items-start gap-2">
-				<div className="flex flex-col gap-1">
-					<Input
-						aria-label={`Name of ${col.columnName}`}
-						aria-invalid={nameError ? true : undefined}
-						className="font-mono"
-						{...register(`fields.${index}.columnName`)}
-					/>
-					{nameError && <span className="text-xs text-destructive">{nameError}</span>}
-				</div>
-				<ColumnTypeField control={control} name={`fields.${index}.columnType`} />
+			<div className="col-span-2 flex flex-col justify-center gap-1 text-xs text-muted-foreground">
+				<span>
+					Name and type are fixed on chain. Use the column menu to change the default value.
+				</span>
 			</div>
 		</div>
 	);

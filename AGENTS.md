@@ -114,13 +114,14 @@ precedence over the skill when they conflict; state the conflict instead of rest
   from `useScopeSync`/`useProjectDatabases` reads against the program; demo samples come only
   from the env-gated `DemoPeridotbaseClient` (`VITE_STUDIO_DEMO=true`).
 - Never add a fake REST client, mock server, or placeholder database. Operations the program lacks
-  (`renameTable`, `alterColumn`, `dropColumn`, `renameColumn`, `dropIndex`) throw
-  `IntegrationUnavailableError`; the UI explains that state.
+  (`alterColumn` type/nullability, `dropColumn`, `renameColumn`, `dropIndex`) throw
+  `IntegrationUnavailableError`; the UI explains that state. `renameTable` and the column default
+  path of `alterColumn` are wired to `rename_table` / `alter_column_default`.
 - When an operation has no on-chain instruction, do not stub a success. Gate the control.
 
 ### Program integration
 
-- Deployed devnet program: `AzhEnpdLzZHf7ro8NfqGpmuSqBHxA7bViTRezFKha6X3` (Anchor workspace in
+- Deployed devnet program: `A1f5kLvsBbJr3z1CHSWHFJwWZXNXgknBotPNMosbb3mJ` (Anchor workspace in
   `peridotbase-core/contracts/solana`). `DEFAULT_PROGRAM_ID` in
   `apps/web/src/shared/stores/workspace.store.ts` points the Studio at it.
 - `@peridotvault/peridotbase-core-sdk` is the on-chain client, linked from

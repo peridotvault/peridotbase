@@ -136,7 +136,7 @@ export const TableHeadRow = ({
 																		<Key size={20} className="text-primary" />
 																	</span>
 																</TooltipTrigger>
-																<TooltipContent className="text-[10px]">
+																<TooltipContent className="text-[0.625rem]">
 																	primary key
 																</TooltipContent>
 															</Tooltip>
@@ -148,7 +148,7 @@ export const TableHeadRow = ({
 																		<Link size={20} className="text-primary" />
 																	</span>
 																</TooltipTrigger>
-																<TooltipContent className="text-[10px]">
+																<TooltipContent className="text-[0.625rem]">
 																	foreign key
 																</TooltipContent>
 															</Tooltip>

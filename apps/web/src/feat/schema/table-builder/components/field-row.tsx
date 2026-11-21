@@ -7,6 +7,7 @@ import { ColumnNameField } from "../../components/column-fields/column-name-fiel
 import { ColumnTypeField } from "../../components/column-fields/column-type-field";
 import { DefaultValueField } from "../../components/column-fields/default-value-field";
 import { PrimaryField } from "../../components/column-fields/primary-field";
+import { TypeNameField } from "./type-name-field";
 import type { AddTableFormData } from "../types";
 import { useOverlayStore } from "@/shared/stores/overlay.store";
 import { AddForeignKeyForm } from "./add-foreign-key/add-foreign-key-form";
@@ -57,13 +58,16 @@ export const FieldRow = ({
 					<LinkIcon aria-hidden="true" className="size-3" />
 				</button>
 			</div>
-			<ColumnTypeField
-				control={control}
-				name={`fields.${index}.columnType`}
-				onIncompatibleOptions={(options) => {
-					for (const option of options) setValue(`fields.${index}.${option}`, false);
-				}}
-			/>
+			<div className="space-y-1">
+				<ColumnTypeField
+					control={control}
+					name={`fields.${index}.columnType`}
+					onIncompatibleOptions={(options) => {
+						for (const option of options) setValue(`fields.${index}.${option}`, false);
+					}}
+				/>
+				<TypeNameField index={index} />
+			</div>
 			<DefaultValueField
 				id={`fields.${index}.defaultValue`}
 				{...register(`fields.${index}.defaultValue`)}

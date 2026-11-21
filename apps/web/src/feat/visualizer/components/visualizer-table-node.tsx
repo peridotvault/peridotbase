@@ -49,7 +49,7 @@ export const VisualizerTableNodeView = ({ data }: NodeProps<VisualizerTableNode>
 			data-active={active || undefined}
 			data-dimmed={dimmed || undefined}
 			className={cn(
-				"group overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm transition-opacity",
+				"group overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm transition-opacity",
 				active && "border-primary ring-2 ring-primary/30",
 				dimmed && "opacity-25",
 			)}
@@ -66,12 +66,12 @@ export const VisualizerTableNodeView = ({ data }: NodeProps<VisualizerTableNode>
 					{table.tableName}
 				</span>
 				<Link
-					to="/studio/org/$organization/$project/table/$table"
+					to="/studio/org/$organization/$project/database/$table"
 					params={{ organization, project, table: table.tableName }}
 					search={{ [CONSTANTS.TABLE_SCHEMA]: table.schemaName }}
 					aria-label={`Open ${table.tableName}`}
 					title="Open table"
-					className="nodrag rounded p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
+					className="nodrag rounded-sm p-0.5 text-muted-foreground opacity-0 transition-opacity hover:bg-muted hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100"
 					onClick={(e) => e.stopPropagation()}
 				>
 					<ArrowUpRight className="size-4" />

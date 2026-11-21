@@ -2,7 +2,6 @@ import seed from "../data/database.json";
 
 export type AdminRecord = { username: string; salt: string; passwordHash: string };
 export type AdminSettings = {
-	activeProgramId: string;
 	rpcUrl: string;
 	cluster: string;
 	demoMode: boolean;
@@ -31,11 +30,6 @@ const timingEqual = (a: string, b: string): boolean => {
 	let diff = 0;
 	for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
 	return diff === 0;
-};
-
-const sha256Hex = async (text: string): Promise<string> => {
-	const digest = await crypto.subtle.digest("SHA-256", enc.encode(text));
-	return hex(new Uint8Array(digest));
 };
 
 const pbkdf2Hex = async (
@@ -89,16 +83,9 @@ export const verifyPassword = async (
 	admin: AdminRecord,
 	password: string,
 ): Promise<boolean> => {
-	// Legacy seed: plain SHA-256(salt + password) hex. Still accepted once, then re-hashed on login.
-	if (!admin.passwordHash.startsWith("pbkdf2$")) {
-		return (await sha256Hex(admin.salt + password)) === admin.passwordHash;
-	}
 	const [, iterRaw, expected] = admin.passwordHash.split("$");
 	const iterations = Number.parseInt(iterRaw, 10);
 	if (!Number.isFinite(iterations) || !expected) return false;
 	const actual = await pbkdf2Hex(admin.salt, password, iterations);
 	return timingEqual(actual, expected);
 };
-
-export const needsRehash = (admin: AdminRecord): boolean =>
-	!admin.passwordHash.startsWith("pbkdf2$");

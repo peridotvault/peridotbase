@@ -1,6 +1,6 @@
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import type { OnChangeFn, RowSelectionState } from "@tanstack/react-table";
 import { useCallback } from "react";
+import { ToolbarButton } from "@/shared/components/toolbar";
 import { useUpdateCell } from "../../hooks/use-update-cell";
 import { useUpdateCellStore } from "../../stores/update-cell.store";
 
@@ -37,22 +37,18 @@ export const SaveBtn = ({
 	}
 
 	return (
-		<Button
+		<ToolbarButton
 			type="button"
 			variant="default"
-			size="lg"
-			className="border-l-0 border-y-0 border-r border-border rounded-none"
 			onClick={handleSave}
 			aria-label="Save changes to the table"
 			disabled={isUpdatingCell || Boolean(disabledReason)}
 			title={disabledReason}
 		>
-			Save Changes
-			{updateCount > 0 && (
-				<span className="ml-1.5 px-1.5 text-[10px] bg-white/20 border border-white/20 rounded">
-					{updateCount}
-				</span>
-			)}
-		</Button>
+			Save changes
+			<span className="rounded-full bg-foreground/10 px-1.5 text-[0.625rem] leading-4 tabular-nums">
+				{updateCount}
+			</span>
+		</ToolbarButton>
 	);
 };

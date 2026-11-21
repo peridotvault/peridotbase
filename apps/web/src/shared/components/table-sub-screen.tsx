@@ -1,8 +1,8 @@
-import { Button } from "@peridotvault/peridotbase-ui/button";
 import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
 import { Link } from "@tanstack/react-router";
 import { Plus, RefreshCw, Table2 } from "lucide-react";
 import type { ReactNode } from "react";
+import { Toolbar, ToolbarButton, ToolbarIconButton } from "@/shared/components/toolbar";
 import { useTableSchemaName } from "@/shared/hooks/use-table-schema-name";
 import { useStudioScope } from "@/shared/hooks/use-studio-scope";
 import { CONSTANTS } from "@/shared/utils/constants";
@@ -50,49 +50,38 @@ export const TableSubScreen = ({
 	}
 
 	return (
-		<div className="flex-1 flex flex-col overflow-hidden">
-			<header className="max-h-8 overflow-hidden border-b border-border w-full flex items-center bg-background text-foreground sticky top-0 left-0 right-0 z-0">
-				<Button
+		<div className="flex flex-1 flex-col overflow-hidden">
+			<Toolbar
+				actions={
+					action && (
+						<ToolbarButton type="button" variant="default" onClick={action.onClick}>
+							<Plus />
+							{action.label}
+						</ToolbarButton>
+					)
+				}
+			>
+				<ToolbarIconButton
 					type="button"
-					variant="ghost"
-					className="size-8! aspect-square border-x-0 border-y-0 border-border rounded-none text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
 					onClick={() => void refetch()}
 					aria-label={`Refetch ${subject} for ${tableName}`}
 					disabled={isRefetching}
 				>
-					<RefreshCw className="size-4" />
-				</Button>
+					<RefreshCw />
+				</ToolbarIconButton>
 
-				<Button
-					variant="ghost"
-					size="lg"
-					asChild
-					className="border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2 text-muted-foreground hover:text-foreground"
-				>
+				<ToolbarButton variant="ghost" asChild>
 					<Link
-						to="/studio/org/$organization/$project/table/$table"
+						to="/studio/org/$organization/$project/database/$table"
 						params={{ ...scope, table: tableName }}
 						search={{ [CONSTANTS.TABLE_SCHEMA]: schemaName }}
 						aria-label={`View data for ${tableName}`}
 					>
-						<Table2 className="size-4" />
+						<Table2 />
 						View data
 					</Link>
-				</Button>
-
-				{action && (
-					<Button
-						type="button"
-						variant="default"
-						size="lg"
-						className="border-l border-y-0 border-r-0 border-border rounded-none flex items-center gap-2"
-						onClick={action.onClick}
-					>
-						<Plus className="size-4" />
-						{action.label}
-					</Button>
-				)}
-			</header>
+				</ToolbarButton>
+			</Toolbar>
 			{children}
 		</div>
 	);

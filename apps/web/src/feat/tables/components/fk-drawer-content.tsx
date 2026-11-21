@@ -52,7 +52,7 @@ export const FkDrawerContent = ({
 
 	const handleNavigate = () => {
 		navigate({
-			to: "/studio/org/$organization/$project/table/$table",
+			to: "/studio/org/$organization/$project/database/$table",
 			params: { ...scope, table: referencedTable },
 			search: { filters: [filter], [CONSTANTS.TABLE_SCHEMA]: schemaName },
 		});

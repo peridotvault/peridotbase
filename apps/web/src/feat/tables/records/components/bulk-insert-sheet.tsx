@@ -165,7 +165,7 @@ export const BulkInsertSheet = ({
 									}
 								}}
 								disabled={isInserting}
-								className="text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 cursor-pointer disabled:opacity-50"
+								className="text-xs text-muted-foreground file:mr-3 file:h-7 file:cursor-pointer file:rounded-sm file:border-0 file:bg-primary file:px-2.5 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/80 disabled:opacity-50"
 							/>
 						</div>
 					</TabsContent>

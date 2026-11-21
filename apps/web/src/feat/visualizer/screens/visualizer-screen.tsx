@@ -33,7 +33,7 @@ export const VisualizerScreen = () => {
 		<div className="relative h-full w-full">
 			<VisualizerCanvas tables={tables} edges={edges} />
 			{edges.length === 0 && (
-				<p className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-md border bg-card px-3 py-1.5 text-xs text-muted-foreground shadow-sm">
+				<p className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2 rounded-lg border bg-card px-3 py-1.5 text-xs text-muted-foreground shadow-sm">
 					This database has no foreign keys.
 				</p>
 			)}
