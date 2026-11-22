@@ -707,9 +707,19 @@ export class ProgramClient implements PeridotbaseClient {
 		const scope = this.requireScope();
 		const project = await this.projectOf(scope);
 		const accounts = await this.currentDatabases(project);
-		const match = accounts.find(
-			({ account }: { account: { name: string } }) => account.name === name,
-		);
+		// Duplicates predate the create guard. Resolve the newest one instead of whichever
+		// account the RPC returned first: that keeps every screen on the same database.
+		const match = accounts
+			.filter(({ account }: { account: { name: string } }) => account.name === name)
+			.reduce<(typeof accounts)[number] | undefined>(
+				(newest, entry) =>
+					!newest ||
+					BigInt(entry.account.databaseId.toString()) >
+						BigInt(newest.account.databaseId.toString())
+						? entry
+						: newest,
+				undefined,
+			);
 
 		if (!match) {
 			throw new Error(
@@ -1249,6 +1259,19 @@ export class ProgramClient implements PeridotbaseClient {
 			scope.organization,
 		);
 		const existing = await this.currentDatabases(project);
+		const trimmed = name.trim();
+
+		if (!trimmed) throw new Error("A database needs a name");
+
+		// The name is how every screen addresses a database, so two databases with one name make
+		// selection ambiguous. The program only seeds the PDA with the id, so this cannot be
+		// enforced on-chain; refuse it here instead of creating a second, unreachable catalog.
+		if (existing.some((entry) => entry.account.name === trimmed)) {
+			throw new Error(
+				`Database "${trimmed}" already exists in this project. Open it from the sidebar, or choose a different name.`,
+			);
+		}
+
 		let nextId =
 			existing.reduce(
 				(max: bigint, entry: { account: { databaseId: unknown } }) =>
@@ -1269,13 +1292,13 @@ export class ProgramClient implements PeridotbaseClient {
 			nextId += 1n;
 		}
 
-		await this.sdk.createDatabase({ name, databaseId: nextId, project });
+		await this.sdk.createDatabase({ name: trimmed, databaseId: nextId, project });
 		for (const key of this.databases.keys()) {
-			if (key === name || key.startsWith(`${name}::`)) this.databases.delete(key);
+			if (key === trimmed || key.startsWith(`${trimmed}::`)) this.databases.delete(key);
 		}
 
 		return {
-			name,
+			name: trimmed,
 			owner: new PublicKey(this.requireWallet()).toBase58(),
 			// Fresh catalog: the program's lifetime counter starts at zero.
 			size: "0 created",
