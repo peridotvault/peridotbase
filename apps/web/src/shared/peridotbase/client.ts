@@ -7,6 +7,7 @@ import {
 	type WalletPort,
 } from "@peridotvault/peridotbase-sdk";
 import { useScopeStore } from "@/shared/stores/scope.store";
+import deployment from "@/shared/config/deployment.json";
 import { DemoPeridotbaseClient } from "./demo/demo-client";
 import { isDemoMode } from "./demo/demo-mode";
 
@@ -18,8 +19,8 @@ export type StudioConnectionConfig = {
 };
 
 let currentConfig: StudioConnectionConfig = {
-	rpcUrl: "https://api.devnet.solana.com",
-	cluster: "devnet",
+	rpcUrl: deployment.rpcUrl,
+	cluster: deployment.cluster as Cluster,
 	programId: null,
 };
 

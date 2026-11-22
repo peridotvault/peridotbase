@@ -1,9 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { toast } from "sonner";
 import { databaseKeys } from "@/shared/query/keys";
 import { createDatabaseRequest, getDatabases } from "@/shared/peridotbase/databases";
-import { sdkErrorMessage } from "@/shared/peridotbase/errors";
 import { isDemoMode } from "@/shared/peridotbase/demo/demo-mode";
 import { useDatabaseStore } from "@/shared/stores/database.store";
 import { useScopeStore } from "@/shared/stores/scope.store";
@@ -33,31 +31,25 @@ export const useActiveDatabase = () => useDatabaseStore((state) => state.selecte
 
 /** Creates the program account first, then refreshes the list. Never stubs a success. */
 export const useCreateDatabase = (organization: string, project: string) => {
+	const queryClient = useQueryClient();
 	const setSelectedDatabase = useDatabaseStore((state) => state.setSelectedDatabase);
-	const query = useQuery({
-		queryKey: databaseKeys.list(organization, project),
-		queryFn: getDatabases,
-		enabled: false,
-	});
 
-	return async (name: string) => {
-		const trimmed = name.trim();
+	return useMutation({
+		mutationFn: async (name: string) => {
+			const trimmed = name.trim();
 
-		if (!trimmed) {
-			toast.error("Name your database first");
-			return null;
-		}
+			if (!trimmed) throw new Error("Name your database first");
 
-		try {
 			await createDatabaseRequest(trimmed);
-			await query.refetch();
-			setSelectedDatabase(trimmed);
-			toast.success(`Database "${trimmed}" created`);
 
 			return trimmed;
-		} catch (error) {
-			toast.error(sdkErrorMessage(error, `Couldn't create "${trimmed}"`));
-			return null;
-		}
-	};
+		},
+		onSuccess: async (trimmed) => {
+			setSelectedDatabase(trimmed);
+			// One chain write, so the list is re-read rather than guessed.
+			await queryClient.invalidateQueries({
+				queryKey: databaseKeys.list(organization, project),
+			});
+		},
+	});
 };

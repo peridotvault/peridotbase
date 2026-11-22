@@ -1,5 +1,6 @@
 import type { ExecuteQueryResult } from "@peridotvault/peridotbase-sdk";
 import { ToggleGroup, ToggleGroupItem } from "@peridotvault/peridotbase-ui/toggle-group";
+import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@peridotvault/peridotbase-ui/tooltip";
 import {
 	AlignLeft,
@@ -94,9 +95,18 @@ export const RunnerHeader = ({
 				disabled={isExecutingQuery}
 				aria-label="Run the query"
 			>
-				Run
-				<Command className="size-3" />
-				<CornerDownLeft className="size-3" />
+				{isExecutingQuery ? (
+					<>
+						<Spinner size="size-3" color="bg-primary-foreground" />
+						Running…
+					</>
+				) : (
+					<>
+						Run
+						<Command className="size-3" />
+						<CornerDownLeft className="size-3" />
+					</>
+				)}
 			</ToolbarButton>
 
 			<Tooltip>

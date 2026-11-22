@@ -12,6 +12,12 @@ export const DEFAULT_RPC_URL = deployment.rpcUrl;
 export const DEFAULT_CLUSTER = deployment.cluster as Cluster;
 export const DEFAULT_PROGRAM_ID = deployment.programId;
 
+/**
+ * The rate-limited public devnet endpoint. A browser that stored it before the deployment moved
+ * to a dedicated RPC would keep every request throttled, so it is never restored.
+ */
+const PUBLIC_DEVNET_RPC = "https://api.devnet.solana.com";
+
 /** How long a remembered wallet session stays valid without connecting again. */
 export const WALLET_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -103,7 +109,10 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
 
 				return {
 					...current,
-					rpcUrl: stored.rpcUrl || DEFAULT_RPC_URL,
+					rpcUrl:
+						stored.rpcUrl && stored.rpcUrl !== PUBLIC_DEVNET_RPC
+							? stored.rpcUrl
+							: DEFAULT_RPC_URL,
 					cluster:
 						stored.cluster &&
 						["mainnet-beta", "devnet", "testnet", "localnet", "custom"].includes(

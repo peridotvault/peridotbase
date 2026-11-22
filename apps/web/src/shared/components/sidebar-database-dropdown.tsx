@@ -16,13 +16,16 @@ import {
 	DropdownMenuTrigger,
 } from "@peridotvault/peridotbase-ui/dropdown-menu";
 import { Input } from "@peridotvault/peridotbase-ui/input";
-import { Check, ChevronDown, Database, Plus } from "lucide-react";
+import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
+import { Check, ChevronDown, Database, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
 	useActiveDatabase,
 	useCreateDatabase,
 	useProjectDatabases,
 } from "@/shared/hooks/use-project-databases";
+import { sdkErrorMessage } from "@/shared/peridotbase/errors";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
 import { useStudioScope } from "@/shared/hooks/use-studio-scope";
 import { useDatabaseStore } from "@/shared/stores/database.store";
@@ -33,18 +36,38 @@ export const SidebarDatabaseDropdown = () => {
 	const databases = useProjectDatabases(organization, project);
 	const activeDatabase = useActiveDatabase();
 	const setSelectedDatabase = useDatabaseStore((state) => state.setSelectedDatabase);
-	const createDatabase = useCreateDatabase(organization, project);
+	const { mutateAsync: createDatabase, isPending: isCreating } = useCreateDatabase(
+		organization,
+		project,
+	);
 	const capabilities = useStudioCapabilities();
-	const [isCreating, setIsCreating] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 	const [name, setName] = useState("");
 
 	const handleCreate = async () => {
-		const created = await createDatabase(name);
+		const trimmed = name.trim();
 
-		if (!created) return;
+		if (!trimmed) {
+			toast.error("Name your database first");
+			return;
+		}
 
-		setName("");
-		setIsCreating(false);
+		try {
+			// One wallet approval and one transaction: say so while it is pending instead of
+			// leaving the button unresponsive.
+			await toast
+				.promise(createDatabase(trimmed), {
+					loading: `Creating "${trimmed}" — approve it in your wallet`,
+					success: `Database "${trimmed}" created`,
+					error: (error: unknown) => sdkErrorMessage(error, `Couldn't create "${trimmed}"`),
+				})
+				.unwrap();
+
+			setName("");
+			setIsOpen(false);
+		} catch {
+			// toast.promise already showed the failure and keeps the dialog open for a retry.
+		}
 	};
 
 	return (
@@ -57,8 +80,16 @@ export const SidebarDatabaseDropdown = () => {
 						aria-label="Database"
 					>
 						<span className="flex min-w-0 items-center gap-2">
-							<Database className="size-3.5 shrink-0 text-muted-foreground" />
-							<span className="truncate">{activeDatabase ?? "Select database"}</span>
+							{isCreating ? (
+								<Spinner size="size-3.5" color="bg-muted-foreground" />
+							) : (
+								<Database className="size-3.5 shrink-0 text-muted-foreground" />
+							)}
+							<span className="truncate">
+								{isCreating
+									? `Creating ${name.trim()}…`
+									: (activeDatabase ?? "Select database")}
+							</span>
 						</span>
 						<ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
 					</Button>
@@ -73,14 +104,20 @@ export const SidebarDatabaseDropdown = () => {
 						</DropdownMenuItem>
 					))}
 					<DropdownMenuSeparator />
-					<DropdownMenuItem disabled={!capabilities.ddl} onClick={() => setIsCreating(true)}>
+					<DropdownMenuItem disabled={!capabilities.ddl} onClick={() => setIsOpen(true)}>
 						<Plus className="size-4" />
 						New database
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<Dialog open={isCreating} onOpenChange={setIsCreating}>
+			<Dialog
+				open={isOpen}
+				onOpenChange={(open) => {
+					// The transaction is already in flight; closing would hide its progress.
+					if (!isCreating) setIsOpen(open);
+				}}
+			>
 				<DialogContent className="sm:max-w-sm">
 					<DialogHeader>
 						<DialogTitle>New database</DialogTitle>
@@ -92,9 +129,10 @@ export const SidebarDatabaseDropdown = () => {
 						autoFocus
 						aria-label="Database name"
 						value={name}
+						disabled={isCreating}
 						onChange={(event) => setName(event.target.value)}
 						onKeyDown={(event) => {
-							if (event.key === "Enter") void handleCreate();
+							if (event.key === "Enter" && !isCreating) void handleCreate();
 						}}
 						placeholder="Database name"
 					/>
@@ -103,12 +141,19 @@ export const SidebarDatabaseDropdown = () => {
 							This connection cannot create databases.
 						</p>
 					)}
+					{isCreating && (
+						<p className="flex items-center gap-2 text-xs text-muted-foreground" role="status">
+							<Loader2 className="size-3.5 animate-spin" />
+							Waiting for your wallet, then for the cluster to confirm. Keep this tab open.
+						</p>
+					)}
 					<DialogFooter className="gap-2">
-						<Button variant="outline" onClick={() => setIsCreating(false)}>
+						<Button variant="outline" disabled={isCreating} onClick={() => setIsOpen(false)}>
 							Cancel
 						</Button>
-						<Button onClick={() => void handleCreate()} disabled={!name.trim()}>
-							Create
+						<Button onClick={() => void handleCreate()} disabled={isCreating || !name.trim()}>
+							{isCreating && <Spinner size="size-3.5" color="bg-primary-foreground" />}
+							{isCreating ? "Creating…" : "Create"}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
