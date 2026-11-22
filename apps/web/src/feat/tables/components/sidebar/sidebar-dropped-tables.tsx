@@ -21,12 +21,17 @@ import {
 } from "@/shared/peridotbase";
 import { tableKeys } from "@/shared/query/keys";
 import { useDatabaseStore } from "@/shared/stores/database.store";
+import { CONSTANTS } from "@/shared/utils/constants";
+import { tableId } from "@/shared/utils/table-id";
 
 /** Soft-dropped catalogs: their rows are still on chain and the program can bring them back. */
 export const SidebarDroppedTables = () => {
 	const queryClient = useQueryClient();
 	const { selectedDatabase } = useDatabaseStore();
-	const [closeTarget, setCloseTarget] = useState<string | null>(null);
+	const [closeTarget, setCloseTarget] = useState<{
+		tableName: string;
+		schemaName?: string;
+	} | null>(null);
 	const [confirmName, setConfirmName] = useState("");
 
 	const { data: dropped = [] } = useQuery({
@@ -36,22 +41,24 @@ export const SidebarDroppedTables = () => {
 	});
 
 	const { mutateAsync: close, isPending: isClosing } = useMutation({
-		mutationFn: (tableName: string) => closeDroppedTable({ tableName, db: selectedDatabase }),
+		mutationFn: (table: { tableName: string; schemaName?: string }) =>
+			closeDroppedTable({ ...table, db: selectedDatabase }),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: tableKeys.lists() }),
 	});
 
 	const { mutateAsync: restore, isPending } = useMutation({
-		mutationFn: (tableName: string) => restoreTable({ tableName, db: selectedDatabase }),
+		mutationFn: (table: { tableName: string; schemaName?: string }) =>
+			restoreTable({ ...table, db: selectedDatabase }),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: tableKeys.lists() }),
 	});
 
 	if (dropped.length === 0) return null;
 
-	const handleRestore = async (tableName: string) => {
+	const handleRestore = async (table: { tableName: string; schemaName?: string }) => {
 		try {
 			await toast
-				.promise(restore(tableName), {
-					loading: `Restoring ${tableName}...`,
+				.promise(restore(table), {
+					loading: `Restoring ${tableId(table)}...`,
 					success: (result) => result.message,
 					error: (error: Error) => sdkErrorMessage(error, "Failed to restore table"),
 				})
@@ -62,12 +69,12 @@ export const SidebarDroppedTables = () => {
 	};
 
 	const handleClose = async () => {
-		if (!closeTarget || confirmName.trim() !== closeTarget) return;
+		if (!closeTarget || confirmName.trim() !== closeTarget.tableName) return;
 
 		try {
 			await toast
 				.promise(close(closeTarget), {
-					loading: `Closing ${closeTarget}...`,
+					loading: `Closing ${tableId(closeTarget)}...`,
 					success: (result) => result.message,
 					error: (error: Error) => sdkErrorMessage(error, "Failed to close the table"),
 				})
@@ -85,25 +92,30 @@ export const SidebarDroppedTables = () => {
 				<p className="mb-2 text-xs text-muted-foreground">Dropped tables</p>
 				<ul className="space-y-1">
 					{dropped.map((table) => (
-						<li key={table.tableName} className="flex items-center justify-between gap-2">
-							<span className="truncate text-xs line-through">{table.tableName}</span>
+						<li key={tableId(table)} className="flex items-center justify-between gap-2">
+							<span className="truncate text-xs line-through">
+								{table.schemaName && table.schemaName !== CONSTANTS.DEFAULT_SCHEMA && (
+									<span className="text-muted-foreground">{table.schemaName}.</span>
+								)}
+								{table.tableName}
+							</span>
 							<div className="flex items-center gap-0.5">
 								<Button
 									variant="ghost"
 									size="icon-sm"
-									aria-label={`Restore ${table.tableName}`}
+									aria-label={`Restore ${tableId(table)}`}
 									disabled={isPending || isClosing}
-									onClick={() => void handleRestore(table.tableName)}
+									onClick={() => void handleRestore(table)}
 								>
 									<ArchiveRestore className="size-4" />
 								</Button>
 								<Button
 									variant="ghost"
 									size="icon-sm"
-									aria-label={`Close ${table.tableName} permanently`}
+									aria-label={`Close ${tableId(table)} permanently`}
 									disabled={isPending || isClosing}
 									onClick={() => {
-										setCloseTarget(table.tableName);
+										setCloseTarget(table);
 										setConfirmName("");
 									}}
 								>
@@ -133,7 +145,9 @@ export const SidebarDroppedTables = () => {
 						</DialogDescription>
 					</DialogHeader>
 					<div className="space-y-2">
-						<Label htmlFor="close-table-confirm">{closeTarget}</Label>
+						<Label htmlFor="close-table-confirm">
+							{closeTarget ? tableId(closeTarget) : null}
+						</Label>
 						<Input
 							id="close-table-confirm"
 							value={confirmName}
@@ -151,7 +165,9 @@ export const SidebarDroppedTables = () => {
 						</Button>
 						<Button
 							variant="destructive"
-							disabled={isClosing || confirmName.trim() !== closeTarget}
+							disabled={
+								isClosing || !closeTarget || confirmName.trim() !== closeTarget.tableName
+							}
 							onClick={() => void handleClose()}
 						>
 							Close permanently

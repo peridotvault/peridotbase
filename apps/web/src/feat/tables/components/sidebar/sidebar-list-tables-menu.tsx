@@ -242,7 +242,7 @@ export const SidebarListTablesMenu = ({
 									onClick={() => openOverlay(deleteOverlayId)}
 								>
 									<Trash2 className="size-4" />
-									Delete table
+									Drop table
 								</DropdownMenuItem>
 							</>
 						)}
@@ -443,11 +443,11 @@ const DeleteTableDialog = ({
 		<Dialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-md">
 				<DialogHeader>
-					<DialogTitle>Delete Table</DialogTitle>
+					<DialogTitle>Drop Table</DialogTitle>
 					<DialogDescription>
-						Are you sure you want to delete the table{" "}
-						<span className="font-semibold text-foreground">"{tableName}"</span>? This action
-						cannot be undone and all data will be permanently lost.
+						Drop the table <span className="font-semibold text-foreground">"{tableName}"</span>
+						? Its rows stay on chain and it moves to Dropped tables, where you can restore it.
+						Closing it there reclaims rent and cannot be undone.
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter className="gap-2">
@@ -455,7 +455,7 @@ const DeleteTableDialog = ({
 						Cancel
 					</Button>
 					<Button variant="destructive" onClick={onDelete} disabled={isDeleting}>
-						{isDeleting ? "Deleting..." : "Delete Table"}
+						{isDeleting ? "Dropping..." : "Drop Table"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

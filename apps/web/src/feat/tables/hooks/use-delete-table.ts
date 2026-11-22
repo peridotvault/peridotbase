@@ -33,9 +33,9 @@ export const useDeleteTable = () => {
 	): Promise<MutationResult> => {
 		const promise = deleteTableAsync({ tableName, schemaName });
 		toast.promise(promise, {
-			loading: "Deleting table...",
-			success: (result) => result.message || `Deleted table "${tableName}"`,
-			error: (error: StudioError) => sdkErrorMessage(error, "Failed to delete table"),
+			loading: "Dropping table...",
+			success: (result) => result.message || `Dropped table "${tableName}"`,
+			error: (error: StudioError) => sdkErrorMessage(error, "Failed to drop table"),
 		});
 
 		return promise;

@@ -49,6 +49,7 @@ import {
 import { useTablesList } from "@/shared/hooks/use-tables-list";
 import { tableKeys } from "@/shared/query/keys";
 import { useDatabaseStore } from "@/shared/stores/database.store";
+import { CONSTANTS } from "@/shared/utils/constants";
 
 const GUARD_COPY: Record<TableGuardKind, { label: string; description: string }> = {
 	appendOnly: {
@@ -195,6 +196,15 @@ export const TableSettingsDialog = ({
 	useEffect(() => {
 		if (current.data && open) setGuards(current.data);
 	}, [current.data, open]);
+
+	// A table name is unique only inside a schema; filter by both so a same-named table in
+	// another namespace does not contribute foreign keys here.
+	const outgoingRelationships = (relationships.data ?? []).filter(
+		(entry) =>
+			entry.fromTable === tableName &&
+			(entry.fromSchema === undefined ||
+				entry.fromSchema === (schemaName ?? CONSTANTS.DEFAULT_SCHEMA)),
+	);
 
 	const save = useMutation({
 		mutationFn: async () => {
@@ -546,39 +556,40 @@ export const TableSettingsDialog = ({
 							</p>
 						</div>
 						<ul className="divide-y divide-border overflow-hidden rounded-lg border border-border">
-							{(relationships.data ?? [])
-								.filter((entry) => entry.fromTable === tableName)
-								.map((entry) => (
-									<li
-										key={`${entry.fkId}-${entry.fromColumn}`}
-										className="flex items-center justify-between gap-3 px-4 py-2 text-xs"
-									>
-										<span className="font-mono">
-											{entry.fromColumn} → {entry.toTable}.{entry.toColumn}
-										</span>
-										{entry.fkId ? (
-											<Button
-												variant="ghost"
-												size="sm"
-												disabled={unlink.isPending}
-												onClick={() =>
-													void runRelationship(
-														() =>
-															unlink.mutateAsync({
-																fkId: entry.fkId!,
-																parentTable: entry.toTable,
-															}),
-														"Removing foreign key...",
-													)
-												}
-											>
-												Remove
-											</Button>
-										) : null}
-									</li>
-								))}
-							{(relationships.data ?? []).filter((entry) => entry.fromTable === tableName)
-								.length === 0 ? (
+							{outgoingRelationships.map((entry) => (
+								<li
+									key={`${entry.fkId}-${entry.fromColumn}`}
+									className="flex items-center justify-between gap-3 px-4 py-2 text-xs"
+								>
+									<span className="font-mono">
+										{entry.fromColumn} →{" "}
+										{entry.toSchema && entry.toSchema !== CONSTANTS.DEFAULT_SCHEMA
+											? `${entry.toSchema}.`
+											: ""}
+										{entry.toTable}.{entry.toColumn}
+									</span>
+									{entry.fkId ? (
+										<Button
+											variant="ghost"
+											size="sm"
+											disabled={unlink.isPending}
+											onClick={() =>
+												void runRelationship(
+													() =>
+														unlink.mutateAsync({
+															fkId: entry.fkId!,
+															parentTable: entry.toTable,
+														}),
+													"Removing foreign key...",
+												)
+											}
+										>
+											Remove
+										</Button>
+									) : null}
+								</li>
+							))}
+							{outgoingRelationships.length === 0 ? (
 								<li className="px-4 py-2 text-xs text-muted-foreground">
 									No outgoing foreign keys.
 								</li>

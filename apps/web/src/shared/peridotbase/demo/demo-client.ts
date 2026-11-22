@@ -734,6 +734,18 @@ export class DemoPeridotbaseClient implements PeridotbaseClient {
 		return clone(this.table(ref).columns);
 	}
 
+	async listTablesWithColumns(
+		database: string,
+	): Promise<Array<TableInfo & { columns: ColumnInfo[] }>> {
+		this.assertDatabase(database);
+
+		return this.databaseAt(database).tables.map((table) => ({
+			...clone(table.info),
+			rowCount: table.rows.length,
+			columns: clone(table.columns),
+		}));
+	}
+
 	async getRelationships(database: string): Promise<Relationship[]> {
 		this.assertDatabase(database);
 

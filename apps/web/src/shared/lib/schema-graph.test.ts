@@ -78,4 +78,16 @@ describe("buildSchemaGraph", () => {
 
 		expect(targets(tables)).toEqual(["orders -> accounts"]);
 	});
+
+	it("assumes the caller's schema when the decoder reports no referenced schema", () => {
+		const tables = [
+			table("checkouts", "pgsql", [
+				column("id"),
+				column("user_id", { referencedTable: "users", referencedSchema: undefined }),
+			]),
+			table("users", "pgsql", [column("id")]),
+		];
+
+		expect(targets(tables)).toEqual(["pgsql.checkouts -> pgsql.users"]);
+	});
 });

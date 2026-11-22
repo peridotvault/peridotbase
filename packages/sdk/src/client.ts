@@ -183,6 +183,10 @@ export type PeridotbaseClient = {
 	/** Tables whose catalog is soft-dropped; they keep their rows and can be restored. */
 	listDroppedTables: (database: string) => Promise<TableInfo[]>;
 	getTableColumns: (ref: TableRef) => Promise<ColumnInfo[]>;
+	/** Live tables plus their columns from one catalog scan (used by the visualizer). */
+	listTablesWithColumns: (
+		database: string,
+	) => Promise<Array<TableInfo & { columns: ColumnInfo[] }>>;
 	getRelationships: (database: string) => Promise<Relationship[]>;
 	/** Adds a single-column FK to the parent primary key or a unique column. */
 	createForeignKey: (

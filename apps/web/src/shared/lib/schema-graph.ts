@@ -30,8 +30,12 @@ export const buildSchemaGraph = (tables: SchemaGraphTable[], schema: string) => 
 
 			if (!referencedTable || !referencedColumn) return [];
 
+			// The catalog decoder resolves the parent table but not its schema name, so an
+			// absent `referencedSchema` means "same schema as the referencing table".
 			const target = visible.find(
-				(t) => t.tableName === referencedTable && t.schemaName === referencedSchema,
+				(t) =>
+					t.tableName === referencedTable &&
+					(referencedSchema === undefined || t.schemaName === referencedSchema),
 			);
 
 			if (!target) return [];

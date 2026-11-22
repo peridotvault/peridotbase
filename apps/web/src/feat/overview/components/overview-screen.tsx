@@ -3,12 +3,13 @@ import { Spinner } from "@peridotvault/peridotbase-ui/spinner";
 import { Link } from "@tanstack/react-router";
 import { Activity, CircleAlert, CheckCircle2, Database, Table2, Rows3 } from "lucide-react";
 import { useMemo } from "react";
+import { useActiveDatabase } from "@/shared/hooks/use-project-databases";
 import { useOrganization, useProject } from "@/shared/hooks/use-scope";
 import { useProtocolHealth } from "@/shared/hooks/use-protocol-health";
 import { useSchemaGraph } from "@/shared/hooks/use-schema-graph";
+import { useDroppedTables } from "@/shared/hooks/use-dropped-tables";
 import { useStudioScope } from "@/shared/hooks/use-studio-scope";
 import { useTablesList } from "@/shared/hooks/use-tables-list";
-import { useDatabasesList } from "@/shared/hooks/use-databases-list";
 import {
 	PageHeader,
 	PageShell,
@@ -17,6 +18,7 @@ import {
 	PanelList,
 } from "@/shared/components/page";
 import { DATA_TABLE_PATH } from "@/shared/lib/sections";
+import { tableId } from "@/shared/utils/table-id";
 
 const Stat = ({
 	icon: Icon,
@@ -48,18 +50,20 @@ const Stat = ({
 /** The project home: one screen that says whether the project is healthy and how big it is. */
 export const OverviewScreen = () => {
 	const { organization, project } = useStudioScope();
+	const activeDatabase = useActiveDatabase();
 	const activeOrganization = useOrganization(organization);
 	const activeProject = useProject(organization, project);
 	const health = useProtocolHealth();
-	const { databases } = useDatabasesList(organization, project);
 	const { tablesList = [], isLoadingTablesList } = useTablesList();
+	const { droppedTables, isLoadingDroppedTables } = useDroppedTables();
 	const { tables: graph = [] } = useSchemaGraph();
 
+	// Same-named tables in two schemas are different tables: key by `<schema>.<table>`.
 	const columnsByTable = useMemo(
 		() =>
 			new Map(
-				graph.map((table: { tableName: string; columns: unknown[] }) => [
-					table.tableName,
+				graph.map((table: { tableName: string; schemaName?: string; columns: unknown[] }) => [
+					tableId(table),
 					table.columns.length,
 				]),
 			),
@@ -68,9 +72,8 @@ export const OverviewScreen = () => {
 
 	const tableCount = tablesList.length;
 	const rowCount = tablesList.reduce((total, table) => total + (table.rowCount ?? 0), 0);
-	const indexCount = graph.length;
 	const healthy = Boolean(health.data?.reachable);
-	const storage = databases?.[0]?.size ?? "—";
+	const droppedCount = droppedTables.length;
 
 	return (
 		<PageShell>
@@ -100,19 +103,23 @@ export const OverviewScreen = () => {
 					icon={Table2}
 					label="Tables"
 					value={isLoadingTablesList ? "…" : String(tableCount)}
-					detail={`${columnsByTable.size} with columns loaded`}
+					detail={`${columnsByTable.size} of ${tableCount} with columns loaded`}
 				/>
 				<Stat
 					icon={Rows3}
 					label="Rows"
 					value={isLoadingTablesList ? "…" : rowCount.toLocaleString()}
-					detail="Across every table"
+					detail={`Across ${activeDatabase ?? "the selected database"}`}
 				/>
 				<Stat
 					icon={Database}
-					label="Storage"
-					value={storage}
-					detail={`${databases?.[0]?.name ?? "no database"} · ${indexCount} tables graphed`}
+					label="Dropped"
+					value={isLoadingDroppedTables ? "…" : String(droppedCount)}
+					detail={
+						droppedCount > 0
+							? `${activeDatabase ?? "selected database"} · close to reclaim rent`
+							: `${activeDatabase ?? "no database"} · nothing to clean up`
+					}
 				/>
 			</section>
 
@@ -141,7 +148,7 @@ export const OverviewScreen = () => {
 										{table.tableName}
 									</span>
 									<span className="flex shrink-0 items-center gap-4 text-xs text-muted-foreground">
-										<span>{columnsByTable.get(table.tableName) ?? 0} columns</span>
+										<span>{columnsByTable.get(tableId(table)) ?? 0} columns</span>
 										<span>{(table.rowCount ?? 0).toLocaleString()} rows</span>
 									</span>
 								</Link>
@@ -149,7 +156,7 @@ export const OverviewScreen = () => {
 						))}
 						{tablesList.length === 0 && (
 							<li className="px-5 py-6 text-center text-sm text-muted-foreground">
-								This project has no tables yet.
+								No tables in {activeDatabase ?? "this database"} yet.
 							</li>
 						)}
 					</PanelList>

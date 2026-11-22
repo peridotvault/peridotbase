@@ -4,7 +4,10 @@ import { z } from "zod";
 export const databaseInfoSchema = z.object({
 	name: z.string("Name is required"),
 	owner: z.string("Owner is required"),
-	/** Account size in bytes, human readable. */
+	/**
+	 * Human readable lifetime table count (`table_count` is monotonic), not the live count.
+	 * Use `listTables` for tables that currently exist.
+	 */
 	size: z.string("Size is required"),
 	encoding: z.string("Encoding is required"),
 });

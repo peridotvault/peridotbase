@@ -373,6 +373,13 @@ export class ProgramNotWiredClient implements PeridotbaseClient {
 		throw new IntegrationUnavailableError("getTableColumns");
 	}
 
+	listTablesWithColumns(
+		_database: string,
+	): Promise<Array<TableInfo & { columns: ColumnInfo[] }>> {
+		void _database;
+		throw new IntegrationUnavailableError("listTablesWithColumns");
+	}
+
 	createForeignKey(
 		_ref: TableRef,
 		_payload: { column: string; parentTable: string; parentColumn?: string },

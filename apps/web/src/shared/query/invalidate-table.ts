@@ -27,14 +27,20 @@ export const invalidateTableRows = (queryClient: QueryClient, tableName: string)
 	]);
 
 /**
- * Drops a renamed or deleted table's columns, rows and indexes rather than invalidating them: a
- * refetch would ask for a table that no longer exists.
+ * Drops a renamed or deleted table's caches rather than invalidating them: a refetch would ask
+ * for a table that no longer exists, or feed a new same-named table the old table's metadata.
+ * Keys after the table name (database, schema) are left open on purpose so every variant goes.
  */
 export const forgetTable = (queryClient: QueryClient, tableName: string) => {
 	for (const queryKey of [
 		tableKeys.dataByTable(tableName),
 		tableKeys.columnsByTable(tableName),
 		indexKeys.byTable(tableName),
+		["tableComment", tableName],
+		["tableGuards", tableName],
+		["tablePolicies", tableName],
+		["tableStorage", tableName],
+		["tableExtension", tableName],
 	]) {
 		queryClient.removeQueries({ queryKey });
 	}

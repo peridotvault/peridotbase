@@ -61,18 +61,8 @@ export const getSchemaGraph = async (db?: string | null): Promise<SchemaGraphTab
 	if (!db) throw new Error("Select a database first");
 
 	const client = getPeridotbaseClient();
-	const tables = await client.listTables(db);
 
-	return Promise.all(
-		tables.map(async (table) => ({
-			...table,
-			columns: await client.getTableColumns({
-				database: db,
-				table: table.tableName,
-				schema: table.schemaName,
-			}),
-		})),
-	);
+	return client.listTablesWithColumns(db);
 };
 
 export const getTableColumns = (

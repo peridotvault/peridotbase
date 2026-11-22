@@ -1195,7 +1195,9 @@ export class ProgramClient implements PeridotbaseClient {
 				}): DatabaseInfo => ({
 					name: account.name,
 					owner: new PublicKey(account.organization as never).toBase58(),
-					size: `${account.tableCount ?? 0} tables`,
+					// `table_count` is a lifetime counter: dropped and closed tables still count.
+					// Live counts come from `listTables`; the Studio never renders this as live.
+					size: `${account.tableCount ?? 0} created`,
 					encoding: DATABASE_ENCODING,
 				}),
 			);
@@ -1239,7 +1241,8 @@ export class ProgramClient implements PeridotbaseClient {
 		return {
 			name,
 			owner: new PublicKey(this.requireWallet()).toBase58(),
-			size: "0",
+			// Fresh catalog: the program's lifetime counter starts at zero.
+			size: "0 created",
 			encoding: DATABASE_ENCODING,
 		} as DatabaseInfo;
 	}
@@ -1599,12 +1602,15 @@ export class ProgramClient implements PeridotbaseClient {
 		models: TableModel[],
 	): Promise<Map<string, string>> {
 		const names = new Map<string, string>();
-		names.set((await sdk.schemaAddress()).toBase58(), "public");
+		const defaultSchema = (await sdk.schemaAddress()).toBase58();
+		names.set(defaultSchema, "public");
 		const addresses = new Set(
 			models
 				.map((model) => model.schema?.toBase58())
 				.filter((value): value is string => Boolean(value)),
 		);
+		// The default namespace is already named above; do not fetch it again.
+		addresses.delete(defaultSchema);
 		const program = sdk.program as unknown as {
 			account: {
 				schemaCatalog: {
@@ -1628,15 +1634,39 @@ export class ProgramClient implements PeridotbaseClient {
 
 	async getTableColumns(ref: TableRef): Promise<ColumnInfo[]> {
 		const table = await this.tableOf(ref);
-		const models = await (await this.databaseSdk(ref.database, ref.schema)).loadTables();
+		const sdk = await this.databaseSdk(ref.database, ref.schema);
+		const models = await sdk.loadTables();
 		const byAddress = new Map(models.map((model) => [model.address.toBase58(), model]));
 
-		return this.columnsOf(table.model, byAddress);
+		return this.columnsOf(table.model, byAddress, await this.schemaNames(sdk, models));
+	}
+
+	/**
+	 * Live tables plus their columns from a single catalog scan. `getTableColumns` per table
+	 * rescans the whole catalog every call, which the visualizer did N times.
+	 */
+	async listTablesWithColumns(
+		database: string,
+	): Promise<Array<TableInfo & { columns: ColumnInfo[] }>> {
+		const sdk = await this.databaseSdk(database);
+		const models = await sdk.loadTables();
+		const names = await this.schemaNames(sdk, models);
+		const byAddress = new Map(models.map((model) => [model.address.toBase58(), model]));
+
+		return models
+			.filter((model) => model.status === "active")
+			.map((model) => ({
+				tableName: model.name,
+				schemaName: names.get(model.schema?.toBase58() ?? "") ?? "public",
+				rowCount: Number(model.rowCount),
+				columns: this.columnsOf(model, byAddress, names),
+			}));
 	}
 
 	private columnsOf(
 		model: TableModel,
 		byAddress: Map<string, TableModel> = new Map(),
+		schemaNames: Map<string, string> = new Map(),
 	): ColumnInfo[] {
 		return model.columns.map((column, index) => {
 			const notNull = model.constraints.some(
@@ -1685,6 +1715,11 @@ export class ProgramClient implements PeridotbaseClient {
 				isPrimaryKey: model.primaryKeyColumns.includes(index),
 				isForeignKey: Boolean(foreignKey),
 				referencedTable: parent?.name ?? null,
+				// Resolve the parent's schema from its catalog: the FK stores only the
+				// parent address, and same-named tables in two schemas must not collide.
+				referencedSchema: parent
+					? schemaNames.get(parent.schema?.toBase58() ?? "")
+					: undefined,
 				referencedColumn:
 					parent && parentColumnIndex !== null && parentColumnIndex !== undefined
 						? (parent.columns[parentColumnIndex]?.name ?? null)
@@ -1796,13 +1831,19 @@ export class ProgramClient implements PeridotbaseClient {
 			tableId: await sdk.nextTableId(),
 			name: newTableName,
 		});
+		// New tables are v3-only in the Studio: without the descriptor every read and
+		// write rejects with "no v3 record storage".
+		await initV3Storage(sdk, created.model.tableId);
 
 		return { message: `Duplicated ${ref.table} as ${created.model.name}` };
 	}
 
 	async getRelationships(database: string): Promise<Relationship[]> {
 		const sdk = await this.databaseSdk(database);
-		const models = await sdk.loadTables();
+		const models = (await sdk.loadTables()).filter((model) => model.status === "active");
+		const names = await this.schemaNames(sdk, models);
+		const schemaOf = (model: TableModel): string =>
+			names.get(model.schema?.toBase58() ?? "") ?? "public";
 		const byAddress = new Map(models.map((model) => [model.address.toBase58(), model]));
 		const relationships: Relationship[] = [];
 
@@ -1832,8 +1873,10 @@ export class ProgramClient implements PeridotbaseClient {
 					relationships.push({
 						fromTable: model.name,
 						fromColumn,
+						fromSchema: schemaOf(model),
 						toTable: parent.name,
 						toColumn,
+						toSchema: schemaOf(parent),
 						fkId: foreignKey.fkId.toString(),
 					});
 				});
@@ -2712,6 +2755,8 @@ export class ProgramClient implements PeridotbaseClient {
 	async executeQuery(database: string, request: ExecuteQueryRequest): Promise<QueryResult> {
 		const started = performance.now();
 		const statements = parseSql(request.statement);
+		// Comments or whitespace only: nothing was submitted, so do not report success.
+		if (statements.length === 0) throw new Error("No SQL statement found");
 		const sdk = await this.databaseSdk(database);
 		const createdTables = new Set<string>();
 		let last: StatementResult | null = null;
@@ -2779,6 +2824,18 @@ export class ProgramClient implements PeridotbaseClient {
 			}
 		} catch (error) {
 			if (sdk.batching) sdk.discardBatch();
+
+			// A batch is sent as several packets, so a later packet failing leaves the earlier
+			// ones landed. Say so: those tables exist and an FK can no longer be added to them.
+			const landed = (error as { landed?: number }).landed ?? 0;
+
+			if (landed > 0 && error instanceof Error) {
+				error.message +=
+					`\n\n${landed} transaction${landed === 1 ? "" : "s"} landed before this failure.` +
+					" A table that landed without its foreign keys cannot be linked later: drop" +
+					" the partially created tables and run the script again.";
+			}
+
 			throw error;
 		}
 

@@ -61,8 +61,10 @@ export type ColumnInfoSchemaType = ColumnInfo;
 export const relationshipSchema = z.object({
 	fromTable: z.string(),
 	fromColumn: z.string(),
+	fromSchema: z.string().optional(),
 	toTable: z.string(),
 	toColumn: z.string(),
+	toSchema: z.string().optional(),
 	/** On-chain foreign key id; set when the relationship was decoded from a catalog. */
 	fkId: z.string().optional(),
 });
