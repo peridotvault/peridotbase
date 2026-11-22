@@ -6,6 +6,7 @@ import { vscodeTheme } from "@uiw/react-json-view/vscode";
 import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 import { askAssistant } from "@/shared/stores/assistant-request.store";
+import { sdkErrorMessage } from "@/shared/peridotbase";
 import { RUNNER_STATE_KEYS } from "../constants";
 import { TableView } from "./table-view";
 
@@ -27,7 +28,7 @@ export const QueryResultContainer = ({
 			return (
 				<div className="flex h-full p-2">
 					<div className="space-y-2 text-sm">
-						<div>Error: {error.message}</div>
+						<div>Error: {sdkErrorMessage(error, "Query failed")}</div>
 						<Button
 							type="button"
 							variant="outline"

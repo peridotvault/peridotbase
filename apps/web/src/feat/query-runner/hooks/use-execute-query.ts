@@ -1,6 +1,6 @@
 import type { ExecuteQueryResult } from "@peridotvault/peridotbase-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { executeQuery as executeQueryRequest } from "@/shared/peridotbase";
+import { executeQuery as executeQueryRequest, sdkErrorMessage } from "@/shared/peridotbase";
 import { invalidateAllTables } from "@/shared/query/invalidate-table";
 import { useDatabaseStore } from "@/shared/stores/database.store";
 import { useQueryRunStore } from "@/shared/stores/query-run.store";
@@ -33,7 +33,8 @@ export const useExecuteQuery = () => {
 					return result;
 				},
 				(error: Error) => {
-					finish(error);
+					// The toast outlives this screen, so it needs the same readable message.
+					finish(new Error(sdkErrorMessage(error, "Query failed")));
 
 					throw error;
 				},

@@ -21,7 +21,14 @@ export const sdkErrorMessage = (error: unknown, fallback: string): string => {
 	if (isForeignKeyViolation(error)) {
 		return "Foreign key violation: the referenced row does not exist, or another row still references this one.";
 	}
-	if (error instanceof Error && error.message) return error.message;
+	if (error instanceof Error && error.message) {
+		// The public devnet endpoint rate limits hard; the query never reached the cluster.
+		if (/\b429\b|Too Many Requests|rate limits exceeded/i.test(error.message)) {
+			return "The RPC endpoint is rate limiting (429), so nothing was submitted. Point `apps/web/src/shared/config/deployment.json` at a dedicated RPC URL and run the query again.";
+		}
+
+		return error.message;
+	}
 	if (typeof error === "string" && error) return error;
 	return fallback;
 };
