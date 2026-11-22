@@ -1,54 +1,45 @@
-import type { ExecuteQueryResult, QueryRunStepEvent } from "@peridotvault/peridotbase-sdk";
+import type { ExecuteQueryResult } from "@peridotvault/peridotbase-sdk";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
 import { executeQuery as executeQueryRequest } from "@/shared/peridotbase";
 import { invalidateAllTables } from "@/shared/query/invalidate-table";
 import { useDatabaseStore } from "@/shared/stores/database.store";
+import { useQueryRunStore } from "@/shared/stores/query-run.store";
 
-export type RunStep = {
-	index: number;
-	label: string;
-	status: QueryRunStepEvent["status"];
-};
+export type { QueryRunStep as RunStep } from "@/shared/stores/query-run.store";
 
 export const useExecuteQuery = () => {
 	const queryClient = useQueryClient();
 	const { selectedDatabase } = useDatabaseStore();
-	const [steps, setSteps] = useState<RunStep[]>([]);
-	const [stepTotal, setStepTotal] = useState(0);
-
-	const onStep = useCallback((event: QueryRunStepEvent) => {
-		setStepTotal(event.total);
-		setSteps((current) =>
-			[...current.filter((step) => step.index !== event.index), event].sort(
-				(a, b) => a.index - b.index,
-			),
-		);
-	}, []);
+	const start = useQueryRunStore((state) => state.start);
+	const apply = useQueryRunStore((state) => state.apply);
+	const finish = useQueryRunStore((state) => state.finish);
+	const isExecutingQuery = useQueryRunStore((state) => state.status === "running");
 
 	const {
 		// `mutate` reports a failure through `executeQueryError` only, never as a rejection.
 		mutate: executeQuery,
-		isPending: isExecutingQuery,
 		error: executeQueryError,
 	} = useMutation<ExecuteQueryResult, Error, { query: string }>({
 		mutationFn: ({ query }) => {
-			setSteps([]);
-			setStepTotal(0);
-			return executeQueryRequest({ query, db: selectedDatabase, onStep });
-		},
-		// A query can change any table's rows, columns or indexes.
-		// Not awaited: the result shows while the other screens refetch.
-		onSuccess: () => {
-			invalidateAllTables(queryClient);
+			start();
+
+			return executeQueryRequest({ query, db: selectedDatabase, onStep: apply }).then(
+				(result) => {
+					// A query can change any table's rows, columns or indexes. Kept out of
+					// `onSuccess` so it still runs when the runner screen has been left.
+					invalidateAllTables(queryClient);
+					finish(null);
+
+					return result;
+				},
+				(error: Error) => {
+					finish(error);
+
+					throw error;
+				},
+			);
 		},
 	});
 
-	return {
-		executeQuery,
-		isExecutingQuery,
-		executeQueryError,
-		steps,
-		stepTotal,
-	};
+	return { executeQuery, isExecutingQuery, executeQueryError };
 };

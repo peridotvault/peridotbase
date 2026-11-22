@@ -7,6 +7,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { NuqsAdapter } from "nuqs/adapters/react";
 import { useLayoutEffect } from "react";
 import { SettingsOverlay } from "@/feat/settings";
+import { QueryRunToast } from "@/feat/query-runner/components/query-run-toast";
 import { TableBuilderOverlay } from "@/feat/schema";
 import { StudioTopbar } from "@/feat/workspace";
 import { CommandPalette } from "@/shared/components/components/command-palette";
@@ -71,6 +72,8 @@ function StudioLayout() {
 			{/* Inside the adapter: it reads the open table's schema from the URL. */}
 			{isInApp && <CommandPalette />}
 			<Toaster position="top-right" theme={resolvedTheme} />
+			{/* Run progress is a toast so it survives leaving the runner screen. */}
+			{isInApp && <QueryRunToast />}
 			{isInApp && <TableBuilderOverlay />}
 			<SettingsOverlay />
 			<TanStackDevtools

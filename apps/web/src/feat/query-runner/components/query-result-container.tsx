@@ -7,7 +7,6 @@ import { useQueryState } from "nuqs";
 import { useMemo } from "react";
 import { askAssistant } from "@/shared/stores/assistant-request.store";
 import { RUNNER_STATE_KEYS } from "../constants";
-import { type RunStep, RunStepper } from "./run-stepper";
 import { TableView } from "./table-view";
 
 export const QueryResultContainer = ({
@@ -15,15 +14,11 @@ export const QueryResultContainer = ({
 	isLoading,
 	error,
 	lastExecutedQuery,
-	steps = [],
-	stepTotal = 0,
 }: {
 	results: ExecuteQueryResult | null;
 	isLoading: boolean;
 	error: Error | null;
 	lastExecutedQuery: string;
-	steps?: RunStep[];
-	stepTotal?: number;
 }) => {
 	const [showAs] = useQueryState(RUNNER_STATE_KEYS.SHOW_AS);
 
@@ -97,13 +92,9 @@ export const QueryResultContainer = ({
 		>
 			<div className="flex-1 overflow-auto w-full">
 				{isLoading ? (
-					stepTotal > 0 ? (
-						<RunStepper steps={steps} total={stepTotal} />
-					) : (
-						<div className="flex items-center justify-center h-full overflow-auto">
-							<Spinner size="size-8" color="bg-[#d4d4d4]" />
-						</div>
-					)
+					<div className="flex items-center justify-center h-full overflow-auto">
+						<Spinner size="size-8" color="bg-[#d4d4d4]" />
+					</div>
 				) : (
 					renderResults
 				)}
