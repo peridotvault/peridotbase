@@ -1264,9 +1264,9 @@ export class ProgramClient implements PeridotbaseClient {
 		if (!trimmed) throw new Error("A database needs a name");
 
 		// The name is how every screen addresses a database, so two databases with one name make
-		// selection ambiguous. The program only seeds the PDA with the id, so this cannot be
-		// enforced on-chain; refuse it here instead of creating a second, unreachable catalog.
-		if (existing.some((entry) => entry.account.name === trimmed)) {
+		// selection ambiguous. The program claims the name case-folded; matching that here turns
+		// the on-chain rejection into a message the user can act on.
+		if (existing.some((entry) => entry.account.name.toLowerCase() === trimmed.toLowerCase())) {
 			throw new Error(
 				`Database "${trimmed}" already exists in this project. Open it from the sidebar, or choose a different name.`,
 			);
