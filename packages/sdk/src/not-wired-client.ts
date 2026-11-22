@@ -459,11 +459,6 @@ export class ProgramNotWiredClient implements PeridotbaseClient {
 		throw new IntegrationUnavailableError("duplicateTable");
 	}
 
-	closeDroppedTable(_ref: TableRef): Promise<MutationResult> {
-		void _ref;
-		throw new IntegrationUnavailableError("closeDroppedTable");
-	}
-
 	dropTable(_ref: TableRef): Promise<MutationResult> {
 		void _ref;
 		throw new IntegrationUnavailableError("dropTable");

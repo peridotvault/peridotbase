@@ -141,7 +141,7 @@ export const OverviewScreen = () => {
 									params={{ organization, project, table: table.tableName }}
 									className="flex items-center justify-between gap-4 px-5 py-3 transition-colors hover:bg-muted/60"
 								>
-									<span className="truncate" title={`${table.schemaName}.${table.tableName}`}>
+									<span className="truncate" title={tableId(table)}>
 										{table.schemaName && table.schemaName !== "public" && (
 											<span className="text-muted-foreground">{table.schemaName}.</span>
 										)}

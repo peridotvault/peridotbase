@@ -134,17 +134,6 @@ export const duplicateTable = ({
 }): Promise<MutationResult> =>
 	getPeridotbaseClient().duplicateTable(ref(db, tableName, schemaName), newTableName);
 
-export const closeDroppedTable = ({
-	tableName,
-	schemaName,
-	db,
-}: {
-	tableName: string;
-	schemaName?: string;
-	db?: string | null;
-}): Promise<MutationResult> =>
-	getPeridotbaseClient().closeDroppedTable(ref(db, tableName, schemaName));
-
 export const restoreTable = ({
 	tableName,
 	schemaName,

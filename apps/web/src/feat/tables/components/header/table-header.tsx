@@ -11,6 +11,7 @@ import { useRowMutation } from "../../hooks/use-row-mutation";
 import { AddRecordMenu } from "./add-record-menu";
 import { ClearBtn } from "./clear-btn";
 import { ColumnPreferencesMenu } from "./column-preferences-menu";
+import { CopyTableNameBtn } from "./copy-table-name-btn";
 import { DeleteBtn } from "./delete-btn";
 import { LiveModeToggle } from "./live-mode-toggle";
 import { RefetchBtn } from "./refetch-btn";
@@ -71,6 +72,7 @@ export const TableHeader = ({
 				}}
 			/>
 			<ColumnPreferencesMenu tableName={tableName} />
+			<CopyTableNameBtn tableName={tableName} />
 			<AddRecordMenu />
 		</Toolbar>
 	);

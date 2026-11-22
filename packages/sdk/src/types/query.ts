@@ -17,3 +17,15 @@ export type QueryResult = {
 
 /** Historical name kept for the Studio's screens; prefer `QueryResult`. */
 export type ExecuteQueryResult = QueryResult;
+
+/**
+ * One finished step of a multi-statement run. The UI marks the first unreported step active, so
+ * a script that lands ten statements shows progress instead of a blank spinner.
+ */
+export type QueryRunStepEvent = {
+	/** Zero-based position of the finished step in the run. */
+	index: number;
+	total: number;
+	label: string;
+	status: "active" | "done" | "failed";
+};

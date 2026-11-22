@@ -38,7 +38,8 @@ export const RunnerScreen = ({
 	const selectedDatabase = useDatabaseStore((state) => state.selectedDatabase);
 	const query = queryId ? getQuery(queryId) : null;
 	const isFavorite = query?.isFavorite ?? false;
-	const { executeQuery, isExecutingQuery, executeQueryError } = useExecuteQuery();
+	const { executeQuery, isExecutingQuery, executeQueryError, steps, stepTotal } =
+		useExecuteQuery();
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [currentQuery, setCurrentQuery] = useState<string>("");
 	const [lastExecutedQuery, setLastExecutedQuery] = useState("");
@@ -140,6 +141,8 @@ export const RunnerScreen = ({
 				isLoading={isExecutingQuery}
 				error={executeQueryError}
 				lastExecutedQuery={lastExecutedQuery}
+				steps={steps}
+				stepTotal={stepTotal}
 			/>
 		</div>
 	);

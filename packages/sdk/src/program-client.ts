@@ -81,6 +81,7 @@ import type {
 	OrganizationProposalInfo,
 	ProjectInfo,
 	QueryResult,
+	QueryRunStepEvent,
 	ReadRowsQuery,
 	Relationship,
 	RenameColumnPayload,
@@ -406,6 +407,41 @@ const BASE58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
 const CURRENT_LAYOUT_FILTER = {
 	memcmp: { offset: 9, bytes: BASE58[LAYOUT_VERSION] },
+};
+
+/**
+ * Human label for one statement in the runner stepper. The wait is on-chain, so the label says
+ * what is being done rather than repeating the SQL the user already wrote.
+ */
+const statementLabel = (statement: Statement): string => {
+	switch (statement.kind) {
+		case "createDatabase":
+			return `CREATE DATABASE ${statement.name}`;
+		case "createTable":
+			return `CREATE TABLE ${statement.name}`;
+		case "createIndex":
+			return `CREATE INDEX ${statement.name}`;
+		case "alterTable":
+			return `ALTER TABLE ${statement.table}`;
+		case "insert":
+			return `INSERT INTO ${statement.table}`;
+		case "select":
+			return `SELECT from ${statement.table}`;
+		case "update":
+			return `UPDATE ${statement.table}`;
+		case "delete":
+			return `DELETE from ${statement.table}`;
+		case "createView":
+			return `CREATE VIEW ${statement.name}`;
+		case "dropView":
+			return `DROP VIEW ${statement.name}`;
+		case "explain":
+			return "EXPLAIN";
+		case "setOp":
+			return statement.op.toUpperCase();
+		case "with":
+			return "WITH";
+	}
 };
 
 /**
@@ -2220,23 +2256,15 @@ export class ProgramClient implements PeridotbaseClient {
 		return { message: `Dropped table ${ref.table}`, signature };
 	}
 
-	async closeDroppedTable(ref: TableRef): Promise<MutationResult> {
-		const sdk = await this.databaseSdk(ref.database, ref.schema);
-		await this.requireCurrentDatabase(sdk, ref.database);
-		const model = (await sdk.loadTables()).find((entry) => entry.name === ref.table);
-
-		if (!model) throw new Error(`unknown table: ${ref.table}`);
-		if (model.status !== "dropped") throw new Error(`${ref.table} is not dropped`);
-
-		const signature = await sdk.closeTableCatalog(model.tableId);
-
-		return { message: `Closed ${ref.table} permanently`, signature };
-	}
-
 	async restoreTable(ref: TableRef): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(ref.database, ref.schema);
 		await this.requireCurrentDatabase(sdk, ref.database);
-		const model = (await sdk.loadTables()).find((entry) => entry.name === ref.table);
+		const schema = await sdk.schemaAddress();
+		// A table name is unique per schema only; restoring the wrong namespace would fail
+		// with "not dropped" or bring back the wrong table.
+		const model = (await sdk.loadTables()).find(
+			(entry) => entry.name === ref.table && (!entry.schema || entry.schema.equals(schema)),
+		);
 
 		if (!model) throw new Error(`unknown table: ${ref.table}`);
 		if (model.status !== "dropped") throw new Error(`${ref.table} is not dropped`);
@@ -2752,15 +2780,27 @@ export class ProgramClient implements PeridotbaseClient {
 		};
 	}
 
-	async executeQuery(database: string, request: ExecuteQueryRequest): Promise<QueryResult> {
+	async executeQuery(
+		database: string,
+		request: ExecuteQueryRequest,
+		onStep?: (event: QueryRunStepEvent) => void,
+	): Promise<QueryResult> {
 		const started = performance.now();
 		const statements = parseSql(request.statement);
 		// Comments or whitespace only: nothing was submitted, so do not report success.
 		if (statements.length === 0) throw new Error("No SQL statement found");
+		const total = statements.length;
 		const sdk = await this.databaseSdk(database);
 		const createdTables = new Set<string>();
 		let last: StatementResult | null = null;
 		let transactions = 0;
+		// Echoed back as failed so the stepper does not keep spinning on the step that threw.
+		let active: { index: number; label: string } | null = null;
+		let stepTotal = total;
+		const report = (index: number, label: string, status: QueryRunStepEvent["status"]) => {
+			if (status !== "done") active = { index, label };
+			onStep?.({ index, total: stepTotal, label, status });
+		};
 
 		try {
 			// Batch mode: every write below stages an unsigned transaction and
@@ -2783,15 +2823,22 @@ export class ProgramClient implements PeridotbaseClient {
 				statements.every((statement) => statement.kind === "createTable");
 
 			if (ddlOnly) {
+				stepTotal = total + 1;
 				last = await this.runCreateTableScript(
 					sdk,
 					statements as Array<Extract<Statement, { kind: "createTable" }>>,
 					ids,
 					models,
+					(step) => {
+						if (step.status !== "done") active = { index: step.index, label: step.label };
+						onStep?.({ ...step, total: stepTotal });
+					},
 				);
 				transactions += last.transactions ?? 0;
 			} else {
-				for (const statement of statements) {
+				for (const [index, statement] of statements.entries()) {
+					const label = statementLabel(statement);
+					report(index, label, "active");
 					// Staged DDL is invisible to chain reads, so a script that mixes DDL
 					// with SELECT or with writes against a table it just created must
 					// land the staged transactions first.
@@ -2809,6 +2856,7 @@ export class ProgramClient implements PeridotbaseClient {
 
 					last = await this.runStatement(database, statement, ids);
 					transactions += last.transactions ?? 0;
+					report(index, last.message ?? label, "done");
 
 					if (statement.kind === "createTable") createdTables.add(statement.name);
 					if (readOnly || targetsNewTable) {
@@ -2824,6 +2872,15 @@ export class ProgramClient implements PeridotbaseClient {
 			}
 		} catch (error) {
 			if (sdk.batching) sdk.discardBatch();
+			const failedStep = active as { index: number; label: string } | null;
+			if (failedStep) {
+				onStep?.({
+					index: failedStep.index,
+					label: failedStep.label,
+					total: stepTotal,
+					status: "failed",
+				});
+			}
 
 			// A batch is sent as several packets, so a later packet failing leaves the earlier
 			// ones landed. Say so: those tables exist and an FK can no longer be added to them.
@@ -2944,14 +3001,17 @@ export class ProgramClient implements PeridotbaseClient {
 		statements: Array<Extract<Statement, { kind: "createTable" }>>,
 		ids: { tableIdSeed: bigint },
 		landed: TableModel[],
+		onStep?: (event: Omit<QueryRunStepEvent, "total">) => void,
 	): Promise<StatementResult> {
 		const plans = statements.map((statement) => ({
 			statement,
 			tableId: ids.tableIdSeed++,
 		}));
 
-		for (const { statement, tableId } of plans) {
+		for (const [index, { statement, tableId }] of plans.entries()) {
+			onStep?.({ index, label: `CREATE TABLE ${statement.name}`, status: "active" });
 			await this.stageCreateTable(sdk, statement, tableId);
+			onStep?.({ index, label: `CREATE TABLE ${statement.name}`, status: "done" });
 		}
 
 		// Staged catalogs are invisible to `loadTables`, so the key planner gets them from here.
@@ -2990,7 +3050,14 @@ export class ProgramClient implements PeridotbaseClient {
 			ready.add(statement.name);
 		}
 
+		const flushIndex = plans.length;
+		onStep?.({ index: flushIndex, label: "Sending transaction batch", status: "active" });
 		const transactions = (await sdk.flushBatch()).length;
+		onStep?.({
+			index: flushIndex,
+			label: `Confirmed ${transactions} transaction${transactions === 1 ? "" : "s"}`,
+			status: "done",
+		});
 
 		return {
 			columns: [],

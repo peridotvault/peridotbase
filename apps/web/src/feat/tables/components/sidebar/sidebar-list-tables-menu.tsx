@@ -35,6 +35,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { useSchemaEditStore } from "@/shared/stores/schema-edit.store";
+import { copyText } from "@/shared/lib/clipboard";
 import { useCopyTableSchema } from "@/shared/hooks/use-copy-table-schema";
 import { useExportFile } from "@/shared/hooks/use-export-file";
 import { useStudioCapabilities } from "@/shared/hooks/use-studio-capabilities";
@@ -138,8 +139,9 @@ export const SidebarListTablesMenu = ({
 	};
 
 	const handleCopyName = () => {
-		navigator.clipboard.writeText(tableName);
-		toast.success("Table name copied to clipboard");
+		void copyText(tableName)
+			.then(() => toast.success(`Copied "${tableName}"`))
+			.catch(() => toast.error("Clipboard is unavailable in this browser"));
 	};
 
 	const handleDelete = async () => {

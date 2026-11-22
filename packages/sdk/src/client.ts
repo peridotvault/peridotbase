@@ -26,6 +26,7 @@ import type {
 	TopUpSponsorAllowancePayload,
 	DeleteRowsResult,
 	ExecuteQueryRequest,
+	QueryRunStepEvent,
 	IndexInfo,
 	MutationResult,
 	OrganizationInfo,
@@ -216,8 +217,6 @@ export type PeridotbaseClient = {
 	dropTable: (ref: TableRef) => Promise<MutationResult>;
 	/** Copies the schema (not rows) into a new table with a fresh id. */
 	duplicateTable: (ref: TableRef, newTableName: string) => Promise<MutationResult>;
-	/** Irreversible rent cleanup for a soft-dropped table. */
-	closeDroppedTable: (ref: TableRef) => Promise<MutationResult>;
 	restoreTable: (ref: TableRef) => Promise<MutationResult>;
 	getTableComment: (ref: TableRef) => Promise<string | null>;
 	setTableComment: (ref: TableRef, comment: string) => Promise<MutationResult>;
@@ -281,7 +280,11 @@ export type PeridotbaseClient = {
 		indexName: string,
 		nullsNotDistinct: boolean,
 	) => Promise<MutationResult>;
-	executeQuery: (database: string, request: ExecuteQueryRequest) => Promise<QueryResult>;
+	executeQuery: (
+		database: string,
+		request: ExecuteQueryRequest,
+		onStep?: (event: QueryRunStepEvent) => void,
+	) => Promise<QueryResult>;
 };
 
 export type PeridotbaseClientOptions = {

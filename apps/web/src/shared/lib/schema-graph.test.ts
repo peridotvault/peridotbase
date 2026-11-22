@@ -48,7 +48,8 @@ describe("buildSchemaGraph", () => {
 	];
 
 	it("links an FK to the referenced schema's table, not a same-named one", () => {
-		expect(targets(pgTables)).toEqual(["sales.orders -> public.accounts"]);
+		// The default schema is implicit in ids, so `public.accounts` renders as `accounts`.
+		expect(targets(pgTables)).toEqual(["sales.orders -> accounts"]);
 	});
 
 	it("drops an FK whose referenced schema is filtered out", () => {

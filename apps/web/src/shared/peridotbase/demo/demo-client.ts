@@ -1079,16 +1079,6 @@ export class DemoPeridotbaseClient implements PeridotbaseClient {
 		return { message: `Duplicated "${ref.table}" as "${newTableName}" in demo mode` };
 	}
 
-	async closeDroppedTable(ref: TableRef): Promise<MutationResult> {
-		const key = this.tableKey(ref.database, ref.table);
-
-		if (!this.dropped.delete(key)) {
-			throw new Error(`Demo mode: ${ref.table} is not dropped`);
-		}
-
-		return { message: `Closed "${ref.table}" permanently in demo mode` };
-	}
-
 	async restoreTable(ref: TableRef): Promise<MutationResult> {
 		const key = this.tableKey(ref.database, ref.table);
 		const table = this.dropped.get(key);
