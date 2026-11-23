@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { readRowsQuerySchema } from "@peridotvault/peridotbase-sdk";
 import { getWalletPort } from "./client";
 
 /*
@@ -10,5 +11,19 @@ import { getWalletPort } from "./client";
 describe("getWalletPort", () => {
 	it("returns a usable port before any client read", () => {
 		expect(typeof getWalletPort().connect).toBe("function");
+	});
+});
+
+/*
+ * Failure mode:
+ * - `readRows` reads `query.filters.every`/`query.sorts.length`, so a caller that only wants a
+ *   page (`{ limit }`) used to crash with "Cannot read properties of undefined".
+ */
+describe("readRowsQuerySchema", () => {
+	it("defaults the optional sort and filter arrays", () => {
+		const query = readRowsQuerySchema.parse({ limit: 5 });
+
+		expect(query.sorts).toEqual([]);
+		expect(query.filters).toEqual([]);
 	});
 });

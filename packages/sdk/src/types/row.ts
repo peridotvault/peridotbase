@@ -5,10 +5,12 @@ export const readRowsQuerySchema = z.object({
 	cursor: z.string().optional(),
 	limit: z.coerce.number().int().min(1).max(500).default(50),
 	direction: z.enum(["asc", "desc"]).default("asc"),
-	sorts: z.array(z.object({ columnName: z.string(), direction: z.enum(["asc", "desc"]) })),
-	filters: z.array(
-		z.object({ columnName: z.string(), operator: z.string(), value: z.string() }),
-	),
+	sorts: z
+		.array(z.object({ columnName: z.string(), direction: z.enum(["asc", "desc"]) }))
+		.default([]),
+	filters: z
+		.array(z.object({ columnName: z.string(), operator: z.string(), value: z.string() }))
+		.default([]),
 });
 
 export type ReadRowsQuery = z.infer<typeof readRowsQuerySchema>;

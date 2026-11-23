@@ -1955,8 +1955,10 @@ export class ProgramClient implements PeridotbaseClient {
 				values: row.values,
 			}));
 
+		const filters = query.filters ?? [];
+		const sorts = query.sorts ?? [];
 		const filtered = rows.filter(({ record }) =>
-			query.filters.every((filter) => {
+			filters.every((filter) => {
 				const index = columns.findIndex((column) => column.name === filter.columnName);
 				const cell = index >= 0 ? record[filter.columnName] : undefined;
 				return matches(cell, filter.operator, filter.value);
@@ -1965,9 +1967,9 @@ export class ProgramClient implements PeridotbaseClient {
 
 		const sorted = [...filtered];
 
-		if (query.sorts.length > 0) {
+		if (sorts.length > 0) {
 			sorted.sort((left, right) => {
-				for (const sort of query.sorts) {
+				for (const sort of sorts) {
 					const order = compare(left.record[sort.columnName], right.record[sort.columnName]);
 					if (order !== 0) return sort.direction === "desc" ? -order : order;
 				}
@@ -1999,6 +2001,8 @@ export class ProgramClient implements PeridotbaseClient {
 	async insertRows(ref: TableRef, records: RowRecord[]): Promise<BulkInsertResult> {
 		const { v3 } = await this.tableContext(ref);
 		const errors: Array<{ recordIndex: number; error: string }> = [];
+		/** Original errors, so a rethrow keeps `code`, `canonicalCode` and `tableName`. */
+		const thrown: unknown[] = [];
 		let successCount = 0;
 
 		for (const [recordIndex, record] of records.entries()) {
@@ -2006,11 +2010,18 @@ export class ProgramClient implements PeridotbaseClient {
 				await v3.insert(this.coerceColumns(v3.columns, record));
 				successCount += 1;
 			} catch (error) {
+				thrown.push(error);
 				errors.push({
 					recordIndex,
 					error: error instanceof Error ? error.message : String(error),
 				});
 			}
+		}
+
+		// A single-record insert must surface the real reason (DuplicateKey, CheckViolation,
+		// Unauthorized) instead of resolving green with "Inserted 0, failed 1".
+		if (successCount === 0 && thrown.length > 0) {
+			throw thrown[0];
 		}
 
 		return {
