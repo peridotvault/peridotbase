@@ -3042,6 +3042,33 @@ export class ProgramClient implements PeridotbaseClient {
 			tableId: ids.tableIdSeed++,
 		}));
 
+		// A duplicate name is rejected on chain only after the batch is signed, which costs a
+		// wallet prompt and reports a nameless error. Both cases are known before staging.
+		const existing = new Set(
+			landed
+				.filter((model) => model.status === "active")
+				.map((model) => model.name.toLowerCase()),
+		);
+		const seen = new Set<string>();
+
+		for (const { statement } of plans) {
+			const name = statement.name.toLowerCase();
+
+			if (existing.has(name)) {
+				throw new Error(
+					`Table "${statement.name}" already exists in this database, so nothing was submitted. Drop or rename it, or restore it from the dropped tables.`,
+				);
+			}
+
+			if (seen.has(name)) {
+				throw new Error(
+					`This script creates "${statement.name}" twice, so nothing was submitted.`,
+				);
+			}
+
+			seen.add(name);
+		}
+
 		for (const [index, { statement, tableId }] of plans.entries()) {
 			onStep?.({ index, label: `CREATE TABLE ${statement.name}`, status: "active" });
 			await this.stageCreateTable(sdk, statement, tableId);
