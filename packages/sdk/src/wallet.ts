@@ -73,6 +73,8 @@ type InjectedWindow = Window & {
  */
 let registered: WalletStandardWallet[] | null = null;
 const registryListeners = new Set<() => void>();
+/** The API wallets register through; also handed to wallets that read it from `app-ready`. */
+let registerApi: RegisterApi | null = null;
 
 const notifyRegistry = () => {
 	for (const listener of registryListeners) listener();
@@ -81,7 +83,14 @@ const notifyRegistry = () => {
 const announceWallets = () => {
 	if (typeof window === "undefined") return;
 
-	window.dispatchEvent(new Event("wallet-standard:app-ready"));
+	// Some extensions read the API from `event.detail.register` and throw
+	// "Cannot destructure property 'register' of undefined" on a detail-less Event, once per
+	// announcement. Spec-compliant wallets ignore the extra detail, so always attach it.
+	window.dispatchEvent(
+		registerApi
+			? new CustomEvent("wallet-standard:app-ready", { detail: registerApi })
+			: new Event("wallet-standard:app-ready"),
+	);
 };
 
 /**
@@ -98,41 +107,44 @@ const readRegistry = (): WalletStandardWallet[] => {
 
 	registered = [];
 
-	window.addEventListener("wallet-standard:register-wallet", (event) => {
-		const announce = (event as CustomEvent<(api: RegisterApi) => void>).detail;
+	const api: RegisterApi = {
+		get: () => registered ?? [],
+		register: (...wallets) => {
+			let added = false;
 
-		if (typeof announce !== "function" || !registered) return;
+			for (const candidate of wallets) {
+				if (!registered?.some((wallet) => wallet.name === candidate.name)) {
+					registered?.push(candidate);
+					added = true;
+				}
+			}
 
-		announce({
-			get: () => registered ?? [],
-			register: (...wallets) => {
-				let added = false;
+			if (added) notifyRegistry();
+
+			return () => {
+				let removed = false;
 
 				for (const candidate of wallets) {
-					if (!registered?.some((wallet) => wallet.name === candidate.name)) {
-						registered?.push(candidate);
-						added = true;
+					const index = registered?.indexOf(candidate) ?? -1;
+
+					if (index >= 0) {
+						registered?.splice(index, 1);
+						removed = true;
 					}
 				}
 
-				if (added) notifyRegistry();
+				if (removed) notifyRegistry();
+			};
+		},
+	};
+	registerApi = api;
 
-				return () => {
-					let removed = false;
+	window.addEventListener("wallet-standard:register-wallet", (event) => {
+		const announce = (event as CustomEvent<(api: RegisterApi) => void>).detail;
 
-					for (const candidate of wallets) {
-						const index = registered?.indexOf(candidate) ?? -1;
+		if (typeof announce !== "function") return;
 
-						if (index >= 0) {
-							registered?.splice(index, 1);
-							removed = true;
-						}
-					}
-
-					if (removed) notifyRegistry();
-				};
-			},
-		});
+		announce(api);
 	});
 
 	announceWallets();
