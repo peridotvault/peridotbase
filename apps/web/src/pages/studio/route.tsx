@@ -12,6 +12,7 @@ import { TableBuilderOverlay } from "@/feat/schema";
 import { StudioTopbar } from "@/feat/workspace";
 import { CommandPalette } from "@/shared/components/components/command-palette";
 import { AnnouncementBar } from "@/shared/components/announcement-bar";
+import { TxProgressToast } from "@/shared/components/tx-progress-toast";
 import { useScopeSync } from "@/shared/hooks/use-scope-sync";
 import { useTheme } from "@/shared/hooks/use-theme";
 
@@ -74,6 +75,7 @@ function StudioLayout() {
 			<Toaster position="top-right" theme={resolvedTheme} />
 			{/* Run progress is a toast so it survives leaving the runner screen. */}
 			{isInApp && <QueryRunToast />}
+			{isInApp && <TxProgressToast />}
 			{isInApp && <TableBuilderOverlay />}
 			<SettingsOverlay />
 			<TanStackDevtools

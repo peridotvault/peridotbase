@@ -28,6 +28,7 @@ import {
 } from "@/shared/peridotbase";
 import { databaseKeys } from "@/shared/query/keys";
 import { useDatabaseStore } from "@/shared/stores/database.store";
+import { useTxProgressStore } from "@/shared/stores/tx-progress.store";
 
 /** Destructive database lifecycle plus project-level role grants. */
 export const DatabaseAdminSection = () => {
@@ -77,7 +78,27 @@ export const DatabaseAdminSection = () => {
 	});
 
 	const closeDatabase = useMutation({
-		mutationFn: () => deleteDatabase(selectedDatabase!, closeProposal.trim() || undefined),
+		mutationFn: async () => {
+			const progress = useTxProgressStore.getState();
+
+			progress.begin(`Deleting "${selectedDatabase!}"`);
+
+			try {
+				const result = await deleteDatabase(
+					selectedDatabase!,
+					closeProposal.trim() || undefined,
+					(step) => useTxProgressStore.getState().apply(step),
+				);
+
+				useTxProgressStore.getState().finish();
+
+				return result;
+			} catch (error) {
+				useTxProgressStore.getState().finish(error);
+
+				throw error;
+			}
+		},
 	});
 
 	const cancelClose = useMutation({
@@ -202,7 +223,7 @@ export const DatabaseAdminSection = () => {
 							onClick={() =>
 								void run(
 									() => closeDatabase.mutateAsync(),
-									"Closing: approval 1 of 2 freezes the database, approval 2 closes it...",
+									"Deleting the database — follow the transaction stepper",
 								)
 							}
 						>
@@ -210,8 +231,8 @@ export const DatabaseAdminSection = () => {
 						</Button>
 					</div>
 					<p className="text-xs text-muted-foreground">
-						Deleting signs 2 transactions: freeze the database, then close every table and the
-						catalog.
+						Deleting freezes the database, closes every table in batches, then finishes. The
+						stepper names each transaction before your wallet asks to approve it.
 					</p>
 
 					<div className="flex items-start gap-3 rounded-lg border border-destructive/40 p-3">

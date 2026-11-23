@@ -1,8 +1,36 @@
+import { statSync } from "node:fs";
 import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+
+/**
+ * The pre-bundled copy of the linked core SDK is keyed by the lockfile, and a `link:` package
+ * changes without touching it. A rebuild then stayed invisible: the dev server kept serving a
+ * cached bundle whose constants and error strings no longer existed in the repo, so every fix
+ * looked like it had not been applied. Re-optimize whenever that dist is newer than the cache.
+ */
+const linkedCoreIsStale = (): boolean => {
+	try {
+		return (
+			statSync(
+				fileURLToPath(new URL("./node_modules/.vite/deps/_metadata.json", import.meta.url)),
+			).mtimeMs <
+			statSync(
+				fileURLToPath(
+					new URL(
+						"./node_modules/@peridotvault/peridotbase-core-sdk/dist/index.js",
+						import.meta.url,
+					),
+				),
+			).mtimeMs
+		);
+	} catch {
+		// No cache yet, or the link is missing: let Vite decide.
+		return false;
+	}
+};
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -80,6 +108,9 @@ export default defineConfig({
 		},
 	},
 	optimizeDeps: {
+		// Only when the linked core SDK was rebuilt: forcing on every start throws away the
+		// prebundle for monaco/react too.
+		force: linkedCoreIsStale(),
 		include: [
 			"monaco-editor",
 			"react",

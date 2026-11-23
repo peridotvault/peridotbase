@@ -73,6 +73,13 @@ export type ProtocolHealth = {
 };
 
 /**
+ * Progress of one user-visible action. `active` means the wallet prompt for that transaction is
+ * open (or its confirmation is pending); a multi-transaction action reports each one in order, so
+ * the UI can show what the approvals are for instead of an unexplained queue.
+ */
+export type TxStepEvent = { label: string; status: "active" | "done" };
+
+/**
  * The single contract between the Studio and Peridotbase. Every implementation either talks to
  * the program through Solana RPC or throws `IntegrationUnavailableError`; there is deliberately
  * no HTTP fallback.
@@ -160,7 +167,11 @@ export type PeridotbaseClient = {
 	/** Revokes the allowance and refunds the remaining cap to the sponsor. */
 	closeSponsorAllowance: (grantee: string) => Promise<MutationResult>;
 	/** Staged close: seats every table and the database catalog, then finishes. */
-	deleteDatabase: (database: string, proposalId?: string) => Promise<MutationResult>;
+	deleteDatabase: (
+		database: string,
+		proposalId?: string,
+		onStep?: (step: TxStepEvent) => void,
+	) => Promise<MutationResult>;
 	/** Cancels a staged close before any content was closed. */
 	cancelCloseDatabase: (database: string) => Promise<MutationResult>;
 	/** Irreversible: drops the wallet's authority over the database. */

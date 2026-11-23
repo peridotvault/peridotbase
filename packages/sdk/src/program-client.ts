@@ -44,6 +44,7 @@ import type {
 	PeridotbaseClientOptions,
 	ProtocolHealth,
 	RowUpdate,
+	TxStepEvent,
 } from "./client.js";
 import { IntegrationUnavailableError } from "./errors.js";
 import type { WalletPort } from "./ports.js";
@@ -1417,15 +1418,21 @@ export class ProgramClient implements PeridotbaseClient {
 		return { message: `Allowance closed for ${grantee}`, signature };
 	}
 
-	async deleteDatabase(database: string, proposalId?: string): Promise<MutationResult> {
+	async deleteDatabase(
+		database: string,
+		proposalId?: string,
+		onStep?: (step: TxStepEvent) => void,
+	): Promise<MutationResult> {
 		const sdk = await this.databaseSdk(database);
+		onStep?.({ label: "Freeze the database", status: "active" });
 		await sdk.beginCloseDatabase(
 			undefined,
 			proposalId === undefined
 				? undefined
 				: sdk.organizationProposalAddress(sdk.organization, Number(proposalId)),
 		);
-		const result = await sdk.closeDatabaseContents();
+		onStep?.({ label: "Freeze the database", status: "done" });
+		const result = await sdk.closeDatabaseContents({ onStep });
 
 		return {
 			message: `Closed ${database}: ${result.tables} tables in ${result.batches} batches`,
