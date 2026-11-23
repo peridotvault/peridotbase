@@ -202,13 +202,17 @@ export const DatabaseAdminSection = () => {
 							onClick={() =>
 								void run(
 									() => closeDatabase.mutateAsync(),
-									"Closing every table and the catalog...",
+									"Closing: approval 1 of 2 freezes the database, approval 2 closes it...",
 								)
 							}
 						>
 							Delete database
 						</Button>
 					</div>
+					<p className="text-xs text-muted-foreground">
+						Deleting signs 2 transactions: freeze the database, then close every table and the
+						catalog.
+					</p>
 
 					<div className="flex items-start gap-3 rounded-lg border border-destructive/40 p-3">
 						<Checkbox

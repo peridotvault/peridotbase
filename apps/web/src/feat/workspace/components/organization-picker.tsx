@@ -21,12 +21,22 @@ export const OrganizationPicker = () => {
 	const [isCreating, setIsCreating] = useState(false);
 
 	const handleCreate = async () => {
-		if (!name.trim()) return;
+		const trimmed = name.trim();
+
+		if (!trimmed) return;
 
 		setIsCreating(true);
 
 		try {
-			const organization = await getPeridotbaseClient().createOrganization(name);
+			// One transaction: name it while it is pending so a wallet prompt is never a mystery.
+			const organization = await toast
+				.promise(getPeridotbaseClient().createOrganization(trimmed), {
+					loading: `Creating "${trimmed}" — approve the transaction in your wallet (~30s)`,
+					success: `Organization "${trimmed}" created`,
+					error: (error: unknown) =>
+						sdkErrorMessage(error, "Couldn't create the organization"),
+				})
+				.unwrap();
 
 			setName("");
 			await refresh();
@@ -34,8 +44,8 @@ export const OrganizationPicker = () => {
 				to: "/studio/org/$organization",
 				params: { organization: organization.slug },
 			});
-		} catch (error) {
-			toast.error(sdkErrorMessage(error, "Couldn't create the organization"));
+		} catch {
+			// toast.promise already showed the failure.
 		} finally {
 			setIsCreating(false);
 		}
@@ -123,7 +133,7 @@ export const OrganizationPicker = () => {
 							</Button>
 						</div>
 						<p className="text-xs text-muted-foreground">
-							Creating signs one transaction with the connected wallet.
+							Creating signs 1 transaction with your wallet (create organization).
 						</p>
 					</PanelBody>
 				</Panel>

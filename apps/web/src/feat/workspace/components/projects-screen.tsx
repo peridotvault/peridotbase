@@ -29,12 +29,21 @@ export const ProjectsScreen = ({ organization }: { organization: string }) => {
 	if (!activeOrganization) return <Navigate to="/studio/org" replace />;
 
 	const handleCreate = async () => {
-		if (!name.trim()) return;
+		const trimmed = name.trim();
+
+		if (!trimmed) return;
 
 		setIsCreating(true);
 
 		try {
-			const project = await getPeridotbaseClient().createProject(organization, name);
+			// One transaction: name it while it is pending so a wallet prompt is never a mystery.
+			const project = await toast
+				.promise(getPeridotbaseClient().createProject(organization, trimmed), {
+					loading: `Creating "${trimmed}" — approve the transaction in your wallet (~30s)`,
+					success: `Project "${trimmed}" created`,
+					error: (error: unknown) => sdkErrorMessage(error, "Couldn't create the project"),
+				})
+				.unwrap();
 
 			setName("");
 			await refresh();
@@ -42,8 +51,8 @@ export const ProjectsScreen = ({ organization }: { organization: string }) => {
 				to: "/studio/org/$organization/$project",
 				params: { organization, project: project.slug },
 			});
-		} catch (error) {
-			toast.error(sdkErrorMessage(error, "Couldn't create the project"));
+		} catch {
+			// toast.promise already showed the failure.
 		} finally {
 			setIsCreating(false);
 		}
@@ -111,7 +120,7 @@ export const ProjectsScreen = ({ organization }: { organization: string }) => {
 						</Button>
 					</div>
 					<p className="text-xs text-muted-foreground">
-						Creating signs one transaction with the connected wallet.
+						Opening a project signs 1 transaction with your wallet.
 					</p>
 				</PanelBody>
 			</Panel>
